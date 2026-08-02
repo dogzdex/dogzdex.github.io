@@ -247,7 +247,7 @@
     </style>
 </head>
 <body>
-    <!-- 顶部栏 -->
+ 
     <div class="global-top-bar">
         <div class="brand"><div class="logo-icon"><img id="logoImg" src="https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350" alt="DOGZ" /></div><span>DOGZ DEX</span></div>
         <div class="actions">
@@ -259,11 +259,11 @@
         </div>
     </div>
 
-    <!-- 主内容 -->
+  
     <div class="main-content">
         <div id="app">
             <div class="card" id="swapCard">
-                <!-- 源兑换面板 -->
+             
                 <div class="swap-panel" id="srcPanel">
                     <div class="row-chain-balance">
                         <div class="chain-display" id="sourceChainDisplay">
@@ -292,12 +292,12 @@
                     </div>
                 </div>
 
-                <!-- 交换按钮 -->
+              
                 <div class="swap-btn-wrapper">
                     <button class="swap-btn" id="swapBtn"><i class="fas fa-chevron-up"></i><i class="fas fa-chevron-down"></i></button>
                 </div>
 
-                <!-- 目标兑换面板 -->
+              
                 <div class="swap-panel" id="dstPanel">
                     <div class="row-chain-balance">
                         <div class="chain-display" id="targetChainDisplay">
@@ -326,13 +326,13 @@
                     </div>
                 </div>
 
-                <!-- 价格影响警告 -->
+         
                 <div class="impact-warning" id="impactWarning">
                     <span class="warn-icon">⚠️</span>
                     <span class="warn-text" id="impactWarningText">本次交易价格影响较大，为 <strong id="impactWarningPercent">1.00%</strong>。实际到账金额可能远低于预期，预计损失 <strong id="impactWarningLoss">$0.00</strong></span>
                 </div>
 
-                <!-- 指定接收地址 -->
+         
                 <div class="recipient-section">
                     <div class="flex items-center justify-end">
                         <button class="recipient-toggle" id="toggleRecipientBtn"><i class="fas fa-pen"></i> 指定接收地址</button>
@@ -342,7 +342,7 @@
                     </div>
                 </div>
 
-                <!-- Meta 区块 -->
+              
                 <div class="meta-block">
                     <div class="swap-meta">
                         <div class="left"><span class="manual-btn" id="manualSettingsBtn">手动设置</span></div>
@@ -362,7 +362,7 @@
         </div>
     </div>
 
-    <!-- 弹窗 -->
+
     <div class="modal-overlay" id="tokenModal">
         <div class="modal-content">
             <div id="mainView">
@@ -436,7 +436,7 @@
         </div>
     </div>
 
-    <!-- 余额不足弹窗 -->
+
     <div class="modal-balance-overlay" id="balanceModal">
         <div class="modal-balance-content">
             <div class="balance-header">
@@ -511,40 +511,36 @@
             const REQUEST_TIMEOUT = 30000;
             const MAX_RETRIES = 2;
 
-            // ============================================================
-            //  代理请求函数（替代原来的 fetchWithOkxAuth）
-            // ============================================================
-            async function proxyRequest(endpoint, params, retryCount) {
-                retryCount = retryCount || 0;
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-                try {
-                    const response = await fetch(PROXY_URL + endpoint, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(params),
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
-                    if (!response.ok) {
-                        const errText = await response.text();
-                        throw new Error(`HTTP ${response.status}: ${errText}`);
-                    }
-                    return await response.json();
-                } catch (e) {
-                    clearTimeout(timeoutId);
-                    if (retryCount < MAX_RETRIES) {
-                        console.warn(`请求失败，重试 ${retryCount+1}/${MAX_RETRIES}`, e);
-                        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
-                        return proxyRequest(endpoint, params, retryCount + 1);
-                    }
-                    throw e;
-                }
-            }
+         
+           async function proxyRequest(endpoint, params, retryCount) {
+    retryCount = retryCount || 0;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+    try {
+        const response = await fetch(PROXY_URL, {   
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint, params }), 
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errText}`);
+        }
+        return await response.json();
+    } catch (e) {
+        clearTimeout(timeoutId);
+        if (retryCount < MAX_RETRIES) {
+            console.warn(`请求失败，重试 ${retryCount+1}/${MAX_RETRIES}`, e);
+            await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+            return proxyRequest(endpoint, params, retryCount + 1);
+        }
+        throw e;
+    }
+}
 
-            // ============================================================
-            //  CHAINS 定义（与原文完全一致）
-            // ============================================================
+          
             const CHAINS = {
                 1: { chainId: 1, name: 'Ethereum', short: 'Ethereum', icon: '⟠', iconUrl: 'https://images.blockscan.com/chain-logos/eth.svg', native: 'ETH', rpc: 'https://eth.llamarpc.com', explorer: 'https://etherscan.io/tx/', id: '1' },
                 56: { chainId: 56, name: 'BNB Chain', short: 'BNB Chain', icon: '🟡', iconUrl: 'https://images.blockscan.com/chain-logos/bsc.svg', native: 'BNB', rpc: 'https://binance.nodereal.io', explorer: 'https://bscscan.com/tx/', id: '56' },
@@ -577,9 +573,7 @@
             };
             const CHAIN_LIST = Object.keys(CHAINS).map(k => CHAINS[k]);
 
-            // ============================================================
-            //  TOKENS（与原文完全一致，仅保留数据）
-            // ============================================================
+         
             const TOKENS = {
                 1: {
                     'DOGZ': { address: '0x82A77710495A35549D2aDD797412b4a4497D33eF', symbol: 'DOGZ', decimals: 18, icon: 'https://etherscan.io/token/images/dogz_32.png' },
@@ -787,7 +781,7 @@
                     'USDT': { address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
                 }
             };
-            // 补全其他链原生代币
+           
             CHAIN_LIST.forEach(c => {
                 if (!TOKENS[c.chainId]) {
                     TOKENS[c.chainId] = {};
@@ -806,9 +800,7 @@
                 return Object.keys(tokens)[0] || chain.native;
             }
 
-            // ============================================================
-            //  STATE 及工具函数
-            // ============================================================
+   
             let state = {
                 chainId: 1,
                 walletAddress: null,
@@ -911,9 +903,7 @@
                 }
             }
 
-            // ============================================================
-            //  UI 更新函数（完全保留）
-            // ============================================================
+        
             function adjustFontSize(el) {
                 if (!el) return;
                 const len = el.value.length;
@@ -1143,9 +1133,7 @@
                 }
             }
 
-            // ============================================================
-            //  PRICES & IMPACT
-            // ============================================================
+          
             function updateUsdPrices() {
                 const amount = parseFloat(document.getElementById('amountInput').value) || 0;
                 const srcToken = getTokenInfo(state.chainId, state.srcTokenSymbol);
@@ -1221,9 +1209,7 @@
                 }
             }
 
-            // ============================================================
-            //  GAS
-            // ============================================================
+         
             async function updateGasPrice() {
                 if (state.isTron || !state.provider) return;
                 try {
@@ -1269,9 +1255,7 @@
                 } catch (e) { console.warn('Gas update failed:', e); }
             }
 
-            // ============================================================
-            //  WALLET CONNECT
-            // ============================================================
+        
             if (window.ethereum) {
                 window.ethereum.on('chainChanged', (chainIdHex) => {
                     const newChainId = parseInt(chainIdHex, 16);
@@ -1427,9 +1411,7 @@
                 document.getElementById('changeBadge').className = 'change-badge neutral';
             }
 
-            // ============================================================
-            //  BALANCE & QUOTE
-            // ============================================================
+     
             async function loadBalances() {
                 if (!state.isConnected || !state.provider) {
                     document.getElementById('srcBalance').textContent = '0';
@@ -1472,9 +1454,7 @@
                 } catch (e) { el.textContent = '0'; }
             }
 
-            // ============================================================
-            //  QUOTE & SWAP（通过代理）
-            // ============================================================
+    
             async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
                 try {
                     let apiChainId = chainId;
@@ -1800,9 +1780,7 @@
                 }
             }
 
-            // ============================================================
-            //  FETCH TOKEN INFO（通过代理）
-            // ============================================================
+       
             async function fetchTokenInfo(chainId, address) {
                 if (!address) return null;
                 const normalized = address.trim();
@@ -1887,9 +1865,7 @@
                 return null;
             }
 
-            // ============================================================
-            //  MODAL 相关
-            // ============================================================
+     
             let isNetworkView = false;
             let previewTimeout = null;
 
@@ -2276,9 +2252,6 @@
                 }
             });
 
-            // ============================================================
-            //  设置弹窗
-            // ============================================================
             document.getElementById('manualSettingsBtn').addEventListener('click', function() {
                 openSettingsModal();
             });
@@ -2395,9 +2368,7 @@
                 if (e.target === this) closeSettingsModal();
             });
 
-            // ============================================================
-            //  事件绑定
-            // ============================================================
+          
             document.getElementById('sourceChainDisplay').addEventListener('click', function() {
                 openTokenModal('src');
             });
@@ -2460,9 +2431,7 @@
                 document.body.removeChild(textarea);
             }
 
-            // ============================================================
-            //  定时刷新
-            // ============================================================
+         
             function startPriceRefresh() {
                 if (state.quoteTimer) clearInterval(state.quoteTimer);
                 state.quoteTimer = setInterval(() => {
@@ -2474,9 +2443,7 @@
                 }, 3000);
             }
 
-            // ============================================================
-            //  主题
-            // ============================================================
+       
             function getPreferredTheme() {
                 return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             }
@@ -2502,9 +2469,7 @@
                     '<svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="5" fill="currentColor"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>';
             }
 
-            // ============================================================
-            //  初始化
-            // ============================================================
+       
             document.addEventListener('DOMContentLoaded', function() {
                 setTheme('auto');
                 const media = window.matchMedia('(prefers-color-scheme: dark)');
