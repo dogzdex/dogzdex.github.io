@@ -1455,33 +1455,34 @@
             }
 
     
-           async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
-                try {
-                    let apiChainId = chainId;
-                    if (isTronChain(chainId)) apiChainId = 195;
-                    if (isNaN(apiChainId)) apiChainId = 1;
-                    const params = {
-                       chainIndex: String(apiChainId),
-                       amount: amount,
-                       fromTokenAddress: srcToken.address,
-                       toTokenAddress: dstToken.address,
-          
-                    };
-                    const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
-                    if (feeRecipient) {
-                        params.toTokenReferrerWalletAddress = feeRecipient;
-                    }
-                    const data = await proxyRequest('/quote', params);
-                    if (data.code !== '0') {
-                        return { error: data.msg || 'Quote error' };
-                    }
-                    const result = data.data[0];
-                    if (!result) return { error: 'No quote data' };
-                    return result;
-                } catch (e) {
-                    return { error: e.message };
-                }
-            }
+          async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
+    try {
+        let apiChainId = chainId;
+        if (isTronChain(chainId)) apiChainId = 195;
+        if (isNaN(apiChainId)) apiChainId = 1;
+        const params = {
+            chainIndex: String(apiChainId),
+            amount: amount,
+            fromTokenAddress: srcToken.address,
+            toTokenAddress: dstToken.address,
+            swapMode: swapMode,              
+            feePercent: FEE_PERCENT,        
+        };
+        const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
+        if (feeRecipient) {
+            params.toTokenReferrerWalletAddress = feeRecipient;
+        }
+        const data = await proxyRequest('/quote', params);
+        if (data.code !== '0') {
+            return { error: data.msg || 'Quote error' };
+        }
+        const result = data.data[0];
+        if (!result) return { error: 'No quote data' };
+        return result;
+    } catch (e) {
+        return { error: e.message };
+    }
+}
 
             async function quote() {
                 const amount = document.getElementById('amountInput').value;
