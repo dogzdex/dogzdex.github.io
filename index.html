@@ -512,15 +512,15 @@
             const MAX_RETRIES = 2;
 
          
-           async function proxyRequest(endpoint, params, retryCount) {
+          async function proxyRequest(endpoint, params, retryCount) {
     retryCount = retryCount || 0;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
     try {
-        const response = await fetch(PROXY_URL, {   
+        const response = await fetch(PROXY_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ endpoint, params }), 
+            body: JSON.stringify({ endpoint, params }),
             signal: controller.signal
         });
         clearTimeout(timeoutId);
