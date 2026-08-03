@@ -37,12 +37,14 @@
         .modal-section-title { font-size:14px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; display:block; text-align:left; }
         .balance-display .balance-amount { letter-spacing: -0.5px; }
         .row-price .price-usd { letter-spacing: -0.3px; }
+        /* 粘贴按钮容器 */
         .modal-search-wrapper { display:flex; align-items:center; background:var(--bg-input); border-radius:16px; padding:4px 4px 4px 14px; margin-bottom:20px; }
         .modal-search-wrapper input { flex:1; background:transparent; border:none; outline:none; color:var(--text-primary); font-size:14px; min-width:0; padding:8px 0; }
         .modal-search-wrapper input::placeholder { color:var(--text-muted); }
         .modal-search-wrapper .paste-btn { background:var(--accent-light); color:var(--accent); border:none; border-radius:8px; padding:3px 8px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap; flex-shrink:0; transition:background 0.2s; }
         .modal-search-wrapper .paste-btn:hover { background:var(--accent); color:white; }
         .modal-search-wrapper .paste-btn i { font-size:13px; }
+        /* 手机端隐藏文字，只显示图标，并减小尺寸 */
         @media (max-width:480px) {
             .modal-search-wrapper .paste-btn span { display:none; }
             .modal-search-wrapper .paste-btn { padding:2px 6px; font-size:11px; }
@@ -247,7 +249,7 @@
     </style>
 </head>
 <body>
- 
+    <!-- 顶部栏 -->
     <div class="global-top-bar">
         <div class="brand"><div class="logo-icon"><img id="logoImg" src="https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350" alt="DOGZ" /></div><span>DOGZ DEX</span></div>
         <div class="actions">
@@ -259,11 +261,11 @@
         </div>
     </div>
 
-  
+    <!-- 主内容 -->
     <div class="main-content">
         <div id="app">
             <div class="card" id="swapCard">
-             
+                <!-- 源兑换面板 -->
                 <div class="swap-panel" id="srcPanel">
                     <div class="row-chain-balance">
                         <div class="chain-display" id="sourceChainDisplay">
@@ -292,12 +294,12 @@
                     </div>
                 </div>
 
-              
+                <!-- 交换按钮 -->
                 <div class="swap-btn-wrapper">
                     <button class="swap-btn" id="swapBtn"><i class="fas fa-chevron-up"></i><i class="fas fa-chevron-down"></i></button>
                 </div>
 
-              
+                <!-- 目标兑换面板 -->
                 <div class="swap-panel" id="dstPanel">
                     <div class="row-chain-balance">
                         <div class="chain-display" id="targetChainDisplay">
@@ -326,13 +328,13 @@
                     </div>
                 </div>
 
-         
+                <!-- 价格影响警告 -->
                 <div class="impact-warning" id="impactWarning">
                     <span class="warn-icon">⚠️</span>
                     <span class="warn-text" id="impactWarningText">本次交易价格影响较大，为 <strong id="impactWarningPercent">1.00%</strong>。实际到账金额可能远低于预期，预计损失 <strong id="impactWarningLoss">$0.00</strong></span>
                 </div>
 
-         
+                <!-- 指定接收地址 -->
                 <div class="recipient-section">
                     <div class="flex items-center justify-end">
                         <button class="recipient-toggle" id="toggleRecipientBtn"><i class="fas fa-pen"></i> 指定接收地址</button>
@@ -342,7 +344,7 @@
                     </div>
                 </div>
 
-              
+                <!-- Meta 区块 -->
                 <div class="meta-block">
                     <div class="swap-meta">
                         <div class="left"><span class="manual-btn" id="manualSettingsBtn">手动设置</span></div>
@@ -362,7 +364,7 @@
         </div>
     </div>
 
-
+    <!-- 弹窗 -->
     <div class="modal-overlay" id="tokenModal">
         <div class="modal-content">
             <div id="mainView">
@@ -436,7 +438,7 @@
         </div>
     </div>
 
-
+    <!-- 余额不足弹窗 -->
     <div class="modal-balance-overlay" id="balanceModal">
         <div class="modal-balance-content">
             <div class="balance-header">
@@ -470,10 +472,13 @@
                 return;
             }
 
-        
-            const PROXY_URL = 'https://okx-proxy.a1878069728.workers.dev';
-
-            const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator'; 
+            // ============================================================
+            //  CONFIG
+            // ============================================================
+            const OKX_API_KEY = '17008e74-dc2a-4fa5-ae8f-b6d92c23c2db';
+            const OKX_SECRET_KEY = '008484F8D05078B0D91AE1C1AEE48BE6';
+            const OKX_PASSPHRASE = 'Xd08404107!';
+            const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator';
             const FEE_PERCENT = '0.29';
             const FEE_RECIPIENTS = {
                 1: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
@@ -483,26 +488,27 @@
                 10: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 8453: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 43114: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                324: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
+                 324: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 59144: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 5000: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 169: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 4200: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 1088: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 9745: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                1672: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
+                 1672: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 4663: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 146: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 534352: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 130: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 196: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 81457: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                25: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
+                 25: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 1030: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 250: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 999: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 57073: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 143: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
+               
                 728126428: 'TWPFwxgYjWDQ4ZK8dj9eZt9KMCpt5NF1Yp',
             };
             const SLIPPAGE_DEFAULT = 0.5;
@@ -511,36 +517,55 @@
             const REQUEST_TIMEOUT = 30000;
             const MAX_RETRIES = 2;
 
-         
-          async function proxyRequest(endpoint, params, retryCount) {
-    retryCount = retryCount || 0;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-    try {
-        const response = await fetch(PROXY_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ endpoint, params }),
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${errText}`);
-        }
-        return await response.json();
-    } catch (e) {
-        clearTimeout(timeoutId);
-        if (retryCount < MAX_RETRIES) {
-            console.warn(`请求失败，重试 ${retryCount+1}/${MAX_RETRIES}`, e);
-            await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
-            return proxyRequest(endpoint, params, retryCount + 1);
-        }
-        throw e;
-    }
-}
+            // ============================================================
+            //  OKX API 签名函数
+            // ============================================================
+            function getOkxHeaders(method, path, body) {
+                body = body || '';
+                const timestamp = new Date().toISOString();
+                const message = timestamp + method + path + body;
+                const hash = CryptoJS.HmacSHA256(message, OKX_SECRET_KEY);
+                const signature = CryptoJS.enc.Base64.stringify(hash);
+                return {
+                    'OK-ACCESS-KEY': OKX_API_KEY,
+                    'OK-ACCESS-SIGN': signature,
+                    'OK-ACCESS-TIMESTAMP': timestamp,
+                    'OK-ACCESS-PASSPHRASE': OKX_PASSPHRASE,
+                    'Content-Type': 'application/json',
+                };
+            }
 
-          
+            async function fetchWithOkxAuth(url, options, retryCount) {
+                retryCount = retryCount || 0;
+                options = options || {};
+                const method = options.method || 'GET';
+                const path = new URL(url).pathname + new URL(url).search;
+                const body = options.body || '';
+                const headers = getOkxHeaders(method, path, body);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+                try {
+                    const response = await fetch(url, {
+                        ...options,
+                        headers: { ...headers, ...(options.headers || {}) },
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                    return response;
+                } catch (e) {
+                    clearTimeout(timeoutId);
+                    if (retryCount < MAX_RETRIES) {
+                        console.warn(`请求失败，重试 ${retryCount+1}/${MAX_RETRIES}`, e);
+                        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+                        return fetchWithOkxAuth(url, options, retryCount + 1);
+                    }
+                    throw e;
+                }
+            }
+
+            // ============================================================
+            //  CHAINS 定义
+            // ============================================================
             const CHAINS = {
                 1: { chainId: 1, name: 'Ethereum', short: 'Ethereum', icon: '⟠', iconUrl: 'https://images.blockscan.com/chain-logos/eth.svg', native: 'ETH', rpc: 'https://eth.llamarpc.com', explorer: 'https://etherscan.io/tx/', id: '1' },
                 56: { chainId: 56, name: 'BNB Chain', short: 'BNB Chain', icon: '🟡', iconUrl: 'https://images.blockscan.com/chain-logos/bsc.svg', native: 'BNB', rpc: 'https://binance.nodereal.io', explorer: 'https://bscscan.com/tx/', id: '56' },
@@ -550,30 +575,41 @@
                 8453: { chainId: 8453, name: 'Base', short: 'Base', icon: '🔵', iconUrl: 'https://images.blockscan.com/chain-logos/base.svg?v=1.1.9693.33322', native: 'ETH', rpc: 'https://mainnet.base.org', explorer: 'https://basescan.org/tx/', id: '8453' },
                 43114: { chainId: 43114, name: 'Avalanche', short: 'Avalanche', icon: '🔴', iconUrl: 'https://images.blockscan.com/chain-logos/avax.svg?v=1.1.9693.33322', native: 'AVAX', rpc: 'https://api.avax.network/ext/bc/C/rpc', explorer: 'https://snowtrace.io/tx/', id: '43114' },
                 728126428: { chainId: 728126428, name: 'Tron', short: 'Tron', icon: '🔶', iconUrl: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x50327c6c5a14dcade707abad2e27eb517df87ab5-106/type=default_90_0?v=1785608444556&x-oss-process=image/format,webp/ignore-error,1', native: 'TRX', rpc: 'https://api.trongrid.io', explorer: 'https://tronscan.org/#/transaction/', id: 'tron', isTron: true },
+                // 其他EVM链
                 324: { chainId: 324, name: 'zkSync Era', short: 'zkSync', icon: '⚡', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/zk_17000.png?x-oss-process=image/format,webp/resize,w_48,h_48,type_6/ignore-error,1', native: 'ETH', rpc: 'https://mainnet.era.zksync.io', explorer: '', id: '324' },
                 59144: { chainId: 59144, name: 'Linea', short: 'Linea', icon: '🔷', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/linea_eth_20700.png?x-oss-process=image/format,webp/ignore-error,1', native: 'ETH', rpc: 'https://rpc.linea.build', explorer: '', id: '59144' },
                 5000: { chainId: 5000, name: 'Mantle', short: 'Mantle', icon: '🔶', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/mnt_20100.png?x-oss-process=image/format,webp/ignore-error,1', native: 'MNT', rpc: 'https://mantle-rpc.publicnode.com', explorer: '', id: '5000' },
+                
                 169: { chainId: 169, name: 'Manta Pacific', short: 'Manta', icon: '🌀', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/manta_22000.png?x-oss-process=image/format,webp/ignore-error,1', native: 'ETH', rpc: 'https://pacific-rpc.manta.network/http', explorer: '', id: '169' },
                 4200: { chainId: 4200, name: 'Merlin', short: 'Merlin', icon: '🧙', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/merlin_btc_23400.png?x-oss-process=image/format,webp/ignore-error,1', native: 'BTC', rpc: 'https://rpc.merlinchain.io', explorer: '', id: '4200' },
                 1088: { chainId: 1088, name: 'Metis', short: 'Metis', icon: '🔺', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/metis.png?x-oss-process=image/format,webp/ignore-error,1', native: 'METIS', rpc: 'https://metis-rpc.publicnode.com', explorer: '', id: '1088' },
+                
                 9745: { chainId: 9745, name: 'Plasma', short: 'Plasma', icon: '🔴', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/xpl_35400.png?x-oss-process=image/format,webp/ignore-error,1', native: 'XPL', rpc: 'https://plasma.drpc.org', explorer: '', id: '9745' },
                 1672: { chainId: 1672, name: 'Pharos', short: 'Pharos', icon: '🔮', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/pharos_36600.png?x-oss-process=image/format,webp/ignore-error,1', native: 'PROS', rpc: 'https://rpc.pharos.xyz', explorer: '', id: '1672' },
                 4663: { chainId: 4663, name: 'Robinhood', short: 'Robinhood', icon: '🐦', iconUrl: 'https://web3.okx.com/cdn/web3/wallet/logo/robinhood.png?x-oss-process=image/format,webp/ignore-error,1', native: 'ETH', rpc: 'https://robinhood.rpc.blxrbdn.com', explorer: '', id: '4663' },
                 146: { chainId: 146, name: 'Sonic', short: 'Sonic', icon: '🔊', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/s_31600.png?x-oss-process=image/format,webp/ignore-error,1', native: 'S', rpc: 'https://sonic.api.pocket.network', explorer: '', id: '146' },
+               
                 534352: { chainId: 534352, name: 'Scroll', short: 'Scroll', icon: '📜', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/scroll_eth_21400.png?x-oss-process=image/format,webp/ignore-error,1', native: 'ETH', rpc: 'https://scroll-rpc.publicnode.com', explorer: '', id: '534352' },
                 130: { chainId: 130, name: 'Unichain', short: 'Unichain', icon: '🦄', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/unichain_33200.png?x-oss-process=image/format,webp/ignore-error,1', native: 'ETH', rpc: 'https://unichain-rpc.publicnode.com', explorer: '', id: '130' },
+               
+               
+               
                 196: { chainId: 196, name: 'X Layer', short: 'X Layer', icon: '❌', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/okb_22400.png?x-oss-process=image/format,webp/ignore-error,1', native: 'OKB', rpc: 'https://xlayer.drpc.org', explorer: '', id: '196' },
+               
                 81457: { chainId: 81457, name: 'Blast', short: 'Blast', icon: '💥', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/blast_eth_23800.png?x-oss-process=image/format,webp/ignore-error,1', native: 'ETH', rpc: 'https://blast-rpc.publicnode.com', explorer: '', id: '81457' },
                 25: { chainId: 25, name: 'Cronos', short: 'Cronos', icon: '🔴', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/cro.png?x-oss-process=image/format,webp/ignore-error,1', native: 'CRO', rpc: 'https://1rpc.io/cro', explorer: '', id: '25' },
                 1030: { chainId: 1030, name: 'Conflux eSpace', short: 'Conflux', icon: '🔶', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/cfx_19200.png?x-oss-process=image/format,webp/ignore-error,1', native: 'CFX', rpc: 'https://conflux-espace-public.unifra.io', explorer: '', id: '1030' },
                 250: { chainId: 250, name: 'Fantom', short: 'Fantom', icon: '🔷', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/FTM-20220328.png?x-oss-process=image/format,webp/ignore-error,1', native: 'FTM', rpc: 'https://1rpc.io/ftm', explorer: '', id: '250' },
                 999: { chainId: 999, name: 'HyperEVM', short: 'HyperEVM', icon: '🔺', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/hype_35600.png?x-oss-process=image/format,webp/ignore-error,1', native: 'HYPE', rpc: 'https://rpc.hypurrscan.io', explorer: '', id: '999' },
                 57073: { chainId: 57073, name: 'Ink', short: 'Ink', icon: '🖊️', iconUrl: 'https://web3.okx.com/cdn/assets/imgs/338/INK.png?x-oss-process=image/format,webp/ignore-error,1', native: 'INK', rpc: 'https://ink.drpc.org', explorer: '', id: '57073' },
+               
                 143: { chainId: 143, name: 'Monad', short: 'Monad', icon: '🔮', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/mon_36000_new.png?x-oss-process=image/format,webp/ignore-error,1', native: 'MON', rpc: 'https://infra.originstake.com/monad/evm', explorer: '', id: '143' },
             };
             const CHAIN_LIST = Object.keys(CHAINS).map(k => CHAINS[k]);
 
-         
+            // ============================================================
+            //  TOKENS — 完全修复语法错误，每个链对象独立闭合
+            // ============================================================
             const TOKENS = {
                 1: {
                     'DOGZ': { address: '0x82A77710495A35549D2aDD797412b4a4497D33eF', symbol: 'DOGZ', decimals: 18, icon: 'https://etherscan.io/token/images/dogz_32.png' },
@@ -592,6 +628,7 @@
                     'USDC': { address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', symbol: 'USDC', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
                     'DOGE': { address: '0xbA2aE424d960c26247Dd6c32edC70B295c744C43', symbol: 'DOGE', decimals: 8, icon: 'https://web3.okx.com/cdn/wallet/logo/Ethereum-7947-003955854.png?x-oss-process=image/format,webp/ignore-error,1' }
                 },
+                
                 250: {
                     'FTM': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'FTM', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/FTM-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
                     'WFTM': { address: '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83', symbol: 'WFTM', decimals: 18, icon: 'https://images.blockscan.com/chain-logos/bsc.svg' },
@@ -643,6 +680,7 @@
                     'WETH': { address: '0x420000000000000000000000000000000000000A', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDC': { address: '0xEA32A96608495e54156Ae48931A7c20f0dcc1a21', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
                 },
+                
                 1672: {
                     'PROS': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'PROS', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1672-null-999/type=default_90_0?v=1777448267901&x-oss-process=image/format,webp/ignore-error,1' },
                     'FBTC': { address: '0xd990cf81e9aea2417326fdfac12b19aa66f8b6c2', symbol: 'FBTC', decimals: 8, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xc96de26018a54d51c097160568752c4e3bd6c364-999/type=default_90_0?v=1773133399032&x-oss-process=image/format,webp/ignore-error,1' },
@@ -650,11 +688,12 @@
                     'WPROS': { address: '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0', symbol: 'WPROS', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1672-null-999/type=default_90_0?v=1777448267901&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDC': { address: '0xc879c018db60520f4355c26ed1a6d572cdac1815', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
                 },
+                
                 4200: {
                     'BTC': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'BTC', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4200-0xf6d226f9dc15d9bb51182815b320d3fbe324e1ba-110/type=default_90_0?v=1768993246543&x-oss-process=image/format,webp/ignore-error,1' },
                     'WBTC': { address: '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA', symbol: 'WBTC', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4200-0xf6d226f9dc15d9bb51182815b320d3fbe324e1ba-110/type=default_90_0?v=1768993246543&x-oss-process=image/format,webp/ignore-error,1' },
                     'SolvBTC': { address: '0x41D9036454BE47d3745A823C4aaCD0e29cFB0f71', symbol: 'SolvBTC', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x4aae823a6a0b376de6a78e74ecc5b079d38cbcf7-106/type=default_90_0?v=1785434428088&x-oss-process=image/format,webp/ignore-error,1' },
-                    'M-STONE': { address: '0xB5d8b1e73c79483d7750C5b8DF8db45A0d24e2cf', symbol: 'M-STONE', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x7122985656e38bdc0302db86685bb972b145bd3c-106/type=default_90_0?v=1785522145872&x-oss-process=image/format,webp/ignore-error,1' },
+                     'M-STONE': { address: '0xB5d8b1e73c79483d7750C5b8DF8db45A0d24e2cf', symbol: 'M-STONE', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x7122985656e38bdc0302db86685bb972b145bd3c-106/type=default_90_0?v=1785522145872&x-oss-process=image/format,webp/ignore-error,1' },
                     'MERL': { address: '0x5c46bFF4B38dc1EAE09C5BAc65872a1D8bc87378', symbol: 'MERL', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/4200-0x5c46bff4b38dc1eae09c5bac65872a1d8bc87378.png/type=png_350_0?x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 4663: {
@@ -664,6 +703,7 @@
                     'WETH': { address: '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDE': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDE', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1783664108626&x-oss-process=image/format,webp/ignore-error,1' }
                 },
+                
                 143: {
                     'MON': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'MON', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/143-null-110/type=default_90_0?v=1763995219024&x-oss-process=image/format,webp/ignore-error,1' },
                     'WBTC': { address: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', symbol: 'WBTC', decimals: 8, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
@@ -735,34 +775,36 @@
                     'USDT': { address: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0x9895D81bB462A195b4922ED7De0e3ACD007c32CB', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
                     'WXPL': { address: '0x6100E367285b01F48D07953803A2d8dCA5D19873', symbol: 'WXPL', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/9745-null-107/type=default_90_0?v=1759032087969&x-oss-process=image/format,webp/ignore-error,1' }
+                    
                 },
+                
                 57073: {
                     'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
                     'USDC': { address: '0x2D270e6886d130D724215A266106e6832161EAEd', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0x4200000000000000000000000000000000000006', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
-                    'USDG': { address: '0xe343167631d89B6Ffc58B88d6b7fB0228795491D', symbol: 'USDG', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xe343167631d89b6ffc58b88d6b7fb0228795491d-110/type=default_90_0?v=1770372351565&x-oss-process=image/format,webp/ignore-error,1' },
+                     'USDG': { address: '0xe343167631d89B6Ffc58B88d6b7fB0228795491D', symbol: 'USDG', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xe343167631d89b6ffc58b88d6b7fb0228795491d-110/type=default_90_0?v=1770372351565&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDT': { address: '0x0200C29006150606B650577BBE7B6248F58470c1', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 59144: {
                     'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
                     'USDC': { address: '0x176211869cA2b568f2A7D4EE941E073a821EE1ff', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
-                    'WBTC': { address: '0x3aAB2285ddcDdaD8edf438C1bAB47e1a9D05a9b4', symbol: 'WBTC', decimals: 8, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                     'WBTC': { address: '0x3aAB2285ddcDdaD8edf438C1bAB47e1a9D05a9b4', symbol: 'WBTC', decimals: 8, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDT': { address: '0xA219439258ca9da29E9Cc4cE5596924745e12B93', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 81457: {
                     'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
                     'USDB': { address: '0x4300000000000000000000000000000000000003', symbol: 'USDB', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/81457-0x4300000000000000000000000000000000000003.png/type=png_350_0?x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0x4300000000000000000000000000000000000004', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
-                    'BLAST': { address: '0xb1a5700fA2358173Fe465e6eA4Ff52E36e88E2ad', symbol: 'BLAST', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/81457-0xb1a5700fa2358173fe465e6ea4ff52e36e88e2ad-106/type=default_90_0?v=1785607400522&x-oss-process=image/format,webp/ignore-error,1' },
-                    'USDE': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDE', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1780906403391&x-oss-process=image/format,webp/ignore-error,1' }
+                     'BLAST': { address: '0xb1a5700fA2358173Fe465e6eA4Ff52E36e88E2ad', symbol: 'BLAST', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/81457-0xb1a5700fa2358173fe465e6ea4ff52e36e88e2ad-106/type=default_90_0?v=1785607400522&x-oss-process=image/format,webp/ignore-error,1' },
+                   'USDE': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDE', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1780906403391&x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 534352: {
                     'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
                     'USDC': { address: '0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0x5300000000000000000000000000000000000004', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
-                    'SCR': { address: '0xd29687c813D741E2F938F4aC377128810E217b1b', symbol: 'SCR', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/534352-0xd29687c813d741e2f938f4ac377128810e217b1b-106/type=default_90_0?v=1785607296586&x-oss-process=image/format,webp/ignore-error,1' },
-                    'USDT': { address: '0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
+                     'SCR': { address: '0xd29687c813D741E2F938F4aC377128810E217b1b', symbol: 'SCR', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/534352-0xd29687c813d741e2f938f4ac377128810e217b1b-106/type=default_90_0?v=1785607296586&x-oss-process=image/format,webp/ignore-error,1' },
+                   'USDT': { address: '0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 43114: {
                     'AVAX': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'AVAX', decimals: 18, icon: 'https://images.blockscan.com/chain-logos/avax.svg?v=1.1.9693.33322' },
@@ -781,7 +823,7 @@
                     'USDT': { address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
                 }
             };
-           
+            // 补全其他链原生代币
             CHAIN_LIST.forEach(c => {
                 if (!TOKENS[c.chainId]) {
                     TOKENS[c.chainId] = {};
@@ -800,7 +842,9 @@
                 return Object.keys(tokens)[0] || chain.native;
             }
 
-   
+            // ============================================================
+            //  STATE
+            // ============================================================
             let state = {
                 chainId: 1,
                 walletAddress: null,
@@ -834,17 +878,24 @@
                 usdPriceDst: 0,
             };
 
+            // ============================================================
+            //  UTILITIES
+            // ============================================================
             function getChain(chainId) { return CHAINS[chainId] || CHAINS[1]; }
+
             function getTokens(chainId) {
                 const base = TOKENS[chainId] || {};
                 const custom = state.customTokens[chainId] || {};
                 return { ...base, ...custom };
             }
+
             function getTokenInfo(chainId, symbol) {
                 const tokens = getTokens(chainId);
                 return tokens[symbol] || { address: '0x', symbol, decimals: 18, icon: '' };
             }
+
             function isTronChain(chainId) { const c = getChain(chainId); return c && c.isTron || false; }
+
             function formatBalance(bn, decimals) {
                 if (!bn) return '0';
                 try {
@@ -858,9 +909,22 @@
                     return str;
                 } catch { return '0'; }
             }
+
+            function formatBalanceFull(bn, decimals) {
+                if (!bn) return '0';
+                try {
+                    let val = bn.toString();
+                    let formatted = ethers.formatUnits(val, decimals);
+                    let trimmed = formatted.replace(/\.?0+$/, '');
+                    if (trimmed === '') return '0';
+                    return trimmed;
+                } catch { return '0'; }
+            }
+
             function toWei(amount, decimals) {
                 try { return ethers.parseUnits(amount.toString(), decimals); } catch { return amount * Math.pow(10, decimals); }
             }
+
             function sanitizeInput(value, decimals) {
                 if (!value) return value;
                 let cleaned = value.replace(/[^0-9.]/g, '');
@@ -871,6 +935,7 @@
                 }
                 return parts.join('.');
             }
+
             function isValidAddress(chainId, address) {
                 if (!address) return false;
                 const chain = getChain(chainId);
@@ -880,6 +945,7 @@
                     return ethers.isAddress(address);
                 }
             }
+
             function showToast(msg, type) {
                 type = type || 'info';
                 const toast = document.getElementById('toast');
@@ -893,6 +959,7 @@
                 clearTimeout(window.toastTimer);
                 window.toastTimer = setTimeout(() => toast.classList.add('hidden'), 10000);
             }
+
             function renderChainIcon(container, chain, size) {
                 size = size || '28px';
                 if (chain.iconUrl) {
@@ -903,7 +970,130 @@
                 }
             }
 
-        
+            // ============================================================
+            //  THEME
+            // ============================================================
+            function getPreferredTheme() {
+                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function setTheme(mode) {
+                const effective = mode === 'auto' ? getPreferredTheme() : mode;
+                document.body.className = effective;
+                document.getElementById('app').className = effective;
+                document.documentElement.style.background = 'var(--bg-primary)';
+                document.body.style.background = 'var(--bg-primary)';
+                const logo = document.getElementById('logoImg');
+                const footer = document.getElementById('footerLogo');
+                if (effective === 'dark') {
+                    logo.src = 'https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350';
+                    footer.src =
+                        'https://i.hd-r.cn/07cce604-676b-400d-9d73-0ff20dea760a.png';
+                } else {
+                    logo.src = 'https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350';
+                    footer.src =
+                        'https://i.hd-r.cn/bcc7df42-30d6-45b0-b58b-dde6176a3a6f.png';
+                }
+                document.getElementById('themeToggleBtn').innerHTML = effective === 'light' ? '<i class="fas fa-moon"></i>' :
+                    '<svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="5" fill="currentColor"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>';
+            }
+
+            // ============================================================
+            //  UI UPDATE
+            // ============================================================
+            function updateChainUI() {
+                const chain = getChain(state.chainId);
+                renderChainIcon(document.getElementById('sourceChainIcon'), chain);
+                renderChainIcon(document.getElementById('targetChainIcon'), chain);
+                document.getElementById('sourceChainName').textContent = chain.short;
+                document.getElementById('targetChainName').textContent = chain.short;
+                updateWalletUI();
+                document.getElementById('modalMoreBtn').textContent = CHAIN_LIST.length + '+';
+                // 输入框小数位限制
+                const srcToken = getTokenInfo(state.chainId, state.srcTokenSymbol);
+                const input = document.getElementById('amountInput');
+                input.maxLength = 30;
+                input.addEventListener('input', function(e) {
+                    const dec = srcToken.decimals || 18;
+                    const val = this.value;
+                    const sanitized = sanitizeInput(val, dec);
+                    if (sanitized !== val) this.value = sanitized;
+                    adjustFontSize(this);
+                });
+                const output = document.getElementById('dstEstimateInput');
+                output.addEventListener('input', function() { adjustFontSize(this); });
+                setTimeout(() => { adjustFontSize(input); adjustFontSize(output); }, 100);
+                updateBalanceModalChain();
+                // 关键：切换链时同步代币
+                autoSwitchTokens(state.chainId);
+            }
+
+            // 统一代币同步函数（链切换或手动调用）
+            function autoSwitchTokens(chainId) {
+                const tokens = getTokens(chainId);
+                const src = state.srcTokenSymbol;
+                const dst = state.dstTokenSymbol;
+                let changed = false;
+
+                // 检查源代币是否存在
+                if (!tokens[src]) {
+                    let newSrc = null;
+                    if (tokens['USDT']) newSrc = 'USDT';
+                    else if (tokens['USDC']) newSrc = 'USDC';
+                    else if (tokens['DAI']) newSrc = 'DAI';
+                    else {
+                        const native = getChain(chainId).native;
+                        if (tokens[native]) newSrc = native;
+                        else newSrc = Object.keys(tokens)[0] || null;
+                    }
+                    if (newSrc) {
+                        state.srcTokenSymbol = newSrc;
+                        changed = true;
+                    }
+                }
+
+                // 检查目标代币是否存在或与源相同
+                const newSrc = state.srcTokenSymbol;
+                if (!tokens[dst] || dst === newSrc) {
+                    let newDst = getDefaultDstSymbol(chainId);
+                    if (newDst === newSrc) {
+                        const keys = Object.keys(tokens);
+                        const other = keys.find(k => k !== newSrc);
+                        if (other) newDst = other;
+                        else newDst = newSrc;
+                    }
+                    if (newDst && newDst !== dst) {
+                        state.dstTokenSymbol = newDst;
+                        changed = true;
+                    }
+                }
+
+                if (changed) {
+                    updateTokenUI();
+                    if (state.isConnected) {
+                        loadBalances();
+                        quote();
+                    }
+                } else {
+                    // 确保UI同步
+                    updateTokenUI();
+                }
+            }
+
+            function updateBalanceModalChain() {
+                const chain = getChain(state.chainId);
+                const token = getTokenInfo(state.chainId, state.srcTokenSymbol);
+                const iconEl = document.getElementById('balanceTokenIcon');
+                const symbolEl = document.getElementById('balanceTokenSymbol');
+                const chainIconEl = document.getElementById('balanceChainIcon');
+                const chainNameEl = document.getElementById('balanceChainName');
+                if (token.icon) iconEl.src = token.icon;
+                else iconEl.src = 'https://assets.coingecko.com/coins/images/325/thumb/Tether.png';
+                symbolEl.textContent = token.symbol || 'USDT';
+                renderChainIcon(chainIconEl, chain);
+                chainNameEl.textContent = chain.short;
+            }
+
             function adjustFontSize(el) {
                 if (!el) return;
                 const len = el.value.length;
@@ -923,16 +1113,6 @@
                 el.style.width = 'auto';
             }
 
-            function updateDstInputEmptyState() {
-                const el = document.getElementById('dstEstimateInput');
-                const val = el.value.trim();
-                if (val === '0' || val === '' || val === '—') {
-                    el.classList.add('empty-value');
-                } else {
-                    el.classList.remove('empty-value');
-                }
-            }
-
             function updateTokenUI() {
                 const chainId = state.chainId;
                 const src = getTokenInfo(chainId, state.srcTokenSymbol);
@@ -947,6 +1127,16 @@
                 setTimeout(() => { adjustFontSize(document.getElementById('dstEstimateInput')); }, 100);
                 updateBalanceModalChain();
                 updateDstInputEmptyState();
+            }
+
+            function updateDstInputEmptyState() {
+                const el = document.getElementById('dstEstimateInput');
+                const val = el.value.trim();
+                if (val === '0' || val === '' || val === '—') {
+                    el.classList.add('empty-value');
+                } else {
+                    el.classList.remove('empty-value');
+                }
             }
 
             function updateRateDisplay() {
@@ -984,90 +1174,6 @@
                     status.textContent = '连接钱包';
                     wrap.innerHTML = `<span class="dot-red"></span>`;
                     btn.classList.remove('connected');
-                }
-            }
-
-            function updateBalanceModalChain() {
-                const chain = getChain(state.chainId);
-                const token = getTokenInfo(state.chainId, state.srcTokenSymbol);
-                const iconEl = document.getElementById('balanceTokenIcon');
-                const symbolEl = document.getElementById('balanceTokenSymbol');
-                const chainIconEl = document.getElementById('balanceChainIcon');
-                const chainNameEl = document.getElementById('balanceChainName');
-                if (token.icon) iconEl.src = token.icon;
-                else iconEl.src = 'https://assets.coingecko.com/coins/images/325/thumb/Tether.png';
-                symbolEl.textContent = token.symbol || 'USDT';
-                renderChainIcon(chainIconEl, chain);
-                chainNameEl.textContent = chain.short;
-            }
-
-            function updateChainUI() {
-                const chain = getChain(state.chainId);
-                renderChainIcon(document.getElementById('sourceChainIcon'), chain);
-                renderChainIcon(document.getElementById('targetChainIcon'), chain);
-                document.getElementById('sourceChainName').textContent = chain.short;
-                document.getElementById('targetChainName').textContent = chain.short;
-                updateWalletUI();
-                document.getElementById('modalMoreBtn').textContent = CHAIN_LIST.length + '+';
-                const srcToken = getTokenInfo(state.chainId, state.srcTokenSymbol);
-                const input = document.getElementById('amountInput');
-                input.maxLength = 30;
-                input.addEventListener('input', function(e) {
-                    const dec = srcToken.decimals || 18;
-                    const val = this.value;
-                    const sanitized = sanitizeInput(val, dec);
-                    if (sanitized !== val) this.value = sanitized;
-                    adjustFontSize(this);
-                });
-                const output = document.getElementById('dstEstimateInput');
-                output.addEventListener('input', function() { adjustFontSize(this); });
-                setTimeout(() => { adjustFontSize(input); adjustFontSize(output); }, 100);
-                updateBalanceModalChain();
-                autoSwitchTokens(state.chainId);
-            }
-
-            function autoSwitchTokens(chainId) {
-                const tokens = getTokens(chainId);
-                const src = state.srcTokenSymbol;
-                const dst = state.dstTokenSymbol;
-                let changed = false;
-                if (!tokens[src]) {
-                    let newSrc = null;
-                    if (tokens['USDT']) newSrc = 'USDT';
-                    else if (tokens['USDC']) newSrc = 'USDC';
-                    else if (tokens['DAI']) newSrc = 'DAI';
-                    else {
-                        const native = getChain(chainId).native;
-                        if (tokens[native]) newSrc = native;
-                        else newSrc = Object.keys(tokens)[0] || null;
-                    }
-                    if (newSrc) {
-                        state.srcTokenSymbol = newSrc;
-                        changed = true;
-                    }
-                }
-                const newSrc = state.srcTokenSymbol;
-                if (!tokens[dst] || dst === newSrc) {
-                    let newDst = getDefaultDstSymbol(chainId);
-                    if (newDst === newSrc) {
-                        const keys = Object.keys(tokens);
-                        const other = keys.find(k => k !== newSrc);
-                        if (other) newDst = other;
-                        else newDst = newSrc;
-                    }
-                    if (newDst && newDst !== dst) {
-                        state.dstTokenSymbol = newDst;
-                        changed = true;
-                    }
-                }
-                if (changed) {
-                    updateTokenUI();
-                    if (state.isConnected) {
-                        loadBalances();
-                        quote();
-                    }
-                } else {
-                    updateTokenUI();
                 }
             }
 
@@ -1133,7 +1239,9 @@
                 }
             }
 
-          
+            // ============================================================
+            //  PRICES & IMPACT
+            // ============================================================
             function updateUsdPrices() {
                 const amount = parseFloat(document.getElementById('amountInput').value) || 0;
                 const srcToken = getTokenInfo(state.chainId, state.srcTokenSymbol);
@@ -1209,7 +1317,9 @@
                 }
             }
 
-         
+            // ============================================================
+            //  GAS
+            // ============================================================
             async function updateGasPrice() {
                 if (state.isTron || !state.provider) return;
                 try {
@@ -1255,17 +1365,21 @@
                 } catch (e) { console.warn('Gas update failed:', e); }
             }
 
-        
+            // ============================================================
+            //  WALLET
+            // ============================================================
             if (window.ethereum) {
                 window.ethereum.on('chainChanged', (chainIdHex) => {
                     const newChainId = parseInt(chainIdHex, 16);
                     if (newChainId !== state.chainId && state.isConnected && !state.isTron) {
                         state.chainId = newChainId;
+                        // 更新provider
                         if (state.provider) {
                             const provider = new ethers.BrowserProvider(window.ethereum);
                             state.provider = provider;
                             provider.getSigner().then(signer => { state.signer = signer; });
                         }
+                        // 同步代币并刷新UI
                         autoSwitchTokens(newChainId);
                         updateChainUI();
                         loadBalances();
@@ -1287,6 +1401,7 @@
                 });
             }
 
+            // Tron 连接
             async function connectTronWallet() {
                 if (typeof window.tronLink === 'undefined') {
                     showToast('请安装 TronLink', 'warning');
@@ -1305,6 +1420,7 @@
                 }
             }
 
+            // EVM 连接
             async function connectEvmWallet() {
                 if (typeof window.ethereum === 'undefined') {
                     showToast('请安装 MetaMask 等 EVM 钱包', 'warning');
@@ -1347,6 +1463,7 @@
                 }
             }
 
+            // 统一连接
             async function connectWallet() {
                 const chainId = state.chainId;
                 const chain = getChain(chainId);
@@ -1411,7 +1528,9 @@
                 document.getElementById('changeBadge').className = 'change-badge neutral';
             }
 
-     
+            // ============================================================
+            //  BALANCE & QUOTE
+            // ============================================================
             async function loadBalances() {
                 if (!state.isConnected || !state.provider) {
                     document.getElementById('srcBalance').textContent = '0';
@@ -1453,36 +1572,6 @@
                     }
                 } catch (e) { el.textContent = '0'; }
             }
-
-    
-          async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
-    try {
-        let apiChainId = chainId;
-        if (isTronChain(chainId)) apiChainId = 195;
-        if (isNaN(apiChainId)) apiChainId = 1;
-        const params = {
-            chainIndex: String(apiChainId),
-            amount: amount,
-            fromTokenAddress: srcToken.address,
-            toTokenAddress: dstToken.address,
-            swapMode: swapMode,              
-            feePercent: FEE_PERCENT,        
-        };
-        const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
-        if (feeRecipient) {
-            params.toTokenReferrerWalletAddress = feeRecipient;
-        }
-        const data = await proxyRequest('/quote', params);
-        if (data.code !== '0') {
-            return { error: data.msg || 'Quote error' };
-        }
-        const result = data.data[0];
-        if (!result) return { error: 'No quote data' };
-        return result;
-    } catch (e) {
-        return { error: e.message };
-    }
-}
 
             async function quote() {
                 const amount = document.getElementById('amountInput').value;
@@ -1562,6 +1651,186 @@
                 }
             }
 
+            async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
+                try {
+                    let apiChainId = chainId;
+                    if (isTronChain(chainId)) apiChainId = 195;
+                    if (isNaN(apiChainId)) apiChainId = 1;
+                    const params = new URLSearchParams({
+                        chainIndex: String(apiChainId),
+                        amount: amount,
+                        fromTokenAddress: srcToken.address,
+                        toTokenAddress: dstToken.address,
+                        swapMode: swapMode,
+                        feePercent: FEE_PERCENT,
+                    });
+                    const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
+                    if (feeRecipient) {
+                        params.append('toTokenReferrerWalletAddress', feeRecipient);
+                    }
+                    const url = `${OKX_API_BASE}/quote?${params.toString()}`;
+                    const response = await fetchWithOkxAuth(url, { method: 'GET' });
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        return { error: `HTTP ${response.status}: ${errText}` };
+                    }
+                    const data = await response.json();
+                    if (data.code !== '0') {
+                        return { error: data.msg || 'Quote error' };
+                    }
+                    const result = data.data[0];
+                    if (!result) return { error: 'No quote data' };
+                    return result;
+                } catch (e) {
+                    return { error: e.message };
+                }
+            }
+
+            // ============================================================
+            //  FETCH TOKEN INFO (增强：支持链上读取)
+            // ============================================================
+            async function fetchTokenInfo(chainId, address) {
+                if (!address) return null;
+                const normalized = address.trim();
+                const cacheKey = `${chainId}_${normalized.toLowerCase()}`;
+                if (state.tokenCache[cacheKey]) return state.tokenCache[cacheKey];
+
+                // 原生代币处理
+                const chain = getChain(chainId);
+                const isNative = normalized === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' ||
+                    normalized === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' ||
+                    (chain.isTron && normalized === chain.native);
+                if (isNative) {
+                    const info = {
+                        symbol: chain.native,
+                        decimals: chain.isTron ? 6 : 18,
+                        icon: chain.iconUrl || 'https://via.placeholder.com/32'
+                    };
+                    state.tokenCache[cacheKey] = info;
+                    return info;
+                }
+
+                // 1. 先尝试 OKX API
+                try {
+                    let apiChainId = chainId;
+                    if (isTronChain(chainId)) apiChainId = 195;
+                    if (isNaN(apiChainId)) apiChainId = 1;
+                    const url = `${OKX_API_BASE}/all-tokens?chainIndex=${apiChainId}`;
+                    const response = await fetchWithOkxAuth(url, { method: 'GET' });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.code === '0') {
+                            const tokens = data.data || [];
+                            const found = tokens.find(t =>
+                                t.tokenContractAddress && (
+                                    t.tokenContractAddress.toLowerCase() === normalized.toLowerCase() ||
+                                    t.tokenContractAddress === normalized
+                                )
+                            );
+                            if (found) {
+                                const info = {
+                                    symbol: found.tokenSymbol,
+                                    decimals: parseInt(found.decimals) || 18,
+                                    icon: found.tokenLogoUrl || 'https://via.placeholder.com/32'
+                                };
+                                state.tokenCache[cacheKey] = info;
+                                return info;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('API token fetch failed, trying on-chain...', e);
+                }
+
+                // 2. 链上读取（需要已连接钱包）
+                if (!state.isConnected || !state.provider) {
+                    return null;
+                }
+
+                try {
+                    if (state.isTron && state.tronWeb) {
+                        const tronWeb = state.tronWeb;
+                        const contract = await tronWeb.contract().at(normalized);
+                        const name = await contract.name().call();
+                        const symbol = await contract.symbol().call();
+                        const decimals = await contract.decimals().call();
+                        const info = {
+                            symbol: symbol,
+                            decimals: parseInt(decimals) || 6,
+                            icon: 'https://via.placeholder.com/32'
+                        };
+                        state.tokenCache[cacheKey] = info;
+                        return info;
+                    } else if (!state.isTron && state.provider) {
+                        const contract = new ethers.Contract(normalized, [
+                            'function name() view returns (string)',
+                            'function symbol() view returns (string)',
+                            'function decimals() view returns (uint8)'
+                        ], state.provider);
+                        const name = await contract.name().catch(() => 'Unknown');
+                        const symbol = await contract.symbol().catch(() => 'Unknown');
+                        const decimals = await contract.decimals().catch(() => 18);
+                        const info = {
+                            symbol: symbol,
+                            decimals: parseInt(decimals) || 18,
+                            icon: 'https://via.placeholder.com/32'
+                        };
+                        state.tokenCache[cacheKey] = info;
+                        return info;
+                    }
+                } catch (e) {
+                    console.warn('On-chain token fetch failed:', e);
+                    return null;
+                }
+                return null;
+            }
+
+            // ============================================================
+            //  SWAP EXECUTION
+            // ============================================================
+            async function executeSwap() {
+                if (state.isProcessing) return;
+                const amount = document.getElementById('amountInput').value;
+                if (!amount || parseFloat(amount) <= 0) { showToast('输入有效数量', 'error'); return; }
+                if (!state.isConnected) { showToast('请连接钱包', 'error'); return; }
+                if (!state.lastQuoteData) { showToast('请先获取报价', 'error'); return; }
+                const recipient = document.getElementById('recipientInput').value.trim();
+                if (recipient && !isValidAddress(state.chainId, recipient)) {
+                    showToast('接收地址错误', 'error');
+                    return;
+                }
+
+                const bal = parseFloat(document.getElementById('srcBalance').textContent);
+                if (bal < parseFloat(amount)) {
+                    showBalanceModal();
+                    return;
+                }
+
+                state.isProcessing = true;
+                const btn = document.getElementById('swapActionBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> 处理中...';
+
+                try {
+                    if (state.isTron) {
+                        await executeTronSwap();
+                    } else {
+                        await executeEvmSwap();
+                    }
+                } catch (e) {
+                    if (e.message !== 'USER_REJECTED_APPROVE' && e.message !== 'USER_REJECTED_TX') {
+                        showToast('兑换失败: ' + e.message, 'error');
+                    }
+                } finally {
+                    state.isProcessing = false;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.innerHTML = '<i class="fas fa-arrows-spin"></i> 兑换';
+                    updateSwapButton(parseFloat(document.getElementById('amountInput').value) || 0);
+                }
+            }
+
+            // EVM Swap
             async function executeEvmSwap() {
                 const chainId = state.chainId;
                 const srcToken = getTokenInfo(chainId, state.srcTokenSymbol);
@@ -1578,7 +1847,7 @@
                     slippagePercent = String(state.slippageValue);
                 }
 
-                const params = {
+                const params = new URLSearchParams({
                     chainIndex: String(chainId),
                     amount: amountWei,
                     fromTokenAddress: srcToken.address,
@@ -1589,12 +1858,18 @@
                     approveTransaction: 'true',
                     approveAmount: amountWei,
                     feePercent: FEE_PERCENT,
-                };
+                });
                 const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
                 if (feeRecipient) {
-                    params.toTokenReferrerWalletAddress = feeRecipient;
+                    params.append('toTokenReferrerWalletAddress', feeRecipient);
                 }
-                const data = await proxyRequest('/swap', params);
+                const url = `${OKX_API_BASE}/swap?${params.toString()}`;
+                const response = await fetchWithOkxAuth(url, { method: 'GET' });
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errText}`);
+                }
+                const data = await response.json();
                 if (data.code !== '0') {
                     if (data.msg && data.msg.includes('slippagePercent')) {
                         throw new Error('滑点参数错误，请尝试调整滑点值');
@@ -1676,6 +1951,7 @@
                 quote();
             }
 
+            // Tron Swap
             async function executeTronSwap() {
                 const chainId = state.chainId;
                 const srcToken = getTokenInfo(chainId, state.srcTokenSymbol);
@@ -1688,7 +1964,7 @@
                 else if (state.slippageMode === 'dynamicUpper') slippagePercent = String(state.slippageValue);
                 else slippagePercent = String(state.slippageValue);
 
-                const params = {
+                const params = new URLSearchParams({
                     chainIndex: '195',
                     amount: amountWei,
                     fromTokenAddress: srcToken.address,
@@ -1699,12 +1975,15 @@
                     approveTransaction: 'true',
                     approveAmount: amountWei,
                     feePercent: FEE_PERCENT,
-                };
+                });
                 const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
                 if (feeRecipient) {
-                    params.toTokenReferrerWalletAddress = feeRecipient;
+                    params.append('toTokenReferrerWalletAddress', feeRecipient);
                 }
-                const data = await proxyRequest('/swap', params);
+                const url = `${OKX_API_BASE}/swap?${params.toString()}`;
+                const response = await fetchWithOkxAuth(url, { method: 'GET' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
                 if (data.code !== '0') throw new Error(data.msg || 'Swap error');
                 const swapData = data.data[0];
                 if (!swapData || !swapData.tx) throw new Error('No swap data');
@@ -1738,134 +2017,9 @@
                 }
             }
 
-            async function executeSwap() {
-                if (state.isProcessing) return;
-                const amount = document.getElementById('amountInput').value;
-                if (!amount || parseFloat(amount) <= 0) { showToast('输入有效数量', 'error'); return; }
-                if (!state.isConnected) { showToast('请连接钱包', 'error'); return; }
-                if (!state.lastQuoteData) { showToast('请先获取报价', 'error'); return; }
-                const recipient = document.getElementById('recipientInput').value.trim();
-                if (recipient && !isValidAddress(state.chainId, recipient)) {
-                    showToast('接收地址错误', 'error');
-                    return;
-                }
-
-                const bal = parseFloat(document.getElementById('srcBalance').textContent);
-                if (bal < parseFloat(amount)) {
-                    showBalanceModal();
-                    return;
-                }
-
-                state.isProcessing = true;
-                const btn = document.getElementById('swapActionBtn');
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner"></span> 处理中...';
-
-                try {
-                    if (state.isTron) {
-                        await executeTronSwap();
-                    } else {
-                        await executeEvmSwap();
-                    }
-                } catch (e) {
-                    if (e.message !== 'USER_REJECTED_APPROVE' && e.message !== 'USER_REJECTED_TX') {
-                        showToast('兑换失败: ' + e.message, 'error');
-                    }
-                } finally {
-                    state.isProcessing = false;
-                    btn.disabled = false;
-                    btn.style.opacity = '1';
-                    btn.innerHTML = '<i class="fas fa-arrows-spin"></i> 兑换';
-                    updateSwapButton(parseFloat(document.getElementById('amountInput').value) || 0);
-                }
-            }
-
-       
-            async function fetchTokenInfo(chainId, address) {
-                if (!address) return null;
-                const normalized = address.trim();
-                const cacheKey = `${chainId}_${normalized.toLowerCase()}`;
-                if (state.tokenCache[cacheKey]) return state.tokenCache[cacheKey];
-
-                const chain = getChain(chainId);
-                const isNative = normalized === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' ||
-                    normalized === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' ||
-                    (chain.isTron && normalized === chain.native);
-                if (isNative) {
-                    const info = {
-                        symbol: chain.native,
-                        decimals: chain.isTron ? 6 : 18,
-                        icon: chain.iconUrl || 'https://via.placeholder.com/32'
-                    };
-                    state.tokenCache[cacheKey] = info;
-                    return info;
-                }
-
-                try {
-                    let apiChainId = chainId;
-                    if (isTronChain(chainId)) apiChainId = 195;
-                    if (isNaN(apiChainId)) apiChainId = 1;
-                    const data = await proxyRequest('/all-tokens', { chainIndex: String(apiChainId) });
-                    if (data.code === '0') {
-                        const tokens = data.data || [];
-                        const found = tokens.find(t =>
-                            t.tokenContractAddress && (
-                                t.tokenContractAddress.toLowerCase() === normalized.toLowerCase() ||
-                                t.tokenContractAddress === normalized
-                            )
-                        );
-                        if (found) {
-                            const info = {
-                                symbol: found.tokenSymbol,
-                                decimals: parseInt(found.decimals) || 18,
-                                icon: found.tokenLogoUrl || 'https://via.placeholder.com/32'
-                            };
-                            state.tokenCache[cacheKey] = info;
-                            return info;
-                        }
-                    }
-                } catch (e) {
-                    console.warn('API token fetch failed, trying on-chain...', e);
-                }
-
-                if (!state.isConnected || !state.provider) return null;
-                try {
-                    if (state.isTron && state.tronWeb) {
-                        const tronWeb = state.tronWeb;
-                        const contract = await tronWeb.contract().at(normalized);
-                        const symbol = await contract.symbol().call();
-                        const decimals = await contract.decimals().call();
-                        const info = {
-                            symbol: symbol,
-                            decimals: parseInt(decimals) || 6,
-                            icon: 'https://via.placeholder.com/32'
-                        };
-                        state.tokenCache[cacheKey] = info;
-                        return info;
-                    } else if (!state.isTron && state.provider) {
-                        const contract = new ethers.Contract(normalized, [
-                            'function name() view returns (string)',
-                            'function symbol() view returns (string)',
-                            'function decimals() view returns (uint8)'
-                        ], state.provider);
-                        const symbol = await contract.symbol().catch(() => 'Unknown');
-                        const decimals = await contract.decimals().catch(() => 18);
-                        const info = {
-                            symbol: symbol,
-                            decimals: parseInt(decimals) || 18,
-                            icon: 'https://via.placeholder.com/32'
-                        };
-                        state.tokenCache[cacheKey] = info;
-                        return info;
-                    }
-                } catch (e) {
-                    console.warn('On-chain token fetch failed:', e);
-                    return null;
-                }
-                return null;
-            }
-
-     
+            // ============================================================
+            //  MODAL
+            // ============================================================
             let isNetworkView = false;
             let previewTimeout = null;
 
@@ -1901,14 +2055,19 @@
                         hideTokenPreview();
                     }
                 });
+                // 粘贴按钮 - 增强剪贴板读取
                 document.getElementById('pasteContractBtn').addEventListener('click', async function() {
                     try {
                         let text = null;
+                        // 方法1: navigator.clipboard.readText()
                         if (navigator.clipboard && navigator.clipboard.readText) {
                             try {
                                 text = await navigator.clipboard.readText();
-                            } catch (e) { }
+                            } catch (e) {
+                                // 权限被拒，静默
+                            }
                         }
+                        // 方法2: navigator.clipboard.read()
                         if (!text && navigator.clipboard && navigator.clipboard.read) {
                             try {
                                 const items = await navigator.clipboard.read();
@@ -1919,8 +2078,11 @@
                                         break;
                                     }
                                 }
-                            } catch (e) { }
+                            } catch (e) {
+                                // 静默
+                            }
                         }
+                        // 方法3: 降级方案 execCommand (HTTP 环境下可能仍可用)
                         if (!text) {
                             try {
                                 const input = document.createElement('input');
@@ -1934,10 +2096,13 @@
                                     text = input.value;
                                 }
                                 document.body.removeChild(input);
-                            } catch (e) { }
+                            } catch (e) {
+                                // 忽略
+                            }
                         }
                         if (text && text.trim()) {
                             document.getElementById('tokenSearchInput').value = text.trim();
+                            // 触发输入事件
                             const event = new Event('input', { bubbles: true });
                             document.getElementById('tokenSearchInput').dispatchEvent(event);
                             showToast('已粘贴合约地址', 'success');
@@ -1981,6 +2146,7 @@
                 const cacheKey = `${chainId}_${address.toLowerCase()}`;
                 delete state.tokenCache[cacheKey];
 
+                // 自动设置为当前选择的币种（根据模态框模式）
                 if (state.modalMode === 'src') {
                     state.srcTokenSymbol = symbol;
                     if (state.srcTokenSymbol === state.dstTokenSymbol) {
@@ -2252,6 +2418,67 @@
                 }
             });
 
+            // ============================================================
+            //  RECIPIENT
+            // ============================================================
+            document.getElementById('toggleRecipientBtn').addEventListener('click', function() {
+                const wrap = document.getElementById('recipientInputWrap');
+                wrap.classList.toggle('hidden');
+                if (!wrap.classList.contains('hidden')) {
+                    document.getElementById('recipientInput').focus();
+                }
+            });
+            document.getElementById('recipientInput').addEventListener('input', function() {
+                updateSwapButton(parseFloat(document.getElementById('amountInput').value) || 0);
+            });
+            document.getElementById('recipientInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.getElementById('recipientInputWrap').classList.add('hidden');
+                    this.blur();
+                }
+            });
+
+            document.getElementById('closeBalanceModal').addEventListener('click', function() {
+                document.getElementById('balanceModal').classList.remove('active');
+            });
+            document.getElementById('balanceModal').addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('active');
+            });
+            document.getElementById('copyAddressBtn').addEventListener('click', function() {
+                const addr = document.getElementById('balanceAddress').textContent;
+                if (!addr || addr === '未连接') { showToast('没有可复制的地址', 'error'); return; }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(addr).then(() => showToast('地址已复制', 'success')).catch(() =>
+                        fallbackCopy(addr));
+                } else {
+                    fallbackCopy(addr);
+                }
+            });
+
+            function fallbackCopy(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                textarea.style.top = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showToast('地址已复制', 'success');
+                    } else {
+                        showToast('复制失败，请手动复制', 'error');
+                    }
+                } catch (e) {
+                    showToast('复制失败，请手动复制', 'error');
+                }
+                document.body.removeChild(textarea);
+            }
+
+            // ============================================================
+            //  设置弹窗
+            // ============================================================
             document.getElementById('manualSettingsBtn').addEventListener('click', function() {
                 openSettingsModal();
             });
@@ -2368,7 +2595,9 @@
                 if (e.target === this) closeSettingsModal();
             });
 
-          
+            // ============================================================
+            //  点击链名弹出选择框
+            // ============================================================
             document.getElementById('sourceChainDisplay').addEventListener('click', function() {
                 openTokenModal('src');
             });
@@ -2376,62 +2605,9 @@
                 openTokenModal('dst');
             });
 
-            document.getElementById('toggleRecipientBtn').addEventListener('click', function() {
-                const wrap = document.getElementById('recipientInputWrap');
-                wrap.classList.toggle('hidden');
-                if (!wrap.classList.contains('hidden')) {
-                    document.getElementById('recipientInput').focus();
-                }
-            });
-            document.getElementById('recipientInput').addEventListener('input', function() {
-                updateSwapButton(parseFloat(document.getElementById('amountInput').value) || 0);
-            });
-            document.getElementById('recipientInput').addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    document.getElementById('recipientInputWrap').classList.add('hidden');
-                    this.blur();
-                }
-            });
-
-            document.getElementById('closeBalanceModal').addEventListener('click', function() {
-                document.getElementById('balanceModal').classList.remove('active');
-            });
-            document.getElementById('balanceModal').addEventListener('click', function(e) {
-                if (e.target === this) this.classList.remove('active');
-            });
-            document.getElementById('copyAddressBtn').addEventListener('click', function() {
-                const addr = document.getElementById('balanceAddress').textContent;
-                if (!addr || addr === '未连接') { showToast('没有可复制的地址', 'error'); return; }
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(addr).then(() => showToast('地址已复制', 'success')).catch(() =>
-                        fallbackCopy(addr));
-                } else {
-                    fallbackCopy(addr);
-                }
-            });
-
-            function fallbackCopy(text) {
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.style.position = 'fixed';
-                textarea.style.left = '-9999px';
-                textarea.style.top = '-9999px';
-                document.body.appendChild(textarea);
-                textarea.select();
-                try {
-                    const successful = document.execCommand('copy');
-                    if (successful) {
-                        showToast('地址已复制', 'success');
-                    } else {
-                        showToast('复制失败，请手动复制', 'error');
-                    }
-                } catch (e) {
-                    showToast('复制失败，请手动复制', 'error');
-                }
-                document.body.removeChild(textarea);
-            }
-
-         
+            // ============================================================
+            //  实时刷新
+            // ============================================================
             function startPriceRefresh() {
                 if (state.quoteTimer) clearInterval(state.quoteTimer);
                 state.quoteTimer = setInterval(() => {
@@ -2443,33 +2619,9 @@
                 }, 3000);
             }
 
-       
-            function getPreferredTheme() {
-                return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            }
-
-            function setTheme(mode) {
-                const effective = mode === 'auto' ? getPreferredTheme() : mode;
-                document.body.className = effective;
-                document.getElementById('app').className = effective;
-                document.documentElement.style.background = 'var(--bg-primary)';
-                document.body.style.background = 'var(--bg-primary)';
-                const logo = document.getElementById('logoImg');
-                const footer = document.getElementById('footerLogo');
-                if (effective === 'dark') {
-                    logo.src = 'https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350';
-                    footer.src =
-                        'https://i.hd-r.cn/07cce604-676b-400d-9d73-0ff20dea760a.png';
-                } else {
-                    logo.src = 'https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350';
-                    footer.src =
-                        'https://i.hd-r.cn/bcc7df42-30d6-45b0-b58b-dde6176a3a6f.png';
-                }
-                document.getElementById('themeToggleBtn').innerHTML = effective === 'light' ? '<i class="fas fa-moon"></i>' :
-                    '<svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="5" fill="currentColor"/><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>';
-            }
-
-       
+            // ============================================================
+            //  EVENTS
+            // ============================================================
             document.addEventListener('DOMContentLoaded', function() {
                 setTheme('auto');
                 const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -2532,6 +2684,7 @@
                     openSettingsModal();
                 });
 
+                // 初始化同步
                 autoSwitchTokens(state.chainId);
                 updateChainUI();
                 updateTokenUI();
