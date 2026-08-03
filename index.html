@@ -512,15 +512,25 @@
             const MAX_RETRIES = 2;
 
          
-        async function proxyRequest(endpoint, params, retryCount) {
+       async function proxyRequest(endpoint, params, retryCount) {
     retryCount = retryCount || 0;
+   
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+        if (value !== undefined && value !== null) {
+            searchParams.append(key, value);
+        }
+    }
+    const queryString = searchParams.toString();
+    const fullPath = endpoint + (queryString ? '?' + queryString : '');
+    const payload = { fullPath, params }; 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
     try {
         const response = await fetch(PROXY_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ endpoint, params }),
+            body: JSON.stringify(payload),
             signal: controller.signal
         });
         clearTimeout(timeoutId);
@@ -538,8 +548,7 @@
         }
         throw e;
     }
-}
-          
+}    
             const CHAINS = {
                 1: { chainId: 1, name: 'Ethereum', short: 'Ethereum', icon: '⟠', iconUrl: 'https://images.blockscan.com/chain-logos/eth.svg', native: 'ETH', rpc: 'https://eth.llamarpc.com', explorer: 'https://etherscan.io/tx/', id: '1' },
                 56: { chainId: 56, name: 'BNB Chain', short: 'BNB Chain', icon: '🟡', iconUrl: 'https://images.blockscan.com/chain-logos/bsc.svg', native: 'BNB', rpc: 'https://binance.nodereal.io', explorer: 'https://bscscan.com/tx/', id: '56' },
