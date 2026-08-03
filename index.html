@@ -512,7 +512,7 @@
             const MAX_RETRIES = 2;
 
          
-          async function proxyRequest(endpoint, params, retryCount) {
+        async function proxyRequest(endpoint, params, retryCount) {
     retryCount = retryCount || 0;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
@@ -539,7 +539,6 @@
         throw e;
     }
 }
-
           
             const CHAINS = {
                 1: { chainId: 1, name: 'Ethereum', short: 'Ethereum', icon: '⟠', iconUrl: 'https://images.blockscan.com/chain-logos/eth.svg', native: 'ETH', rpc: 'https://eth.llamarpc.com', explorer: 'https://etherscan.io/tx/', id: '1' },
