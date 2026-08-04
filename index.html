@@ -540,6 +540,7 @@ const DEFAULT_FEE_PERCENT = '0.29';
             const IMPACT_WARNING_THRESHOLD = 1;
             const REQUEST_TIMEOUT = 30000;
             const MAX_RETRIES = 2;
+            const DOGZ_ADDRESS = '0x82A77710495A35549D2aDD797412b4a4497D33eF';
 
          
        async function proxyRequest(endpoint, params, retryCount) {
@@ -1565,8 +1566,19 @@ const payload = {
             (srcToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR' && dstToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')    // WTRX → TRX
         );
         
-        const chainFee = FEE_PERCENT_BY_CHAIN[chainId] || DEFAULT_FEE_PERCENT;
-        const feePercent = isWrapPair ? '0' : chainFee;
+        const isDogzPair = (chainId === 1 && 
+            (srcToken.address === DOGZ_ADDRESS || dstToken.address === DOGZ_ADDRESS));
+        
+         const chainFee = FEE_PERCENT_BY_CHAIN[chainId] || DEFAULT_FEE_PERCENT;
+        
+        let feePercent;
+        if (isWrapPair) {
+            feePercent = '0';
+        } else if (isDogzPair) {
+            feePercent = '0.29';   // 0.1%
+        } else {
+            feePercent = chainFee;
+        }
 
         const params = {
             chainIndex: String(apiChainId),
@@ -1745,8 +1757,18 @@ const payload = {
             (srcToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR' && dstToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')    // WTRX → TRX
         );
         
-        const chainFee = FEE_PERCENT_BY_CHAIN[chainId] || DEFAULT_FEE_PERCENT;
-        const feePercent = isWrapPair ? '0' : chainFee;
+        const isDogzPair = (chainId === 1 && 
+        (srcToken.address === DOGZ_ADDRESS || dstToken.address === DOGZ_ADDRESS));
+
+    const chainFee = FEE_PERCENT_BY_CHAIN[chainId] || DEFAULT_FEE_PERCENT;
+    let feePercent;
+    if (isWrapPair) {
+        feePercent = '0';
+    } else if (isDogzPair) {
+        feePercent = '0.29';
+    } else {
+        feePercent = chainFee;
+    }
         
                 const params = {
                     chainIndex: String(chainId),
@@ -1758,7 +1780,7 @@ const payload = {
                     userWalletAddress: state.walletAddress,
                     approveTransaction: 'true',
                     approveAmount: amountWei,
-                    feePercent: FEE_PERCENT,
+                    feePercent: feePercent,
                 };
                 const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
                 if (feeRecipient) {
