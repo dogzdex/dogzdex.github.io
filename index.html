@@ -522,8 +522,14 @@
         }
     }
     const queryString = searchParams.toString();
-    const fullPath = endpoint + (queryString ? '?' + queryString : '');
-    const payload = { fullPath, params }; 
+    const fullUrl =
+    OKX_API_BASE +
+    endpoint +
+    (queryString ? '?' + queryString : '');
+
+const payload = {
+    url: fullUrl
+};
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
     try {
