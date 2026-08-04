@@ -474,7 +474,37 @@
             const PROXY_URL = 'https://okx-proxy.a1878069728.workers.dev';
 
             const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator'; 
-            const FEE_PERCENT = '0.29';
+            const FEE_PERCENT_BY_CHAIN = {
+    1: '0.29',
+    56: '0.29',
+    137: '0.29',
+    42161: '0.29',
+    10: '0.29',
+    8453: '0.29',
+    43114: '0.29',
+    324: '0.29',
+    59144: '0.29',
+    5000: '0.29',
+    169: '0.29',
+    4200: '0.29',
+    1088: '0.29',
+    9745: '0.29',
+    1672: '0.29',
+    4663: '0.29',
+    146: '0.29',
+    534352: '0.29',
+    130: '0.29',
+    196: '0.29',
+    81457: '0.29',
+    25: '0.29',
+    1030: '0.29',
+    250: '0.29',
+    999: '0.29',
+    57073: '0.29',
+    143: '0.29',
+    728126428: '0.19',
+};
+const DEFAULT_FEE_PERCENT = '0.29';
             const FEE_RECIPIENTS = {
                 1: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
                 56: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
@@ -608,7 +638,7 @@ const payload = {
                 },
                 250: {
                     'FTM': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'FTM', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/FTM-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
-                    'WFTM': { address: '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83', symbol: 'WFTM', decimals: 18, icon: 'https://images.blockscan.com/chain-logos/bsc.svg' },
+                    'WFTM': { address: '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83', symbol: 'WFTM', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/FTM-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
                     'USDC': { address: '0x04068da6c83afcfa0e13ba15a6696662335d5b75', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 25: {
@@ -653,6 +683,7 @@ const payload = {
                 },
                 1088: {
                     'METIS': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'METIS', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/Metis-c067e66f69b8483c857510c70bbebedb-20220719.png?x-oss-process=image/format,webp/ignore-error,1' },
+                    'WMETIS': { address: '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481', symbol: 'WMETIS', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/Metis-c067e66f69b8483c857510c70bbebedb-20220719.png?x-oss-process=image/format,webp/ignore-error,1' },
                     'USDT': { address: '0xbB06DCA3AE6887fAbF931640f67cab3e3a16F4dC', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0x420000000000000000000000000000000000000A', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDC': { address: '0xEA32A96608495e54156Ae48931A7c20f0dcc1a21', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
@@ -1474,13 +1505,76 @@ const payload = {
         let apiChainId = chainId;
         if (isTronChain(chainId)) apiChainId = 195;
         if (isNaN(apiChainId)) apiChainId = 1;
+      
+        const isWrapPair = (
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c') || // 56 BNB → WBNB 
+            (srcToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 56 WBNB → BNB
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2') || // 1 ETH → WETH
+            (srcToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 10 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 10 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23') || // 25 CRO → WCRO
+            (srcToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 25 WCRO → CRO
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 130 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 130 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270') || // 137 POL → WPOL
+            (srcToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 137 WPOL →POL
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A') || // 143 MON → WMON
+            (srcToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 143 WMON → MON
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38') || // 146 S → WS
+            (srcToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 146 WS → S
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746') || // 169 ETH → WETH
+            (srcToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 169 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b') || // 196 OKB → WOKB
+            (srcToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 196 WOKB → OKB
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83') || // 250 FTM → WFTM
+            (srcToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 250 WFTM → FTM
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91') || // 324 ETH → WETH
+            (srcToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 324 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5555555555555555555555555555555555555555') || // 999 HYPE → WHYPE
+            (srcToken.address === '0x5555555555555555555555555555555555555555' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 999 WHYPE → HYPE
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b') || // 1030 CFX → WCFX
+            (srcToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1030 WCFX → CFX
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481') || // 1088 METIS → WMETIS
+            (srcToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1088 WMETIS → METIS
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0') || // 1672 PROS → WPROS
+            (srcToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1672 WPROS → PROS
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA') || // 4200 BTC → WBTC
+            (srcToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4200 WBTC → BTC
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73') || // 4663 ETH → WETH
+            (srcToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4663 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8') || // 5000 MNT → WMNT
+            (srcToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 5000 WMNT → MNT
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 8453 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 8453 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873') || // 9745 XPL → WXPL
+            (srcToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 9745 WXPL → XPL
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1') || // 42161 ETH → WETH
+            (srcToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 42161 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7') || // 43114 AVAX → WAVAX
+            (srcToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 43114 WAVAX → AVAX
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 57073 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 57073 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f') || // 59144 ETH → WETH
+            (srcToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 59144 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4300000000000000000000000000000000000004') || // 81457 ETH → WETH
+            (srcToken.address === '0x4300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 81457 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5300000000000000000000000000000000000004') || // 534352 ETH → WETH
+            (srcToken.address === '0x5300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 534352 WETH → ETH
+            (srcToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' && dstToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR') || // TRX → WTRX
+            (srcToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR' && dstToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')    // WTRX → TRX
+        );
+        
+        const chainFee = FEE_PERCENT_BY_CHAIN[chainId] || DEFAULT_FEE_PERCENT;
+        const feePercent = isWrapPair ? '0' : chainFee;
+
         const params = {
             chainIndex: String(apiChainId),
             amount: amount,
             fromTokenAddress: srcToken.address,
             toTokenAddress: dstToken.address,
-            swapMode: swapMode,              
-            feePercent: FEE_PERCENT,        
+            swapMode: swapMode,
+            feePercent: feePercent,
         };
         const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
         if (feeRecipient) {
@@ -1591,7 +1685,69 @@ const payload = {
                 } else {
                     slippagePercent = String(state.slippageValue);
                 }
-
+                
+                 const isWrapPair = (
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c') || // 56 BNB → WBNB 
+            (srcToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 56 WBNB → BNB
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2') || // 1 ETH → WETH
+            (srcToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 10 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 10 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23') || // 25 CRO → WCRO
+            (srcToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 25 WCRO → CRO
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 130 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 130 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270') || // 137 POL → WPOL
+            (srcToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 137 WPOL →POL
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A') || // 143 MON → WMON
+            (srcToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 143 WMON → MON
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38') || // 146 S → WS
+            (srcToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 146 WS → S
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746') || // 169 ETH → WETH
+            (srcToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 169 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b') || // 196 OKB → WOKB
+            (srcToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 196 WOKB → OKB
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83') || // 250 FTM → WFTM
+            (srcToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 250 WFTM → FTM
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91') || // 324 ETH → WETH
+            (srcToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 324 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5555555555555555555555555555555555555555') || // 999 HYPE → WHYPE
+            (srcToken.address === '0x5555555555555555555555555555555555555555' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 999 WHYPE → HYPE
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b') || // 1030 CFX → WCFX
+            (srcToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1030 WCFX → CFX
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481') || // 1088 METIS → WMETIS
+            (srcToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1088 WMETIS → METIS
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0') || // 1672 PROS → WPROS
+            (srcToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1672 WPROS → PROS
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA') || // 4200 BTC → WBTC
+            (srcToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4200 WBTC → BTC
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73') || // 4663 ETH → WETH
+            (srcToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4663 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8') || // 5000 MNT → WMNT
+            (srcToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 5000 WMNT → MNT
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 8453 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 8453 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873') || // 9745 XPL → WXPL
+            (srcToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 9745 WXPL → XPL
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1') || // 42161 ETH → WETH
+            (srcToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 42161 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7') || // 43114 AVAX → WAVAX
+            (srcToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 43114 WAVAX → AVAX
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 57073 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 57073 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f') || // 59144 ETH → WETH
+            (srcToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 59144 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4300000000000000000000000000000000000004') || // 81457 ETH → WETH
+            (srcToken.address === '0x4300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 81457 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5300000000000000000000000000000000000004') || // 534352 ETH → WETH
+            (srcToken.address === '0x5300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 534352 WETH → ETH
+            (srcToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' && dstToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR') || // TRX → WTRX
+            (srcToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR' && dstToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')    // WTRX → TRX
+        );
+        
+        const chainFee = FEE_PERCENT_BY_CHAIN[chainId] || DEFAULT_FEE_PERCENT;
+        const feePercent = isWrapPair ? '0' : chainFee;
+        
                 const params = {
                     chainIndex: String(chainId),
                     amount: amountWei,
@@ -1701,7 +1857,69 @@ const payload = {
                 if (state.slippageMode === 'dynamic') slippagePercent = '0.5';
                 else if (state.slippageMode === 'dynamicUpper') slippagePercent = String(state.slippageValue);
                 else slippagePercent = String(state.slippageValue);
-
+                
+                const isWrapPair = (
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c') || // 56 BNB → WBNB 
+            (srcToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 56 WBNB → BNB
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2') || // 1 ETH → WETH
+            (srcToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 10 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 10 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23') || // 25 CRO → WCRO
+            (srcToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 25 WCRO → CRO
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 130 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 130 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270') || // 137 POL → WPOL
+            (srcToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 137 WPOL →POL
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A') || // 143 MON → WMON
+            (srcToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 143 WMON → MON
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38') || // 146 S → WS
+            (srcToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 146 WS → S
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746') || // 169 ETH → WETH
+            (srcToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 169 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b') || // 196 OKB → WOKB
+            (srcToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 196 WOKB → OKB
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83') || // 250 FTM → WFTM
+            (srcToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 250 WFTM → FTM
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91') || // 324 ETH → WETH
+            (srcToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 324 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5555555555555555555555555555555555555555') || // 999 HYPE → WHYPE
+            (srcToken.address === '0x5555555555555555555555555555555555555555' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 999 WHYPE → HYPE
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b') || // 1030 CFX → WCFX
+            (srcToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1030 WCFX → CFX
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481') || // 1088 METIS → WMETIS
+            (srcToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1088 WMETIS → METIS
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0') || // 1672 PROS → WPROS
+            (srcToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1672 WPROS → PROS
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA') || // 4200 BTC → WBTC
+            (srcToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4200 WBTC → BTC
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73') || // 4663 ETH → WETH
+            (srcToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4663 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8') || // 5000 MNT → WMNT
+            (srcToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 5000 WMNT → MNT
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 8453 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 8453 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873') || // 9745 XPL → WXPL
+            (srcToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 9745 WXPL → XPL
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1') || // 42161 ETH → WETH
+            (srcToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 42161 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7') || // 43114 AVAX → WAVAX
+            (srcToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 43114 WAVAX → AVAX
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 57073 ETH → WETH
+            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 57073 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f') || // 59144 ETH → WETH
+            (srcToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 59144 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4300000000000000000000000000000000000004') || // 81457 ETH → WETH
+            (srcToken.address === '0x4300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 81457 WETH → ETH
+            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5300000000000000000000000000000000000004') || // 534352 ETH → WETH
+            (srcToken.address === '0x5300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 534352 WETH → ETH
+            (srcToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' && dstToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR') || // TRX → WTRX
+            (srcToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR' && dstToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')    // WTRX → TRX
+        );
+        
+        const chainFee = FEE_PERCENT_BY_CHAIN[chainId] || DEFAULT_FEE_PERCENT;
+        const feePercent = isWrapPair ? '0' : chainFee;
+        
                 const params = {
                     chainIndex: '195',
                     amount: amountWei,
@@ -1915,54 +2133,52 @@ const payload = {
                         hideTokenPreview();
                     }
                 });
-                document.getElementById('pasteContractBtn').addEventListener('click', async function() {
-                    try {
-                        let text = null;
-                        if (navigator.clipboard && navigator.clipboard.readText) {
-                            try {
-                                text = await navigator.clipboard.readText();
-                            } catch (e) { }
-                        }
-                        if (!text && navigator.clipboard && navigator.clipboard.read) {
-                            try {
-                                const items = await navigator.clipboard.read();
-                                for (const item of items) {
-                                    if (item.types.includes('text/plain')) {
-                                        const blob = await item.getType('text/plain');
-                                        text = await blob.text();
-                                        break;
-                                    }
-                                }
-                            } catch (e) { }
-                        }
-                        if (!text) {
-                            try {
-                                const input = document.createElement('input');
-                                input.style.position = 'fixed';
-                                input.style.opacity = '0';
-                                input.style.left = '-9999px';
-                                document.body.appendChild(input);
-                                input.focus();
-                                const success = document.execCommand('paste');
-                                if (success && input.value) {
-                                    text = input.value;
-                                }
-                                document.body.removeChild(input);
-                            } catch (e) { }
-                        }
-                        if (text && text.trim()) {
-                            document.getElementById('tokenSearchInput').value = text.trim();
-                            const event = new Event('input', { bubbles: true });
-                            document.getElementById('tokenSearchInput').dispatchEvent(event);
-                            showToast('已粘贴合约地址', 'success');
-                        } else {
-                            showToast('无法读取剪贴板，请手动输入', 'warning');
-                        }
-                    } catch (e) {
-                        console.warn('Paste error:', e);
-                        showToast('粘贴失败，请手动输入', 'warning');
+                document.getElementById('pasteContractBtn').addEventListener('click', async function(e) {
+    e.preventDefault();
+    try {
+        let text = null;
+        if (navigator.clipboard && navigator.clipboard.readText) {
+            try { text = await navigator.clipboard.readText(); } catch (e) {}
+        }
+        if (!text && navigator.clipboard && navigator.clipboard.read) {
+            try {
+                const items = await navigator.clipboard.read();
+                for (const item of items) {
+                    if (item.types.includes('text/plain')) {
+                        const blob = await item.getType('text/plain');
+                        text = await blob.text();
+                        break;
                     }
-                });
+                }
+            } catch (e) {}
+        }
+        if (!text) {
+           
+            const input = document.createElement('input');
+            input.style.position = 'fixed';
+            input.style.opacity = '0';
+            input.style.left = '-9999px';
+            document.body.appendChild(input);
+            input.focus();
+            try {
+                const success = document.execCommand('paste');
+                if (success && input.value) text = input.value;
+            } catch (e) {}
+            document.body.removeChild(input);
+        }
+        if (text && text.trim()) {
+            document.getElementById('tokenSearchInput').value = text.trim();
+            const event = new Event('input', { bubbles: true });
+            document.getElementById('tokenSearchInput').dispatchEvent(event);
+            showToast('已粘贴合约地址', 'success');
+        } else {
+            showToast('无法读取剪贴板，请手动输入或长按输入框粘贴', 'warning');
+        }
+    } catch (e) {
+        console.warn('Paste error:', e);
+        showToast('粘贴失败，请手动输入', 'warning');
+    }
+});
             }
 
             function showTokenPreview(info) {
