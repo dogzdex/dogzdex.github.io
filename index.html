@@ -243,10 +243,167 @@
         .hidden { display:none !important; }
         .global-footer { width:100%; display:flex; justify-content:center; align-items:center; gap:8px; padding:20px 20px 30px; font-size:14px; color:var(--text-secondary); background:transparent; flex-shrink:0; margin-top:auto; }
         .global-footer img { height:16px; width:auto; display:block; }
-        @media (max-width:480px) { .global-top-bar { padding:8px 16px; } .brand { font-size:13px; } .brand .logo-icon { width:28px; height:28px; } .theme-toggle-btn { width:28px; height:28px; font-size:14px; } .theme-toggle-btn svg { width:18px; height:18px; } .wallet-btn { font-size:10px; padding:3px 8px 3px 4px; min-height:28px; } .wallet-btn .wallet-icon-wrap { width:18px; height:18px; } .wallet-btn .wallet-status-text { font-size:10px; max-width:70px; } #app { padding:14px 12px 18px; margin-top:12px; } .swap-panel { padding:10px 12px; } .chain-display .chain-prefix { font-size:12px; } .chain-display .chain-icon { width:16px; height:16px; font-size:10px; } .chain-display .chain-name { font-size:12px; } .balance-display { font-size:12px; gap:3px; } .balance-display .btn-max { font-size:10px; padding:2px 8px; height:22px; } .token-selector .token-icon { width:34px; height:34px; } .token-selector .token-name { font-size:16px; } .row-price { font-size:12px; } .row-price .change-badge { font-size:11px; padding:1px 6px; } .swap-btn { width:32px; height:32px; font-size:10px; } .swap-btn i { font-size:10px; } .meta-block { padding:10px 12px; margin-top:12px; } .swap-meta { font-size:11px; flex-wrap:wrap; gap:4px; } .swap-meta .right { gap:6px; } .rate-row { font-size:11px; margin-top:6px; padding-top:6px; } .btn-primary { font-size:15px; padding:14px 16px; margin-top:14px; } .impact-warning { font-size:12px; padding:8px 12px; } .global-footer { padding:12px 12px 20px; font-size:12px; } .global-footer img { height:14px; } .modal-content { padding:16px; } .modal-header .title { font-size:16px; } .modal-search-wrapper { padding:2px 2px 2px 12px; } .modal-search-wrapper input { font-size:13px; padding:6px 0; } .modal-chain-item { font-size:12px; padding:3px 10px; } .modal-token-item { padding:8px 6px; } .modal-token-item .left img { width:28px; height:28px; } .modal-token-item .left .name { font-size:14px; } .modal-token-item .left .sub { font-size:11px; } .modal-token-item .right { font-size:12px; } .modal-token-item .right .balance-value { font-size:11px; } .modal-settings-content { padding:16px; } .settings-options .opt { font-size:12px; padding:4px 10px; } .gas-options .opt { font-size:12px; padding:4px 0; } .settings-input-group input { font-size:13px; padding:6px 10px; } .settings-actions .btn-outline, .settings-actions .btn-primary { height:44px; min-height:44px; padding:0 16px; font-size:14px; } .modal-balance-content { padding:16px; } .modal-balance-content .qr { width:120px; height:120px; } .modal-balance-content .address { font-size:12px; padding:6px 10px; } .row-chain-balance { margin-bottom:18px; } .recipient-section { margin-top:18px; } .balance-header .token-info img { width:24px; height:24px; } .balance-header .token-info .name { font-size:14px; } .balance-header .chain-info .chain-name { font-size:12px; } }
+        @media (max-width:480px) {
+    .global-top-bar { padding:8px 16px; }
+    .brand { font-size:13px; }
+    .brand .logo-icon { width:28px; height:28px; }
+    .theme-toggle-btn { width:28px; height:28px; font-size:14px; }
+    .theme-toggle-btn svg { width:18px; height:18px; }
+    .wallet-btn { font-size:10px; padding:3px 8px 3px 4px; min-height:28px; }
+    .wallet-btn .wallet-icon-wrap { width:18px; height:18px; }
+    .wallet-btn .wallet-status-text { font-size:10px; max-width:70px; }
+    #app { padding:14px 12px 18px; margin-top:12px; }
+    .swap-panel { padding:10px 12px; }
+    .chain-display .chain-prefix { font-size:12px; }
+    .chain-display .chain-icon { width:16px; height:16px; font-size:10px; }
+    .chain-display .chain-name { font-size:12px; }
+    .balance-display { font-size:12px; gap:3px; }
+    .balance-display .btn-max { font-size:10px; padding:2px 8px; height:22px; }
+    .token-selector .token-icon { width:34px; height:34px; }
+    .token-selector .token-name { font-size:16px; }
+    .row-price { font-size:12px; }
+    .row-price .change-badge { font-size:11px; padding:1px 6px; }
+    .swap-btn { width:32px; height:32px; font-size:10px; }
+    .swap-btn i { font-size:10px; }
+    .meta-block { padding:10px 12px; margin-top:12px; }
+    .swap-meta { font-size:11px; flex-wrap:wrap; gap:4px; }
+    .swap-meta .right { gap:6px; }
+    .rate-row { font-size:11px; margin-top:6px; padding-top:6px; }
+    .btn-primary { font-size:15px; padding:14px 16px; margin-top:14px; }
+    .impact-warning { font-size:12px; padding:8px 12px; }
+    .global-footer { padding:12px 12px 20px; font-size:12px; }
+    .global-footer img { height:14px; }
+    .modal-content { padding:16px; }
+    .modal-header .title { font-size:16px; }
+    .modal-search-wrapper { padding:2px 2px 2px 12px; }
+    .modal-search-wrapper input { font-size:13px; padding:6px 0; }
+    
+    .modal-search-wrapper .paste-btn {
+        display: none !important;
+    }
+    .modal-chain-item { font-size:12px; padding:3px 10px; }
+    .modal-token-item { padding:8px 6px; }
+    .modal-token-item .left img { width:28px; height:28px; }
+    .modal-token-item .left .name { font-size:14px; }
+    .modal-token-item .left .sub { font-size:11px; }
+    .modal-token-item .right { font-size:12px; }
+    .modal-token-item .right .balance-value { font-size:11px; }
+    .modal-settings-content { padding:16px; }
+    .settings-options .opt { font-size:12px; padding:4px 10px; }
+    .gas-options .opt { font-size:12px; padding:4px 0; }
+    .settings-input-group input { font-size:13px; padding:6px 10px; }
+    .settings-actions .btn-outline, .settings-actions .btn-primary { height:44px; min-height:44px; padding:0 16px; font-size:14px; }
+    .modal-balance-content { padding:16px; }
+    .modal-balance-content .qr { width:120px; height:120px; }
+    .modal-balance-content .address { font-size:12px; padding:6px 10px; }
+    .row-chain-balance { margin-bottom:18px; }
+    .recipient-section { margin-top:18px; }
+    .balance-header .token-info img { width:24px; height:24px; }
+    .balance-header .token-info .name { font-size:14px; }
+    .balance-header .chain-info .chain-name { font-size:12px; }
+}
+
+
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 1s ease;
+    opacity: 1;
+    pointer-events: none;
+}
+#splash-screen.hide {
+    opacity: 0;
+}
+.splash-logo {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: scale(2.5) translateY(0);
+    opacity: 1;
+    margin-bottom: 20px;
+}
+.splash-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.splash-logo.shrink-up {
+    transform: scale(0.8) translateY(-80px);
+}
+.splash-title {
+    color: white;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    margin-top: 10px;
+    text-align: center;
+}
+.splash-title.show {
+    opacity: 1;
+}
+.splash-subtitle {
+    color: rgba(255,255,255,0.8);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 4px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    margin-top: 8px;
+    text-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+    text-align: center;
+}
+.splash-subtitle.show {
+    opacity: 1;
+}
+.splash-text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -20px;
+}
+@media (max-width: 480px) {
+    .splash-logo {
+        width: 120px;
+        height: 120px;
+    }
+    .splash-title {
+        font-size: 20px;
+    }
+    .splash-subtitle {
+        font-size: 14px;
+    }
+}
     </style>
 </head>
 <body>
+
+
+<div id="splash-screen">
+    <div class="splash-logo" id="splashLogo">
+        <img src="https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350" alt="DOGZ" />
+    </div>
+    <div class="splash-text-group">
+        <div class="splash-title" id="splashTitle">太空狗去中心化交易所</div>
+        <div class="splash-subtitle" id="splashSubtitle">狗友们自己的交易所</div>
+    </div>
+</div>
  
     <div class="global-top-bar">
         <div class="brand"><div class="logo-icon"><img id="logoImg" src="https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350" alt="DOGZ" /></div><span>DOGZ DEX</span></div>
@@ -451,9 +608,9 @@
                 </div>
             </div>
             <div style="color:var(--text-secondary);font-size:14px;margin-bottom:8px;">该地址仅支持当前网络资产收款</div>
-            <div class="qr" id="qrContainer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0x7D24AF4774195b3D005e24Fc8B97dE2a597E46c1" alt="QR" /></div>
+            <div class="qr" id="qrContainer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0x6f46c3267dbee08BC31e68EFaca6626892255105" alt="QR" /></div>
             <div style="font-size:13px;color:var(--text-muted);margin-top:8px;">收款地址</div>
-            <div class="address"><span id="balanceAddress" class="mono">0x7D24AF4774195b3D005e24Fc8B97dE2a597E46c1</span><span class="copy-btn" id="copyAddressBtn"><i class="fas fa-copy"></i></span></div>
+            <div class="address"><span id="balanceAddress" class="mono">0x6f46c3267dbee08BC31e68EFaca6626892255105</span><span class="copy-btn" id="copyAddressBtn"><i class="fas fa-copy"></i></span></div>
             <button class="btn-outline mt-2" style="width:100%;justify-content:center;" id="closeBalanceModal">关闭</button>
         </div>
     </div>
@@ -463,7 +620,39 @@
 
     <script>
         (function() {
+ 
+function runSplashAnimation() {
+    const splash = document.getElementById('splash-screen');
+    const logo = document.getElementById('splashLogo');
+    const title = document.getElementById('splashTitle');
+    const subtitle = document.getElementById('splashSubtitle');
+
+    setTimeout(() => {
+        logo.classList.add('shrink-up');
+        title.classList.add('show');
+    }, 1000);
+
+    setTimeout(() => {
+        subtitle.classList.add('show');
+    }, 2000);
+
+    setTimeout(() => {
+        splash.classList.add('hide');
+        setTimeout(() => {
+            splash.style.display = 'none';
+        }, 1000);
+    }, 3500);
+}
+
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runSplashAnimation);
+} else {
+    runSplashAnimation();
+}
+        
             'use strict';
+            
             if (typeof ethers === 'undefined' || typeof CryptoJS === 'undefined') {
                 document.body.innerHTML =
                     `<div style="padding:20px;color:red;text-align:center;font-size:18px;">⚠️ 必要库加载失败</div>`;
@@ -667,15 +856,22 @@ const payload = {
                 25: {
                     'CRO': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'CRO', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/small/25-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-107?v=1750214338804&x-oss-process=image/format,webp/ignore-error,1' },
                     'WBTC': { address: '0x062E66477Faf219F25D27dCED647BF57C3107d52', symbol: 'WBTC', decimals: 8, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                    'SHIB': { address: '0xbED48612BC69fA1CaB67052b42a95FB30C1bcFee', symbol: 'SHIB', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/8453-0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce-110/type=default_90_0?v=1766385055704&x-oss-process=image/format,webp/ignore-error,1' },
+                    'XRP': { address: '0xb9Ce0dd29C91E02d4620F57a66700Fc5e41d6D15', symbol: 'XRP', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x1d2f0da169ceb9fc7b3144628db156f3f6c60dbe-106/type=default_90_0?v=1785866570011&x-oss-process=image/format,webp/ignore-error,1' },
+                    'ADA': { address: '0x0e517979C2c1c1522ddB0c73905e0D39b3F990c0', symbol: 'ADA', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/small/2001-0xae83571000af4499798d1e3b0fa0070eb3a3e3f9-105?v=1749148417326&x-oss-process=image/format,webp/ignore-error,1' },
+                    'LINK': { address: '0xBc6f24649CCd67eC42342AccdCECCB2eFA27c9d9', symbol: 'LINK', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/LINK-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                    'SOL': { address: '0xc9DE0F3e08162312528FF72559db82590b481800', symbol: 'SOL', decimals: 9, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDT': { address: '0x66e428c3f67a68878562e79A0234c1F83c208770', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
                     'DAI': { address: '0xF2001B145b43032AAF5Ee2884e456CCd805F677D', symbol: 'DAI', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/small/196-0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4-1?v=1744949565136&x-oss-process=image/format,webp/ignore-error,1' },
-                    'USDC': { address: '0xc21223249CA28397B4B6541dfFaEcC539BfF0c59', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                    'USDC.e': { address: '0xc21223249CA28397B4B6541dfFaEcC539BfF0c59', symbol: 'USDC.e', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
                     'DOGE': { address: '0x1a8E39ae59e5556B56b76fCBA98d22c9ae557396', symbol: 'DOGE', decimals: 8, icon: 'https://web3.okx.com/cdn/wallet/logo/Ethereum-7947-003955854.png?x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 130: {
                     'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-110/type=default_90_0?v=1765368555397&x-oss-process=image/format,webp/ignore-error,1' },
                     'WBTC': { address: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', symbol: 'WBTC', decimals: 8, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
-                    'USDT': { address: '0x9151434b16b9763660705744891fA906F660EcC5', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                    
+                    'USDT': { address: '0x9151434b16b9763660705744891fA906F660EcC5', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/5000-0x779ded0c9e1022225f8e0630b35a9b54be713736-999/type=default_90_0?v=1785814151772&x-oss-process=image/format,webp/ignore-error,1' },
+                    'HYPE': { address: '0x15D0e0c55a3E7eE67152aD7E89acf164253Ff68d', symbol: 'HYPE', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/70000080-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-107/type=default_90_0?v=1758782101416&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0x4200000000000000000000000000000000000006', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
                     
                     'USDC': { address: '0x078D782b760474a361dDA0AF3839290b0EF57AD6', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
@@ -686,7 +882,8 @@ const payload = {
                     'WBTC': { address: '0xbbeb516fb02a01611cbbe0453fe3c580d7281011', symbol: 'WBTC', decimals: 8, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDT': { address: '0x493257fd37edb34451f62edf8d2a0c418852ba4c', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
-                    'USDC': { address: '0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                    'USDC.e': { address: '0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4', symbol: 'USDC.e', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                    'USDC': { address: '0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
                     'ZK': { address: '0x5a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e', symbol: 'ZK', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/324-0x5a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e-106/type=default_90_0?v=1785607264519&x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 999: {
@@ -729,6 +926,17 @@ const payload = {
                 4663: {
                     'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-110/type=default_90_0?v=1765368555397&x-oss-process=image/format,webp/ignore-error,1' },
                     'NVDA': { address: '0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC', symbol: 'NVDA', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC-900/type=default_90_0?v=1785667513850&x-oss-process=image/format,webp/ignore-error,1' },
+                    'APE': { address: '0x8f86a15EC17cb3369d8b3E666dAdBC11daA82b79', symbol: 'APE', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-C1MHyoTJpRTeS9AQCyspNVu2EWAYCZwmJ1jNkEArFP1f-107/type=default_90_0?v=1776945088516&x-oss-process=image/format,webp/ignore-error,1' },
+                    'SPCX': { address: '0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa', symbol: 'SPCX', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa-900/type=default_90_0?v=1785938768090&x-oss-process=image/format,webp/ignore-error,1' },
+                    'AMD': { address: '0x86923f96303D656E4aa86D9d42D1e57ad2023fdC', symbol: 'AMD', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa-900/type=default_90_0?v=1785938768090&x-oss-process=image/format,webp/ignore-error,1' },
+                    'TSLA': { address: '0x322F0929c4625eD5bAd873c95208D54E1c003b2d', symbol: 'TSLA', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9-900/type=default_90_0?v=1785939250831&x-oss-process=image/format,webp/ignore-error,1' },
+                    'TENDIES': { address: '0x45242320DBB855EeA8Fd36804C6487E10E97FCF9', symbol: 'TENDIES', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x45242320dbb855eea8fd36804c6487e10e97fcf9-999/type=default_90_0?v=1783689155673&x-oss-process=image/format,webp/ignore-error,1' },
+                    'AAPL': { address: '0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9', symbol: 'AAPL', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9-900/type=default_90_0?v=1785939250831&x-oss-process=image/format,webp/ignore-error,1' },
+                    'GOOGL': { address: '0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3', symbol: 'GOOGL', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9-900/type=default_90_0?v=1785939250831&x-oss-process=image/format,webp/ignore-error,1' },
+                    'STONKBROKER': { address: '0xe934e36A439C94017B64a3FecE66AF12099aBF50', symbol: 'STONKBROKER', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0xe934e36a439c94017b64a3fece66af12099abf50-105/type=default_90_0?v=1785871267213&x-oss-process=image/format,webp/ignore-error,1' },
+                    'VIRTUAL': { address: '0xc6911796042b15d7Fa4F6CDe69e245DdCd3d9c31', symbol: 'VIRTUAL', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-3iQL8BFS2vE7mww4ehAqQHAsbmRNCrPxizWAT2Zfyr9y-110/type=default_90_0?v=1768993328532&x-oss-process=image/format,webp/ignore-error,1' },
+                    'CASHCAT': { address: '0x020bfC650A365f8BB26819deAAbF3E21291018b4', symbol: 'CASHCAT', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-CashcatZMRn4Jv8sPQZUSsbTLi2PcPe1ssqbHcnaJqSS-106/type=default_90_0?v=1784598501004&x-oss-process=image/format,webp/ignore-error,1' },
+                    'PIPEDOG': { address: '0x5Cb6F181081301b44905F3ae15419112ecaBd8A6', symbol: 'PIPEDOG', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x5cb6f181081301b44905f3ae15419112ecabd8a6-109/type=default_90_0?v=1785273280464&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDG': { address: '0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168', symbol: 'USDG', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xe343167631d89b6ffc58b88d6b7fb0228795491d-110/type=default_90_0?v=1770372351565&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDE': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDE', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1783664108626&x-oss-process=image/format,webp/ignore-error,1' }
@@ -756,10 +964,11 @@ const payload = {
                     'USDC': { address: '0xb73603C5d87fA094B7314C74ACE2e64D165016fb', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 196: {
-                    'OKB': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'OKB', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/dex/logo/dex_chain_grey_xlayer_logo.png?x-oss-process=image/format,webp/ignore-error,1' },
+                    'OKB': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'OKB', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-null-999/type=default_90_0?v=1777549250903&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDT': { address: '0x779ded0c9e1022225f8e0630b35a9b54be713736', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                    'SOL': { address: '0x505000008de8748dbd4422ff4687a4fc9beba15b', symbol: 'SOL', decimals: 9, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0xe7b000003a45145decf8a28fc755ad5ec5ea025a', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
-                    'WOKB': { address: '0xe538905cf8410324e03a5a23c1c177a474d59b2b', symbol: 'WOKB', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/dex/logo/dex_chain_grey_xlayer_logo.png?x-oss-process=image/format,webp/ignore-error,1' },
+                    'WOKB': { address: '0xe538905cf8410324e03a5a23c1c177a474d59b2b', symbol: 'WOKB', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0xe538905cf8410324e03a5a23c1c177a474d59b2b-999/type=default_90_0?v=1777550304676&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDC': { address: '0x74b7f16337b8972027f6196a17a631ac6de26d22', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 137: {
@@ -846,16 +1055,21 @@ const payload = {
                 59144: {
                     'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
                     'USDC': { address: '0x176211869cA2b568f2A7D4EE941E073a821EE1ff', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                    'DAI': { address: '0x4AF15ec2A0BD43Db75dd04E62FAA3B8EF36b00d5', symbol: 'DAI', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/small/196-0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4-1?v=1744949565136&x-oss-process=image/format,webp/ignore-error,1' },
+                    'LINEA': { address: '0x1789e0043623282D5DCc7F213d703C6D8BAfBB04', symbol: 'LINEA', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/59144-0x1789e0043623282d5dcc7f213d703c6d8bafbb04-107/type=default_90_0?v=1757336017675&x-oss-process=image/format,webp/ignore-error,1' },
+                    
+                    'wstETH': { address: '0xB5beDd42000b71FddE22D3eE8a79Bd49A568fC8F', symbol: 'wstETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0-107/type=default_90_0?v=1753850278448&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
-                    'WBTC': { address: '0x3aAB2285ddcDdaD8edf438C1bAB47e1a9D05a9b4', symbol: 'WBTC', decimals: 8, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                    'WBTC': { address: '0x3aAB2285ddcDdaD8edf438C1bAB47e1a9D05a9b4', symbol: 'WBTC', decimals: 8, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-5XZw2LKTyrfvfiskJ78AMpackRjPcyCif1WhUsPDuVqQ-107/type=default_90_0?v=1785932441672&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDT': { address: '0xA219439258ca9da29E9Cc4cE5596924745e12B93', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 81457: {
                     'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
                     'USDB': { address: '0x4300000000000000000000000000000000000003', symbol: 'USDB', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/81457-0x4300000000000000000000000000000000000003.png/type=png_350_0?x-oss-process=image/format,webp/ignore-error,1' },
+                    
                     'WETH': { address: '0x4300000000000000000000000000000000000004', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
                     'BLAST': { address: '0xb1a5700fA2358173Fe465e6eA4Ff52E36e88E2ad', symbol: 'BLAST', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/81457-0xb1a5700fa2358173fe465e6ea4ff52e36e88e2ad-106/type=default_90_0?v=1785607400522&x-oss-process=image/format,webp/ignore-error,1' },
-                    'USDE': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDE', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1780906403391&x-oss-process=image/format,webp/ignore-error,1' }
+                    'USDe': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDe', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1780906403391&x-oss-process=image/format,webp/ignore-error,1' }
                 },
                 534352: {
                     'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18, icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
@@ -866,7 +1080,9 @@ const payload = {
                 },
                 43114: {
                     'AVAX': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'AVAX', decimals: 18, icon: 'https://images.blockscan.com/chain-logos/avax.svg?v=1.1.9693.33322' },
+                    'WAVAX': { address: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7', symbol: 'WAVAX', decimals: 18, icon: 'https://images.blockscan.com/chain-logos/avax.svg?v=1.1.9693.33322' },
                     'USDC': { address: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E', symbol: 'USDC', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                    'USDC.e': { address: '0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664', symbol: 'USDC.e', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
                     'WBTC': { address: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', symbol: 'WBTC', decimals: 8, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
                     'WETH': { address: '0xe50fA9b3c56FfB159cB0FCA61F5c9D750e8128c8', symbol: 'WETH', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDT': { address: '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
@@ -874,10 +1090,13 @@ const payload = {
                 728126428: {
                     'TRX': { address: 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb', symbol: 'TRX', decimals: 6, icon: 'https://web3.okx.com/cdn/wallet/logo/TRX.png?x-oss-process=image/format,webp/ignore-error,1' },
                     'WTRX': { address: 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR', symbol: 'WTRX', decimals: 6, icon: 'https://web3.okx.com/cdn/wallet/logo/TRX.png?x-oss-process=image/format,webp/ignore-error,1' },
+                    'NFT': { address: 'TFczxzPhnThNSqr5by8tvxsdCFRRz6cPNq', symbol: 'NFT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x20ee7b720f4e4c4ffcb00c4065cdae55271aecca-105/type=default_90_0?v=1767465161810&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDD': { address: 'TXDk8mbtRbXeYuMNS83CfKPaYYT8XWv9Hz', symbol: 'USDD', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/195-TXDk8mbtRbXeYuMNS83CfKPaYYT8XWv9Hz-106/type=default_90_0?v=1785608477288&x-oss-process=image/format,webp/ignore-error,1' },
+                    'TUSD': { address: 'TUpMhErZL2fhh4sVNULAbNKLokS4GjC1F4', symbol: 'TUSD', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/195-TUpMhErZL2fhh4sVNULAbNKLokS4GjC1F4-106/type=default_90_0?v=1785868316608&x-oss-process=image/format,webp/ignore-error,1' },
                     'JST': { address: 'TCFLL5dx5ZJdKnWuesXxi1VPwjLVmWZZy9', symbol: 'JST', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/195-TCFLL5dx5ZJdKnWuesXxi1VPwjLVmWZZy9-106/type=default_90_0?v=1785607290503&x-oss-process=image/format,webp/ignore-error,1' },
                     'SUN': { address: 'TSSMHYeV2uE9qYH95DqyoCuNCzEL1NvU3S', symbol: 'SUN', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/195-TSSMHYeV2uE9qYH95DqyoCuNCzEL1NvU3S-106/type=default_90_0?v=1785607894847&x-oss-process=image/format,webp/ignore-error,1' },
                     'BTT': { address: 'TAFjULxiVgT4qWk6UZwjqwZXTSaGaqnVp4', symbol: 'BTT', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/195-TAFjULxiVgT4qWk6UZwjqwZXTSaGaqnVp4-106/type=default_90_0?v=1785607318249&x-oss-process=image/format,webp/ignore-error,1' },
+                    'USD1': { address: 'TPFqcBAaaUMCSVRCqPaQ9QnzKhmuoLR6Rc', symbol: 'USD1', decimals: 18, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d-107/type=default_90_0?v=1756473338168&x-oss-process=image/format,webp/ignore-error,1' },
                     'USDT': { address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', symbol: 'USDT', decimals: 6, icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
                 }
             };
@@ -1629,7 +1848,7 @@ const payload = {
         if (isWrapPair) {
             feePercent = '0';
         } else if (isDogzPair) {
-            feePercent = '0.29';   // 0.1%
+            feePercent = '0.1';   // 0.1%
         } else {
             feePercent = chainFee;
         }
@@ -1819,7 +2038,7 @@ const payload = {
     if (isWrapPair) {
         feePercent = '0';
     } else if (isDogzPair) {
-        feePercent = '0.29';
+        feePercent = '0.1';
     } else {
         feePercent = chainFee;
     }
