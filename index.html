@@ -610,7 +610,7 @@
             <div style="color:var(--text-secondary);font-size:14px;margin-bottom:8px;">该地址仅支持当前网络资产收款</div>
             <div class="qr" id="qrContainer"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0x6f46c3267dbee08BC31e68EFaca6626892255105" alt="QR" /></div>
             <div style="font-size:13px;color:var(--text-muted);margin-top:8px;">收款地址</div>
-            <div class="address"><span id="balanceAddress" class="mono">0x6f46c3267dbee08BC31e68EFaca6626892255105</span><span class="copy-btn" id="copyAddressBtn"><i class="fas fa-copy"></i></span></div>
+            <div class="address"><span id="balanceAddress" class="mono"></span><span class="copy-btn" id="copyAddressBtn"><i class="fas fa-copy"></i></span></div>
             <button class="btn-outline mt-2" style="width:100%;justify-content:center;" id="closeBalanceModal">关闭</button>
         </div>
     </div>
@@ -663,78 +663,19 @@ if (document.readyState === 'loading') {
             const PROXY_URL = 'https://okx-proxy.a1878069728.workers.dev';
 
             const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator'; 
-            const FEE_PERCENT_BY_CHAIN = {
-    1: '0.29',
-    56: '0.29',
-    137: '0.29',
-    42161: '0.29',
-    10: '0.29',
-    8453: '0.29',
-    43114: '0.29',
-    324: '0.29',
-    59144: '0.29',
-    5000: '0.29',
-    169: '0.29',
-    4200: '0.29',
-    1088: '0.29',
-    9745: '0.29',
-    1672: '0.29',
-    4663: '0.29',
-    146: '0.29',
-    534352: '0.29',
-    130: '0.29',
-    196: '0.29',
-    81457: '0.29',
-    25: '0.29',
-    1030: '0.29',
-    250: '0.29',
-    999: '0.29',
-    57073: '0.29',
-    143: '0.29',
-    728126428: '0.19',
-};
-const DEFAULT_FEE_PERCENT = '0.29';
-            const FEE_RECIPIENTS = {
-                1: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                56: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                137: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                42161: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                10: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                8453: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                43114: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                324: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                59144: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                5000: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                169: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                4200: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                1088: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                9745: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                1672: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                4663: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                146: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                534352: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                130: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                196: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                81457: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                25: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                1030: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                250: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                999: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                57073: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                143: '0x6f46c3267dbee08BC31e68EFaca6626892255105',
-                728126428: 'TWPFwxgYjWDQ4ZK8dj9eZt9KMCpt5NF1Yp',
-            };
+            
             const SLIPPAGE_DEFAULT = 0.5;
             const SLIPPAGE_MODE_DEFAULT = 'dynamic';
             const IMPACT_WARNING_THRESHOLD = 1;
             const REQUEST_TIMEOUT = 30000;
             const MAX_RETRIES = 2;
-            const DOGZ_ADDRESS = '0x82A77710495A35549D2aDD797412b4a4497D33eF';
+           
 
          
-       async function proxyRequest(endpoint, params, retryCount) {
+     
+async function proxyRequest(endpoint, params, retryCount) {
     retryCount = retryCount || 0;
-   
+ 
     const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
         if (value !== undefined && value !== null) {
@@ -742,14 +683,8 @@ const DEFAULT_FEE_PERCENT = '0.29';
         }
     }
     const queryString = searchParams.toString();
-    const fullUrl =
-    OKX_API_BASE +
-    endpoint +
-    (queryString ? '?' + queryString : '');
-
-const payload = {
-    url: fullUrl
-};
+    const fullUrl = OKX_API_BASE + endpoint + (queryString ? '?' + queryString : '');
+    const payload = { url: fullUrl };
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
     try {
@@ -774,7 +709,7 @@ const payload = {
         }
         throw e;
     }
-}    
+}
             const CHAINS = {
                 1: { chainId: 1, name: 'Ethereum', short: 'Ethereum', icon: '⟠', iconUrl: 'https://images.blockscan.com/chain-logos/eth.svg', native: 'ETH', rpc: 'https://eth.llamarpc.com', explorer: 'https://etherscan.io/tx/', id: '1' },
                 56: { chainId: 56, name: 'BNB Chain', short: 'BNB Chain', icon: '🟡', iconUrl: 'https://images.blockscan.com/chain-logos/bsc.svg', native: 'BNB', rpc: 'https://binance.nodereal.io', explorer: 'https://bscscan.com/tx/', id: '56' },
@@ -1774,97 +1709,22 @@ const payload = {
             }
 
     
-          async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
+         
+async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
     try {
         let apiChainId = chainId;
         if (isTronChain(chainId)) apiChainId = 195;
         if (isNaN(apiChainId)) apiChainId = 1;
-      
-        const isWrapPair = (
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c') || // 56 BNB → WBNB 
-            (srcToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 56 WBNB → BNB
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2') || // 1 ETH → WETH
-            (srcToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 10 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 10 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23') || // 25 CRO → WCRO
-            (srcToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 25 WCRO → CRO
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 130 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 130 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270') || // 137 POL → WPOL
-            (srcToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 137 WPOL →POL
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A') || // 143 MON → WMON
-            (srcToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 143 WMON → MON
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38') || // 146 S → WS
-            (srcToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 146 WS → S
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746') || // 169 ETH → WETH
-            (srcToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 169 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b') || // 196 OKB → WOKB
-            (srcToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 196 WOKB → OKB
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83') || // 250 FTM → WFTM
-            (srcToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 250 WFTM → FTM
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91') || // 324 ETH → WETH
-            (srcToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 324 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5555555555555555555555555555555555555555') || // 999 HYPE → WHYPE
-            (srcToken.address === '0x5555555555555555555555555555555555555555' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 999 WHYPE → HYPE
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b') || // 1030 CFX → WCFX
-            (srcToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1030 WCFX → CFX
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481') || // 1088 METIS → WMETIS
-            (srcToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1088 WMETIS → METIS
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0') || // 1672 PROS → WPROS
-            (srcToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1672 WPROS → PROS
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA') || // 4200 BTC → WBTC
-            (srcToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4200 WBTC → BTC
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73') || // 4663 ETH → WETH
-            (srcToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4663 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8') || // 5000 MNT → WMNT
-            (srcToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 5000 WMNT → MNT
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 8453 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 8453 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873') || // 9745 XPL → WXPL
-            (srcToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 9745 WXPL → XPL
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1') || // 42161 ETH → WETH
-            (srcToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 42161 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7') || // 43114 AVAX → WAVAX
-            (srcToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 43114 WAVAX → AVAX
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 57073 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 57073 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f') || // 59144 ETH → WETH
-            (srcToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 59144 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4300000000000000000000000000000000000004') || // 81457 ETH → WETH
-            (srcToken.address === '0x4300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 81457 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5300000000000000000000000000000000000004') || // 534352 ETH → WETH
-            (srcToken.address === '0x5300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 534352 WETH → ETH
-            (srcToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' && dstToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR') || // TRX → WTRX
-            (srcToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR' && dstToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')    // WTRX → TRX
-        );
-        
-        const isDogzPair = (chainId === 1 && 
-            (srcToken.address === DOGZ_ADDRESS || dstToken.address === DOGZ_ADDRESS));
-        
-         const chainFee = FEE_PERCENT_BY_CHAIN[chainId] || DEFAULT_FEE_PERCENT;
-        
-        let feePercent;
-        if (isWrapPair) {
-            feePercent = '0';
-        } else if (isDogzPair) {
-            feePercent = '0.1';   // 0.1%
-        } else {
-            feePercent = chainFee;
-        }
-
         const params = {
             chainIndex: String(apiChainId),
             amount: amount,
             fromTokenAddress: srcToken.address,
             toTokenAddress: dstToken.address,
             swapMode: swapMode,
-            feePercent: feePercent,
+            userWalletAddress: state.walletAddress || '',
+            
         };
-        const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
-        if (feeRecipient) {
-            params.toTokenReferrerWalletAddress = feeRecipient;
-        }
+      
         const data = await proxyRequest('/quote', params);
         if (data.code !== '0') {
             return { error: data.msg || 'Quote error' };
@@ -1956,314 +1816,174 @@ const payload = {
             }
 
             async function executeEvmSwap() {
-                const chainId = state.chainId;
-                const srcToken = getTokenInfo(chainId, state.srcTokenSymbol);
-                const dstToken = getTokenInfo(chainId, state.dstTokenSymbol);
-                const amount = document.getElementById('amountInput').value;
-                const amountWei = toWei(amount, srcToken.decimals).toString();
+    const chainId = state.chainId;
+    const srcToken = getTokenInfo(chainId, state.srcTokenSymbol);
+    const dstToken = getTokenInfo(chainId, state.dstTokenSymbol);
+    const amount = document.getElementById('amountInput').value;
+    const amountWei = toWei(amount, srcToken.decimals).toString();
 
-                let slippagePercent;
-                if (state.slippageMode === 'dynamic') {
-                    slippagePercent = '0.5';
-                } else if (state.slippageMode === 'dynamicUpper') {
-                    slippagePercent = String(state.slippageValue);
-                } else {
-                    slippagePercent = String(state.slippageValue);
-                }
-                
-                 const isWrapPair = (
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c') || // 56 BNB → WBNB 
-            (srcToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 56 WBNB → BNB
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2') || // 1 ETH → WETH
-            (srcToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 10 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 10 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23') || // 25 CRO → WCRO
-            (srcToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 25 WCRO → CRO
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 130 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 130 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270') || // 137 POL → WPOL
-            (srcToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 137 WPOL →POL
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A') || // 143 MON → WMON
-            (srcToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 143 WMON → MON
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38') || // 146 S → WS
-            (srcToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 146 WS → S
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746') || // 169 ETH → WETH
-            (srcToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 169 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b') || // 196 OKB → WOKB
-            (srcToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 196 WOKB → OKB
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83') || // 250 FTM → WFTM
-            (srcToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 250 WFTM → FTM
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91') || // 324 ETH → WETH
-            (srcToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 324 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5555555555555555555555555555555555555555') || // 999 HYPE → WHYPE
-            (srcToken.address === '0x5555555555555555555555555555555555555555' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 999 WHYPE → HYPE
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b') || // 1030 CFX → WCFX
-            (srcToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1030 WCFX → CFX
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481') || // 1088 METIS → WMETIS
-            (srcToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1088 WMETIS → METIS
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0') || // 1672 PROS → WPROS
-            (srcToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1672 WPROS → PROS
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA') || // 4200 BTC → WBTC
-            (srcToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4200 WBTC → BTC
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73') || // 4663 ETH → WETH
-            (srcToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4663 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8') || // 5000 MNT → WMNT
-            (srcToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 5000 WMNT → MNT
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 8453 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 8453 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873') || // 9745 XPL → WXPL
-            (srcToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 9745 WXPL → XPL
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1') || // 42161 ETH → WETH
-            (srcToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 42161 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7') || // 43114 AVAX → WAVAX
-            (srcToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 43114 WAVAX → AVAX
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 57073 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 57073 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f') || // 59144 ETH → WETH
-            (srcToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 59144 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4300000000000000000000000000000000000004') || // 81457 ETH → WETH
-            (srcToken.address === '0x4300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 81457 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5300000000000000000000000000000000000004') || // 534352 ETH → WETH
-            (srcToken.address === '0x5300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 534352 WETH → ETH
-            (srcToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' && dstToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR') || // TRX → WTRX
-            (srcToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR' && dstToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')    // WTRX → TRX
-        );
-        
-        const isDogzPair = (chainId === 1 && 
-        (srcToken.address === DOGZ_ADDRESS || dstToken.address === DOGZ_ADDRESS));
-
-    const chainFee = FEE_PERCENT_BY_CHAIN[chainId] || DEFAULT_FEE_PERCENT;
-    let feePercent;
-    if (isWrapPair) {
-        feePercent = '0';
-    } else if (isDogzPair) {
-        feePercent = '0.1';
+    let slippagePercent;
+    if (state.slippageMode === 'dynamic') {
+        slippagePercent = '0.5';
+    } else if (state.slippageMode === 'dynamicUpper') {
+        slippagePercent = String(state.slippageValue);
     } else {
-        feePercent = chainFee;
+        slippagePercent = String(state.slippageValue);
     }
-        
-                const params = {
-                    chainIndex: String(chainId),
-                    amount: amountWei,
-                    fromTokenAddress: srcToken.address,
-                    toTokenAddress: dstToken.address,
-                    swapMode: 'exactIn',
-                    slippagePercent: slippagePercent,
-                    userWalletAddress: state.walletAddress,
-                    approveTransaction: 'true',
-                    approveAmount: amountWei,
-                    feePercent: feePercent,
-                };
-                const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
-                if (feeRecipient) {
-                    params.toTokenReferrerWalletAddress = feeRecipient;
-                }
-                const data = await proxyRequest('/swap', params);
-                if (data.code !== '0') {
-                    if (data.msg && data.msg.includes('slippagePercent')) {
-                        throw new Error('滑点参数错误，请尝试调整滑点值');
-                    }
-                    throw new Error(data.msg || 'Swap error');
-                }
-                const swapData = data.data[0];
-                if (!swapData || !swapData.tx) throw new Error('No swap data');
 
-                const txInfo = swapData.tx;
-                const isNativeSrc = srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+    const params = {
+        chainIndex: String(chainId),
+        amount: amountWei,
+        fromTokenAddress: srcToken.address,
+        toTokenAddress: dstToken.address,
+        swapMode: 'exactIn',
+        slippagePercent: slippagePercent,
+        userWalletAddress: state.walletAddress,
+        approveTransaction: 'true',
+        approveAmount: amountWei,
+       
+    };
+    
+    const data = await proxyRequest('/swap', params);
+    if (data.code !== '0') {
+        if (data.msg && data.msg.includes('slippagePercent')) {
+            throw new Error('滑点参数错误，请尝试调整滑点值');
+        }
+        throw new Error(data.msg || 'Swap error');
+    }
+    const swapData = data.data[0];
+    if (!swapData || !swapData.tx) throw new Error('No swap data');
 
-                if (txInfo.signatureData && txInfo.signatureData.length > 0 && !isNativeSrc) {
-                    const tokenContract = new ethers.Contract(srcToken.address, [
-                        'function approve(address,uint256) returns (bool)',
-                        'function allowance(address,address) view returns (uint256)'
-                    ], state.signer);
-                    for (const sig of txInfo.signatureData) {
-                        const approveInfo = JSON.parse(sig);
-                        if (approveInfo.approveContract && approveInfo.approveTxCalldata) {
-                            const iface = new ethers.Interface(['function approve(address spender, uint256 amount)']);
-                            const decoded = iface.decodeFunctionData('approve', approveInfo.approveTxCalldata);
-                            const spender = decoded[0];
-                            const amountApprove = decoded[1];
-                            const allowance = await tokenContract.allowance(state.walletAddress, spender);
-                            if (allowance < amountApprove) {
-                                try {
-                                    showToast('正在授权...', 'info');
-                                    const approveTx = await tokenContract.approve(spender, amountApprove);
-                                    await approveTx.wait();
-                                } catch (e) {
-                                    if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes(
-                                        'rejected') || e.message.includes('denied')) {
-                                        showToast('用户取消授权', 'warning');
-                                        throw new Error('USER_REJECTED_APPROVE');
-                                    }
-                                    throw e;
-                                }
-                            }
+    const txInfo = swapData.tx;
+    const isNativeSrc = srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+
+    if (txInfo.signatureData && txInfo.signatureData.length > 0 && !isNativeSrc) {
+        const tokenContract = new ethers.Contract(srcToken.address, [
+            'function approve(address,uint256) returns (bool)',
+            'function allowance(address,address) view returns (uint256)'
+        ], state.signer);
+        for (const sig of txInfo.signatureData) {
+            const approveInfo = JSON.parse(sig);
+            if (approveInfo.approveContract && approveInfo.approveTxCalldata) {
+                const iface = new ethers.Interface(['function approve(address spender, uint256 amount)']);
+                const decoded = iface.decodeFunctionData('approve', approveInfo.approveTxCalldata);
+                const spender = decoded[0];
+                const amountApprove = decoded[1];
+                const allowance = await tokenContract.allowance(state.walletAddress, spender);
+                if (allowance < amountApprove) {
+                    try {
+                        showToast('正在授权...', 'info');
+                        const approveTx = await tokenContract.approve(spender, amountApprove);
+                        await approveTx.wait();
+                    } catch (e) {
+                        if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes(
+                            'rejected') || e.message.includes('denied')) {
+                            showToast('用户取消授权', 'warning');
+                            throw new Error('USER_REJECTED_APPROVE');
                         }
+                        throw e;
                     }
                 }
-
-                let gasLimit = BigInt(txInfo.gas || '500000');
-                gasLimit = gasLimit + gasLimit / 5n;
-
-                const tx = {
-                    to: txInfo.to,
-                    data: txInfo.data,
-                    value: txInfo.value || '0',
-                    gasLimit: gasLimit,
-                };
-                let sentTx;
-                try {
-                    sentTx = await state.signer.sendTransaction(tx);
-                } catch (e) {
-                    if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes('rejected') || e.message
-                        .includes('denied')) {
-                        showToast('用户取消交易', 'warning');
-                        throw new Error('USER_REJECTED_TX');
-                    }
-                    throw e;
-                }
-                await sentTx.wait();
-                const explorer = getChain(chainId).explorer || 'https://etherscan.io/tx/';
-                showToast(
-                    `✅ 兑换成功！哈希: <a href="${explorer}${sentTx.hash}" target="_blank">${sentTx.hash.slice(0,10)}...</a>`,
-                    'success');
-                document.getElementById('amountInput').value = '';
-                document.getElementById('dstEstimateInput').value = '0';
-                updateDstInputEmptyState();
-                document.getElementById('srcUsdPrice').textContent = '$0.00';
-                document.getElementById('dstUsdPrice').textContent = '$0.00';
-                document.getElementById('impactWarning').classList.remove('show');
-                document.getElementById('changeBadge').textContent = '0.00%';
-                document.getElementById('changeBadge').className = 'change-badge neutral';
-                state.lastQuoteData = null;
-                loadBalances();
-                quote();
             }
+        }
+    }
+
+    let gasLimit = BigInt(txInfo.gas || '500000');
+    gasLimit = gasLimit + gasLimit / 5n;
+
+    const tx = {
+        to: txInfo.to,
+        data: txInfo.data,
+        value: txInfo.value || '0',
+        gasLimit: gasLimit,
+    };
+    let sentTx;
+    try {
+        sentTx = await state.signer.sendTransaction(tx);
+    } catch (e) {
+        if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes('rejected') || e.message
+            .includes('denied')) {
+            showToast('用户取消交易', 'warning');
+            throw new Error('USER_REJECTED_TX');
+        }
+        throw e;
+    }
+    await sentTx.wait();
+    const explorer = getChain(chainId).explorer || 'https://etherscan.io/tx/';
+    showToast(
+        `✅ 兑换成功！哈希: <a href="${explorer}${sentTx.hash}" target="_blank">${sentTx.hash.slice(0,10)}...</a>`,
+        'success');
+    document.getElementById('amountInput').value = '';
+    document.getElementById('dstEstimateInput').value = '0';
+    updateDstInputEmptyState();
+    document.getElementById('srcUsdPrice').textContent = '$0.00';
+    document.getElementById('dstUsdPrice').textContent = '$0.00';
+    document.getElementById('impactWarning').classList.remove('show');
+    document.getElementById('changeBadge').textContent = '0.00%';
+    document.getElementById('changeBadge').className = 'change-badge neutral';
+    state.lastQuoteData = null;
+    loadBalances();
+    quote();
+}
 
             async function executeTronSwap() {
-                const chainId = state.chainId;
-                const srcToken = getTokenInfo(chainId, state.srcTokenSymbol);
-                const dstToken = getTokenInfo(chainId, state.dstTokenSymbol);
-                const amount = document.getElementById('amountInput').value;
-                const amountWei = toWei(amount, srcToken.decimals).toString();
+    const chainId = state.chainId;
+    const srcToken = getTokenInfo(chainId, state.srcTokenSymbol);
+    const dstToken = getTokenInfo(chainId, state.dstTokenSymbol);
+    const amount = document.getElementById('amountInput').value;
+    const amountWei = toWei(amount, srcToken.decimals).toString();
 
-                let slippagePercent = '0.5';
-                if (state.slippageMode === 'dynamic') slippagePercent = '0.5';
-                else if (state.slippageMode === 'dynamicUpper') slippagePercent = String(state.slippageValue);
-                else slippagePercent = String(state.slippageValue);
-                
-                const isWrapPair = (
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c') || // 56 BNB → WBNB 
-            (srcToken.address === '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 56 WBNB → BNB
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2') || // 1 ETH → WETH
-            (srcToken.address === '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 10 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 10 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23') || // 25 CRO → WCRO
-            (srcToken.address === '0x5C7F8A570d578ED84E63fdFA7b1eE72dEae1AE23' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 25 WCRO → CRO
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 130 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 130 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270') || // 137 POL → WPOL
-            (srcToken.address === '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 137 WPOL →POL
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A') || // 143 MON → WMON
-            (srcToken.address === '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 143 WMON → MON
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38') || // 146 S → WS
-            (srcToken.address === '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 146 WS → S
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746') || // 169 ETH → WETH
-            (srcToken.address === '0x0Dc808adcE2099A9F62AA87D9670745AbA741746' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 169 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b') || // 196 OKB → WOKB
-            (srcToken.address === '0xe538905cf8410324e03a5a23c1c177a474d59b2b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 196 WOKB → OKB
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83') || // 250 FTM → WFTM
-            (srcToken.address === '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 250 WFTM → FTM
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91') || // 324 ETH → WETH
-            (srcToken.address === '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 324 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5555555555555555555555555555555555555555') || // 999 HYPE → WHYPE
-            (srcToken.address === '0x5555555555555555555555555555555555555555' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 999 WHYPE → HYPE
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b') || // 1030 CFX → WCFX
-            (srcToken.address === '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1030 WCFX → CFX
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481') || // 1088 METIS → WMETIS
-            (srcToken.address === '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1088 WMETIS → METIS
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0') || // 1672 PROS → WPROS
-            (srcToken.address === '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 1672 WPROS → PROS
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA') || // 4200 BTC → WBTC
-            (srcToken.address === '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4200 WBTC → BTC
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73') || // 4663 ETH → WETH
-            (srcToken.address === '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 4663 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8') || // 5000 MNT → WMNT
-            (srcToken.address === '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 5000 WMNT → MNT
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 8453 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 8453 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873') || // 9745 XPL → WXPL
-            (srcToken.address === '0x6100E367285b01F48D07953803A2d8dCA5D19873' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 9745 WXPL → XPL
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1') || // 42161 ETH → WETH
-            (srcToken.address === '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 42161 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7') || // 43114 AVAX → WAVAX
-            (srcToken.address === '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 43114 WAVAX → AVAX
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4200000000000000000000000000000000000006') || // 57073 ETH → WETH
-            (srcToken.address === '0x4200000000000000000000000000000000000006' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 57073 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f') || // 59144 ETH → WETH
-            (srcToken.address === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 59144 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x4300000000000000000000000000000000000004') || // 81457 ETH → WETH
-            (srcToken.address === '0x4300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 81457 WETH → ETH
-            (srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && dstToken.address === '0x5300000000000000000000000000000000000004') || // 534352 ETH → WETH
-            (srcToken.address === '0x5300000000000000000000000000000000000004' && dstToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') || // 534352 WETH → ETH
-            (srcToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' && dstToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR') || // TRX → WTRX
-            (srcToken.address === 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR' && dstToken.address === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb')    // WTRX → TRX
-        );
-        
-        const chainFee = FEE_PERCENT_BY_CHAIN[chainId] || DEFAULT_FEE_PERCENT;
-        const feePercent = isWrapPair ? '0' : chainFee;
-        
-                const params = {
-                    chainIndex: '195',
-                    amount: amountWei,
-                    fromTokenAddress: srcToken.address,
-                    toTokenAddress: dstToken.address,
-                    swapMode: 'exactIn',
-                    slippagePercent: slippagePercent,
-                    userWalletAddress: state.walletAddress,
-                    approveTransaction: 'true',
-                    approveAmount: amountWei,
-                    feePercent: FEE_PERCENT,
-                };
-                const feeRecipient = FEE_RECIPIENTS[chainId] || FEE_RECIPIENTS[1];
-                if (feeRecipient) {
-                    params.toTokenReferrerWalletAddress = feeRecipient;
-                }
-                const data = await proxyRequest('/swap', params);
-                if (data.code !== '0') throw new Error(data.msg || 'Swap error');
-                const swapData = data.data[0];
-                if (!swapData || !swapData.tx) throw new Error('No swap data');
+    let slippagePercent = '0.5';
+    if (state.slippageMode === 'dynamic') slippagePercent = '0.5';
+    else if (state.slippageMode === 'dynamicUpper') slippagePercent = String(state.slippageValue);
+    else slippagePercent = String(state.slippageValue);
 
-                const txInfo = swapData.tx;
-                const tronWeb = state.tronWeb;
-                const tx = {
-                    to: txInfo.to,
-                    data: txInfo.data,
-                    value: txInfo.value || '0',
-                    feeLimit: txInfo.feeLimit || 1000000000,
-                    callValue: txInfo.value || '0',
-                };
-                const signedTx = await tronWeb.trx.sign(tx);
-                const receipt = await tronWeb.trx.sendRawTransaction(signedTx);
-                if (receipt.result) {
-                    showToast(`✅ 兑换成功！哈希: ${receipt.txid}`, 'success');
-                    document.getElementById('amountInput').value = '';
-                    document.getElementById('dstEstimateInput').value = '0';
-                    updateDstInputEmptyState();
-                    document.getElementById('srcUsdPrice').textContent = '$0.00';
-                    document.getElementById('dstUsdPrice').textContent = '$0.00';
-                    document.getElementById('impactWarning').classList.remove('show');
-                    document.getElementById('changeBadge').textContent = '0.00%';
-                    document.getElementById('changeBadge').className = 'change-badge neutral';
-                    state.lastQuoteData = null;
-                    loadBalances();
-                    quote();
-                } else {
-                    throw new Error('交易失败');
-                }
-            }
+    const params = {
+        chainIndex: '195',
+        amount: amountWei,
+        fromTokenAddress: srcToken.address,
+        toTokenAddress: dstToken.address,
+        swapMode: 'exactIn',
+        slippagePercent: slippagePercent,
+        userWalletAddress: state.walletAddress,
+        approveTransaction: 'true',
+        approveAmount: amountWei,
+       
+    };
+   
+    const data = await proxyRequest('/swap', params);
+    if (data.code !== '0') throw new Error(data.msg || 'Swap error');
+    const swapData = data.data[0];
+    if (!swapData || !swapData.tx) throw new Error('No swap data');
+
+    const txInfo = swapData.tx;
+    const tronWeb = state.tronWeb;
+    const tx = {
+        to: txInfo.to,
+        data: txInfo.data,
+        value: txInfo.value || '0',
+        feeLimit: txInfo.feeLimit || 1000000000,
+        callValue: txInfo.value || '0',
+    };
+    const signedTx = await tronWeb.trx.sign(tx);
+    const receipt = await tronWeb.trx.sendRawTransaction(signedTx);
+    if (receipt.result) {
+        showToast(`✅ 兑换成功！哈希: ${receipt.txid}`, 'success');
+        document.getElementById('amountInput').value = '';
+        document.getElementById('dstEstimateInput').value = '0';
+        updateDstInputEmptyState();
+        document.getElementById('srcUsdPrice').textContent = '$0.00';
+        document.getElementById('dstUsdPrice').textContent = '$0.00';
+        document.getElementById('impactWarning').classList.remove('show');
+        document.getElementById('changeBadge').textContent = '0.00%';
+        document.getElementById('changeBadge').className = 'change-badge neutral';
+        state.lastQuoteData = null;
+        loadBalances();
+        quote();
+    } else {
+        throw new Error('交易失败');
+    }
+}
 
             async function executeSwap() {
                 if (state.isProcessing) return;
@@ -3186,7 +2906,7 @@ const payload = {
                 updateSlippageDisplay();
                 startPriceRefresh();
                 console.log('🐕 DOGZ DEX 已启动 (EVM + Tron 多链支持)');
-                console.log('手续费接收地址:', FEE_RECIPIENTS, '费率:', FEE_PERCENT + '%');
+                
 
                 setTimeout(quote, 500);
             });
