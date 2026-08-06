@@ -2044,7 +2044,7 @@ async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
         return info;
     }
 
-    // 1. 先尝试 OKX API（通过代理）
+  
     try {
         let apiChainId = chainId;
         if (isTronChain(chainId)) apiChainId = 195;
@@ -2072,7 +2072,7 @@ async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
         console.warn('API token fetch failed', e);
     }
 
-    // 2. 链上读取（仅当已连接钱包）
+    
     if (!state.isConnected || !state.provider) return null;
     try {
         if (state.isTron && state.tronWeb) {
