@@ -2,15 +2,24 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src * data:; connect-src *; font-src https://cdnjs.cloudflare.com https://fonts.gstatic.com;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>DOGZ DEX</title>
-    <link rel="icon" href="https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350" type="image/png" />
+    <link rel="icon" href="https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350" />
+  
     <script src="https://cdn.tailwindcss.com"></script>
+  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+   
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    
+   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tronweb@5.1.0/dist/TronWeb.js"></script>
+</head>
+        
+    
     <style>
         * { font-family: 'Inter', sans-serif; box-sizing: border-box; margin:0; padding:0; }
         .mono { font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
@@ -1721,10 +1730,9 @@ async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
             fromTokenAddress: srcToken.address,
             toTokenAddress: dstToken.address,
             swapMode: swapMode,
-            userWalletAddress: state.walletAddress || '',
-            
+            recipient: document.getElementById('recipientInput').value.trim() || state.walletAddress || '',
+            userWalletAddress: state.walletAddress || '', 
         };
-      
         const data = await proxyRequest('/quote', params);
         if (data.code !== '0') {
             return { error: data.msg || 'Quote error' };
@@ -1736,7 +1744,6 @@ async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
         return { error: e.message };
     }
 }
-
             async function quote() {
                 const amount = document.getElementById('amountInput').value;
                 const amountNum = parseFloat(amount) || 0;
@@ -1841,7 +1848,7 @@ async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
         userWalletAddress: state.walletAddress,
         approveTransaction: 'true',
         approveAmount: amountWei,
-       
+       recipient: document.getElementById('recipientInput').value.trim() || state.walletAddress,
     };
     
     const data = await proxyRequest('/swap', params);
@@ -1948,7 +1955,7 @@ async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
         userWalletAddress: state.walletAddress,
         approveTransaction: 'true',
         approveAmount: amountWei,
-       
+        recipient: document.getElementById('recipientInput').value.trim() || state.walletAddress,
     };
    
     const data = await proxyRequest('/swap', params);
@@ -2363,7 +2370,7 @@ async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
                 await renderTokenList();
             }
 
-            async function renderTokenList() {
+            function renderTokenList() {
     const container = document.getElementById('modalTokenList');
     const chainId = state.chainId;
     const tokens = getTokens(chainId);
@@ -2371,17 +2378,19 @@ async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
     const otherSymbol = state.modalMode === 'src' ? state.dstTokenSymbol : state.srcTokenSymbol;
     const searchVal = document.getElementById('tokenSearchInput').value.toLowerCase().trim();
 
-    let html = '';
+    container.innerHTML = '';
+
     const sorted = Object.keys(tokens).sort();
     let matched = false;
 
-    
+ 
     for (const symbol of sorted) {
         if (symbol === otherSymbol) continue;
         const info = tokens[symbol];
         const match = symbol.toLowerCase().includes(searchVal) || info.address.toLowerCase().includes(searchVal);
         if (!match) continue;
         matched = true;
+
         const isSelected = symbol === currentSymbol;
         let balance = '0';
         let usdValue = '0.00';
@@ -2393,134 +2402,199 @@ async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
         }
         const val = parseFloat(balance) * (symbol === 'USDT' || symbol === 'USDC' ? 1 : 0.01);
         usdValue = val.toFixed(2);
-        html += `
-            <div class="modal-token-item" data-symbol="${symbol}" data-address="${info.address}">
-                <div class="left">
-                    <img src="${info.icon || 'https://via.placeholder.com/32'}" alt="${symbol}" />
-                    <div>
-                        <div class="name">${symbol}</div>
-                        <div class="sub">${info.address.slice(0,6)}...${info.address.slice(-4)}</div>
-                    </div>
-                </div>
-                <div class="right">
-                    <div class="balance-amount">${balance}</div>
-                    <div class="balance-value">$${usdValue}</div>
-                    ${isSelected ? '<div style="color:var(--accent);font-size:12px;margin-top:2px;">✔️</div>' : ''}
-                </div>
-            </div>
-        `;
+
+        
+        const item = document.createElement('div');
+        item.className = 'modal-token-item';
+        item.dataset.symbol = symbol;
+        item.dataset.address = info.address;
+
+        const left = document.createElement('div');
+        left.className = 'left';
+
+        const img = document.createElement('img');
+        img.src = info.icon || 'https://via.placeholder.com/32';
+        img.alt = symbol;
+        left.appendChild(img);
+
+        const textDiv = document.createElement('div');
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'name';
+        nameDiv.textContent = symbol; 
+        textDiv.appendChild(nameDiv);
+
+        const subDiv = document.createElement('div');
+        subDiv.className = 'sub';
+        subDiv.textContent = info.address.slice(0, 6) + '...' + info.address.slice(-4);
+        textDiv.appendChild(subDiv);
+        left.appendChild(textDiv);
+        item.appendChild(left);
+
+        const right = document.createElement('div');
+        right.className = 'right';
+
+        const balDiv = document.createElement('div');
+        balDiv.className = 'balance-amount';
+        balDiv.textContent = balance;
+        right.appendChild(balDiv);
+
+        const usdDiv = document.createElement('div');
+        usdDiv.className = 'balance-value';
+        usdDiv.textContent = '$' + usdValue;
+        right.appendChild(usdDiv);
+
+        if (isSelected) {
+            const check = document.createElement('div');
+            check.style.cssText = 'color:var(--accent);font-size:12px;margin-top:2px;';
+            check.textContent = '✔️';
+            right.appendChild(check);
+        }
+
+        item.appendChild(right);
+        container.appendChild(item);
+
+       
+        item.addEventListener('click', function() {
+            const sym = this.dataset.symbol;
+            if (state.modalMode === 'src') {
+                state.srcTokenSymbol = sym;
+                if (state.srcTokenSymbol === state.dstTokenSymbol) {
+                    const keys = Object.keys(tokens);
+                    const other = keys.find(k => k !== state.srcTokenSymbol);
+                    if (other) state.dstTokenSymbol = other;
+                }
+            } else {
+                state.dstTokenSymbol = sym;
+                if (state.srcTokenSymbol === state.dstTokenSymbol) {
+                    const keys = Object.keys(tokens);
+                    const other = keys.find(k => k !== state.srcTokenSymbol);
+                    if (other) state.dstTokenSymbol = other;
+                }
+            }
+            updateTokenUI();
+            closeTokenModal();
+            loadBalances();
+            quote();
+        });
     }
 
-   
+ 
     if (!matched && searchVal.length > 0) {
         const isAddress = searchVal.startsWith('0x') || searchVal.startsWith('T') || searchVal.length > 40;
         if (isAddress) {
-           
-            try {
+          
+            (async () => {
                 const info = await fetchTokenInfo(chainId, searchVal);
-                if (info) {
-                    const exists = Object.values(tokens).some(t => t.address.toLowerCase() === searchVal.toLowerCase());
-                    if (!exists) {
-                        html += `
-                            <div class="modal-token-item" data-address="${searchVal}" data-symbol="${info.symbol}" data-new="true">
-                                <div class="left">
-                                    <img src="${info.icon || 'https://via.placeholder.com/32'}" alt="${info.symbol}" />
-                                    <div>
-                                        <div class="name">${info.symbol}</div>
-                                        <div class="sub">${searchVal.slice(0,6)}...${searchVal.slice(-4)}</div>
-                                    </div>
-                                </div>
-                                <div class="right">
-                                    <button class="add-btn" style="background:var(--accent);color:white;border:none;border-radius:12px;padding:4px 12px;font-weight:600;cursor:pointer;font-size:13px;">添加</button>
-                                </div>
-                            </div>
-                        `;
-                    }
+                if (info && !Object.values(tokens).some(t => t.address.toLowerCase() === searchVal.toLowerCase())) {
+                    const addItem = document.createElement('div');
+                    addItem.className = 'modal-token-item';
+                    addItem.dataset.address = searchVal;
+                    addItem.dataset.symbol = info.symbol;
+                    addItem.dataset.new = 'true';
+
+                    const left = document.createElement('div');
+                    left.className = 'left';
+                    const img = document.createElement('img');
+                    img.src = info.icon || 'https://via.placeholder.com/32';
+                    left.appendChild(img);
+                    const textDiv = document.createElement('div');
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'name';
+                    nameDiv.textContent = info.symbol;
+                    textDiv.appendChild(nameDiv);
+                    const subDiv = document.createElement('div');
+                    subDiv.className = 'sub';
+                    subDiv.textContent = searchVal.slice(0, 6) + '...' + searchVal.slice(-4);
+                    textDiv.appendChild(subDiv);
+                    left.appendChild(textDiv);
+                    addItem.appendChild(left);
+
+                    const right = document.createElement('div');
+                    right.className = 'right';
+                    const addBtn = document.createElement('button');
+                    addBtn.className = 'add-btn';
+                    addBtn.textContent = '添加';
+                    addBtn.style.cssText = 'background:var(--accent);color:white;border:none;border-radius:12px;padding:4px 12px;font-weight:600;cursor:pointer;font-size:13px;';
+                    right.appendChild(addBtn);
+                    addItem.appendChild(right);
+
+                    container.appendChild(addItem);
+
+                    addBtn.addEventListener('click', async function(e) {
+                        e.stopPropagation();
+                        const info2 = await fetchTokenInfo(chainId, searchVal);
+                        if (info2) {
+                            addCustomToken(searchVal, info2);
+                        } else {
+                            showToast('无法获取代币信息，请重试', 'error');
+                        }
+                    });
                 }
-            } catch (e) { /* ignore */ }
+            })();
         } else {
-         
-            const results = await searchTokensByName(chainId, searchVal);
-            if (results && results.length > 0) {
-                for (const token of results) {
-                    const address = token.tokenContractAddress;
-                    const symbol = token.tokenSymbol;
-                   
-                    const exists = Object.values(tokens).some(t => t.address.toLowerCase() === address.toLowerCase());
-                    if (!exists) {
-                        html += `
-                            <div class="modal-token-item" data-address="${address}" data-symbol="${symbol}" data-new="true">
-                                <div class="left">
-                                    <img src="${token.tokenLogoUrl || 'https://via.placeholder.com/32'}" alt="${symbol}" />
-                                    <div>
-                                        <div class="name">${symbol}</div>
-                                        <div class="sub">${address.slice(0,6)}...${address.slice(-4)}</div>
-                                    </div>
-                                </div>
-                                <div class="right">
-                                    <button class="add-btn" style="background:var(--accent);color:white;border:none;border-radius:12px;padding:4px 12px;font-weight:600;cursor:pointer;font-size:13px;">添加</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                }
-            } else {
-                html += `<div style="padding:12px;text-align:center;color:var(--text-muted);">未找到匹配的代币，请尝试输入合约地址</div>`;
-            }
-        }
-    }
+           
+            (async () => {
+                const results = await searchTokensByName(chainId, searchVal);
+                if (results && results.length > 0) {
+                    for (const token of results) {
+                        const address = token.tokenContractAddress;
+                        const symbol = token.tokenSymbol;
+                        if (Object.values(tokens).some(t => t.address.toLowerCase() === address.toLowerCase())) continue;
+                        const addItem = document.createElement('div');
+                        addItem.className = 'modal-token-item';
+                        addItem.dataset.address = address;
+                        addItem.dataset.symbol = symbol;
+                        addItem.dataset.new = 'true';
 
-    if (!html) {
-        html = '<div style="padding:12px;text-align:center;color:var(--text-muted);">暂无代币</div>';
-    }
+                        const left = document.createElement('div');
+                        left.className = 'left';
+                        const img = document.createElement('img');
+                        img.src = token.tokenLogoUrl || 'https://via.placeholder.com/32';
+                        left.appendChild(img);
+                        const textDiv = document.createElement('div');
+                        const nameDiv = document.createElement('div');
+                        nameDiv.className = 'name';
+                        nameDiv.textContent = symbol;
+                        textDiv.appendChild(nameDiv);
+                        const subDiv = document.createElement('div');
+                        subDiv.className = 'sub';
+                        subDiv.textContent = address.slice(0, 6) + '...' + address.slice(-4);
+                        textDiv.appendChild(subDiv);
+                        left.appendChild(textDiv);
+                        addItem.appendChild(left);
 
-    container.innerHTML = html;
+                        const right = document.createElement('div');
+                        right.className = 'right';
+                        const addBtn = document.createElement('button');
+                        addBtn.className = 'add-btn';
+                        addBtn.textContent = '添加';
+                        addBtn.style.cssText = 'background:var(--accent);color:white;border:none;border-radius:12px;padding:4px 12px;font-weight:600;cursor:pointer;font-size:13px;';
+                        right.appendChild(addBtn);
+                        addItem.appendChild(right);
 
-    
-    container.querySelectorAll('.modal-token-item').forEach(el => {
-        const symbol = el.dataset.symbol;
-        const address = el.dataset.address;
-        const isNew = el.dataset.new === 'true';
-        if (isNew) {
-            const addBtn = el.querySelector('.add-btn');
-            if (addBtn) {
-                addBtn.addEventListener('click', async function(e) {
-                    e.stopPropagation();
-                    
-                    const info = await fetchTokenInfo(chainId, address);
-                    if (info) {
-                        addCustomToken(address, info);
-                    } else {
-                        showToast('无法获取代币信息，请重试', 'error');
-                    }
-                });
-            }
-        } else {
-            el.addEventListener('click', function() {
-                const symbol = this.dataset.symbol;
-                if (state.modalMode === 'src') {
-                    state.srcTokenSymbol = symbol;
-                    if (state.srcTokenSymbol === state.dstTokenSymbol) {
-                        const keys = Object.keys(tokens);
-                        const other = keys.find(k => k !== state.srcTokenSymbol);
-                        if (other) state.dstTokenSymbol = other;
+                        container.appendChild(addItem);
+
+                        addBtn.addEventListener('click', async function(e) {
+                            e.stopPropagation();
+                            const info2 = await fetchTokenInfo(chainId, address);
+                            if (info2) {
+                                addCustomToken(address, info2);
+                            } else {
+                                showToast('无法获取代币信息，请重试', 'error');
+                            }
+                        });
                     }
                 } else {
-                    state.dstTokenSymbol = symbol;
-                    if (state.srcTokenSymbol === state.dstTokenSymbol) {
-                        const keys = Object.keys(tokens);
-                        const other = keys.find(k => k !== state.srcTokenSymbol);
-                        if (other) state.dstTokenSymbol = other;
-                    }
+                    const noResult = document.createElement('div');
+                    noResult.style.cssText = 'padding:12px;text-align:center;color:var(--text-muted);';
+                    noResult.textContent = '未找到匹配的代币，请尝试输入合约地址';
+                    container.appendChild(noResult);
                 }
-                updateTokenUI();
-                closeTokenModal();
-                loadBalances();
-                quote();
-            });
+            })();
         }
-    });
+    }
 }
+     
 
             function renderNetworkList() {
                 const container = document.getElementById('networkList');
