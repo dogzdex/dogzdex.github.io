@@ -1792,7 +1792,7 @@ console.log(
                         const allowance = await tokenContract.allowance(state.walletAddress, spender);
                         if (allowance < requiredAmount) {
                             try {
-                                showToast('正在授权（无限量）...', 'info');
+                                showToast('正在授权...', 'info');
                                 const approveTx = await tokenContract.approve(spender, ethers.MaxUint256);
                                 await approveTx.wait();
                             } catch (e) {
