@@ -654,10 +654,15 @@
             } catch (e) {
                 clearTimeout(timeoutId);
                 if (retryCount < MAX_RETRIES) {
-                    console.warn(`请求失败，重试 ${retryCount+1}/${MAX_RETRIES}`, e);
-                    await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
-                    return proxyRequest(endpoint, params, retryCount + 1);
-                }
+    console.warn(`请求失败，重试 ${retryCount+1}/${MAX_RETRIES}`, e);
+    
+    let delay = 1000 * (retryCount + 1);
+    if (e.message && (e.message.includes('429') || e.message.includes('Too Many Requests'))) {
+        delay = 5000 * (retryCount + 1); 
+    }
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return proxyRequest(endpoint, params, retryCount + 1);
+}
                 throw e;
             }
         }
@@ -1321,77 +1326,78 @@
         }
 
         function updateUsdPrices() {
-            const amount = parseFloat(document.getElementById('amountInput').value) || 0;
-            const srcToken = getTokenInfo(state.chainId, state.srcTokenSymbol);
-            const dstToken = getTokenInfo(state.chainId, state.dstTokenSymbol);
-            let srcPrice = 0;
-            if (state.lastQuoteData && state.lastQuoteData.fromToken && state.lastQuoteData.fromToken.tokenUnitPrice) {
-                srcPrice = parseFloat(state.lastQuoteData.fromToken.tokenUnitPrice);
-            } else if (state.nativePrice > 0) {
-                srcPrice = state.nativePrice;
-            } else {
-                if (state.srcTokenSymbol === 'USDT' || state.srcTokenSymbol === 'USDC') srcPrice = 1;
-                else if (state.srcTokenSymbol === 'ETH' || state.srcTokenSymbol === 'WETH') srcPrice = 3500;
-                else if (state.srcTokenSymbol === 'BNB') srcPrice = 580;
-                else if (state.srcTokenSymbol === 'DOGZ') srcPrice = 0.0000105;
-                else if (state.srcTokenSymbol === 'TRX') srcPrice = 0.1;
-                else srcPrice = 0.01;
-            }
-            state.usdPriceSrc = srcPrice;
-            const srcUsd = amount * srcPrice;
-            document.getElementById('srcUsdPrice').textContent = srcUsd > 0 ? `$${srcUsd.toFixed(2)}` : '$0.00';
+    const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+    const srcToken = getTokenInfo(state.chainId, state.srcTokenSymbol);
+    const dstToken = getTokenInfo(state.chainId, state.dstTokenSymbol);
+    let srcPrice = 0;
+    if (state.lastQuoteData && state.lastQuoteData.fromToken && state.lastQuoteData.fromToken.tokenUnitPrice) {
+        srcPrice = parseFloat(state.lastQuoteData.fromToken.tokenUnitPrice);
+    } else if (state.nativePrice > 0) {
+        srcPrice = state.nativePrice;
+    } else {
+        if (state.srcTokenSymbol === 'USDT' || state.srcTokenSymbol === 'USDC') srcPrice = 1;
+        else if (state.srcTokenSymbol === 'ETH' || state.srcTokenSymbol === 'WETH') srcPrice = 3500;
+        else if (state.srcTokenSymbol === 'BNB') srcPrice = 580;
+        else if (state.srcTokenSymbol === 'DOGZ') srcPrice = 0.0000105;
+        else if (state.srcTokenSymbol === 'TRX') srcPrice = 0.1;
+        else srcPrice = 0.01;
+    }
+    state.usdPriceSrc = srcPrice;
+    const srcUsd = amount * srcPrice;
+    document.getElementById('srcUsdPrice').textContent = srcUsd > 0 ? `$${srcUsd.toFixed(2)}` : '$0.00';
 
-            const dstEstimate = parseFloat(document.getElementById('dstEstimateInput').value) || 0;
-            let dstPrice = state.dstPrice;
-            if (dstPrice === 0) {
-                if (state.dstTokenSymbol === 'USDT' || state.dstTokenSymbol === 'USDC') dstPrice = 1;
-                else if (state.dstTokenSymbol === 'ETH' || state.dstTokenSymbol === 'WETH') dstPrice = 3500;
-                else if (state.dstTokenSymbol === 'BNB') dstPrice = 580;
-                else if (state.dstTokenSymbol === 'DOGZ') dstPrice = 0.0000105;
-                else if (state.dstTokenSymbol === 'TRX') dstPrice = 0.1;
-                else dstPrice = 0.01;
-            }
-            state.usdPriceDst = dstPrice;
-            const dstUsd = dstEstimate * dstPrice;
-            document.getElementById('dstUsdPrice').textContent = dstUsd > 0 ? `$${dstUsd.toFixed(2)}` : '$0.00';
+    const dstEstimate = parseFloat(document.getElementById('dstEstimateInput').value) || 0;
+    let dstPrice = state.dstPrice;
+    if (dstPrice === 0) {
+        if (state.dstTokenSymbol === 'USDT' || state.dstTokenSymbol === 'USDC') dstPrice = 1;
+        else if (state.dstTokenSymbol === 'ETH' || state.dstTokenSymbol === 'WETH') dstPrice = 3500;
+        else if (state.dstTokenSymbol === 'BNB') dstPrice = 580;
+        else if (state.dstTokenSymbol === 'DOGZ') dstPrice = 0.0000105;
+        else if (state.dstTokenSymbol === 'TRX') dstPrice = 0.1;
+        else dstPrice = 0.01;
+    }
+    state.usdPriceDst = dstPrice;
+    const dstUsd = dstEstimate * dstPrice;
+    document.getElementById('dstUsdPrice').textContent = dstUsd > 0 ? `$${dstUsd.toFixed(2)}` : '$0.00';
 
-            let impactPercent = 0;
-            if (state.lastQuoteData) {
-                if (state.lastQuoteData.priceImpactPercent !== undefined && state.lastQuoteData.priceImpactPercent !== null) {
-                    impactPercent = parseFloat(state.lastQuoteData.priceImpactPercent);
-                } else if (state.lastQuoteData.priceImpact !== undefined && state.lastQuoteData.priceImpact !== null) {
-                    impactPercent = parseFloat(state.lastQuoteData.priceImpact);
-                    if (Math.abs(impactPercent) < 1 && impactPercent !== 0) {
-                        impactPercent = impactPercent * 100;
-                    }
-                }
-            }
-            state.realPriceImpact = impactPercent;
-            const badge = document.getElementById('changeBadge');
-            const display = impactPercent.toFixed(2);
-            badge.textContent = `${display}%`;
-            badge.className = 'change-badge';
-            if (impactPercent > 0.01) {
-                badge.classList.add('positive');
-            } else if (impactPercent < -0.01) {
-                badge.classList.add('negative');
-            } else {
-                badge.classList.add('neutral');
-            }
-
-            const warning = document.getElementById('impactWarning');
-            const warnPercent = document.getElementById('impactWarningPercent');
-            const warnLoss = document.getElementById('impactWarningLoss');
-            const absImpact = Math.abs(impactPercent);
-            if (absImpact >= IMPACT_WARNING_THRESHOLD && dstUsd > 0) {
-                warning.classList.add('show');
-                warnPercent.textContent = impactPercent.toFixed(2) + '%';
-                const loss = dstUsd * (absImpact / 100);
-                warnLoss.textContent = `$${loss.toFixed(2)}`;
-            } else {
-                warning.classList.remove('show');
+    let impactPercent = 0;
+    if (state.lastQuoteData) {
+        if (state.lastQuoteData.priceImpactPercent !== undefined && state.lastQuoteData.priceImpactPercent !== null) {
+            impactPercent = parseFloat(state.lastQuoteData.priceImpactPercent);
+        } else if (state.lastQuoteData.priceImpact !== undefined && state.lastQuoteData.priceImpact !== null) {
+            impactPercent = parseFloat(state.lastQuoteData.priceImpact);
+            if (Math.abs(impactPercent) < 1 && impactPercent !== 0) {
+                impactPercent = impactPercent * 100;
             }
         }
+    }
+    state.realPriceImpact = impactPercent;
+    const badge = document.getElementById('changeBadge');
+    const display = impactPercent.toFixed(2);
+    badge.textContent = `${display}%`;
+    badge.className = 'change-badge';
+    if (impactPercent > 0.01) {
+        badge.classList.add('positive');
+    } else if (impactPercent < -0.01) {
+        badge.classList.add('negative');
+    } else {
+        badge.classList.add('neutral');
+    }
+
+    const warning = document.getElementById('impactWarning');
+    const warnPercent = document.getElementById('impactWarningPercent');
+    const warnLoss = document.getElementById('impactWarningLoss');
+    const absImpact = Math.abs(impactPercent);
+    
+    const loss = dstUsd * (absImpact / 100);
+    if (loss >= 50 && dstUsd > 0) {
+        warning.classList.add('show');
+        warnPercent.textContent = impactPercent.toFixed(2) + '%';
+        warnLoss.textContent = `$${loss.toFixed(2)}`;
+    } else {
+        warning.classList.remove('show');
+    }
+}
 
         async function updateGasPrice() {
             if (state.isTron || !state.provider) return;
@@ -1698,17 +1704,21 @@
                 if (!state.isTron && state.provider) await updateGasPrice();
                 updateUsdPrices();
             } catch (e) {
-                console.warn('Quote error:', e);
-                document.getElementById('dstEstimateInput').value = '0';
-                updateDstInputEmptyState();
-                state.lastQuoteData = null;
-                let msg = e.message;
-                if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('AbortError') || msg.includes('signal is aborted')) {
-                    msg = '网络请求超时，请检查网络或稍后重试';
-                }
-                showToast('获取报价失败: ' + msg, 'error');
-                updateUsdPrices();
-            } finally {
+    console.warn('Quote error:', e);
+    document.getElementById('dstEstimateInput').value = '0';
+    updateDstInputEmptyState();
+    state.lastQuoteData = null;
+    let msg = e.message;
+    if (msg.includes('429') || msg.includes('Too Many Requests') || msg.includes('1015')) {
+        msg = '请求过于频繁，请稍候再试 (429)';
+       
+        setTimeout(() => { if (document.getElementById('amountInput').value) quote(); }, 5000);
+    } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('AbortError') || msg.includes('signal is aborted')) {
+        msg = '网络请求超时，请检查网络或稍后重试';
+    }
+    showToast('获取报价失败: ' + msg, 'error');
+    updateUsdPrices();
+} finally {
                 updateSwapButton(amountNum);
             }
         }
@@ -3101,7 +3111,7 @@ console.log(
                 }
                 if (!state.isTron && state.provider) updateGasPrice();
                 updateUsdPrices();
-            }, 3000);
+            }, 5000);
         }
 
       
@@ -3190,10 +3200,14 @@ console.log(
                     quote();
                 }
             });
-            document.getElementById('amountInput').addEventListener('input', function() {
-                quote();
-                adjustFontSize(this);
-            });
+            let quoteDebounceTimer;
+document.getElementById('amountInput').addEventListener('input', function() {
+    clearTimeout(quoteDebounceTimer);
+    quoteDebounceTimer = setTimeout(() => {
+        quote();
+    }, 400); 
+    adjustFontSize(this);
+});
 
             document.getElementById('slippageDisplay').addEventListener('click', function() {
                 openSettingsModal();
