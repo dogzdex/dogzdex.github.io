@@ -41,7 +41,52 @@
     .balance-display .balance-amount { letter-spacing: -0.5px; }
     .row-price .price-usd { letter-spacing: -0.3px; }
     .modal-search-wrapper { display:flex; align-items:center; background:var(--bg-input); border-radius:16px; padding:4px 4px 4px 14px; margin-bottom:20px; }
-    .modal-search-wrapper input { flex:1; background:transparent; border:none; outline:none; color:var(--text-primary); font-size:14px; min-width:0; padding:8px 0; }
+  
+
+.modal-search-wrapper input {
+    flex: 1;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--text-primary);
+    font-size: 14px;
+    min-width: 0;
+    padding: 8px 0;
+
+   
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+
+
+.modal-search-wrapper input:-webkit-autofill,
+.modal-search-wrapper input:-webkit-autofill:hover,
+.modal-search-wrapper input:-webkit-autofill:focus,
+.modal-search-wrapper input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--text-primary) !important;
+    color: var(--text-primary) !important;
+
+  
+    -webkit-box-shadow: 0 0 0 1000px var(--bg-input) inset !important;
+    box-shadow: 0 0 0 1000px var(--bg-input) inset !important;
+
+    background-color: var(--bg-input) !important;
+    background-clip: padding-box !important;
+
+    border: none !important;
+    outline: none !important;
+}
+
+
+.modal-search-wrapper input:hover,
+.modal-search-wrapper input:focus,
+.modal-search-wrapper input:active {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none;
+}
     .modal-search-wrapper input::placeholder { color:var(--text-muted); }
     .modal-search-wrapper .paste-btn { background:var(--accent-light); color:var(--accent); border:none; border-radius:8px; padding:3px 8px; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:3px; white-space:nowrap; flex-shrink:0; transition:background 0.2s; }
     .modal-search-wrapper .paste-btn:hover { background:var(--accent); color:white; }
