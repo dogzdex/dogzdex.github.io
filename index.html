@@ -509,19 +509,79 @@
             </div>
 
        
-            <div class="meta-block">
-                <div class="swap-meta">
-                    <div class="left"><span class="manual-btn" id="manualSettingsBtn">手动设置</span></div>
-                    <div class="right">
-                        <span class="slippage" id="slippageDisplay"><i class="fas fa-sliders-h"></i> <span id="slippageText">动态 0.5%</span></span>
-                        <span class="gas-fee"><i class="fas fa-gas-pump"></i> Gas: <span id="gasFeeDisplay" class="mono">$0.00</span></span>
-                    </div>
-                </div>
-                <div class="rate-row">
-                    <span class="rate-label">参考汇率</span>
-                    <span class="rate-value" id="rateDisplay">1 USDT ≈ 94,179.60 DOGZ</span>
-                </div>
-            </div>
+   
+
+<div
+    class="meta-block"
+    id="swapMetaBlock"
+    style="display:none;"
+>
+
+    <div class="swap-meta">
+
+        <div class="left">
+
+            <span
+                class="manual-btn"
+                id="manualSettingsBtn"
+            >
+                手动设置
+            </span>
+
+        </div>
+
+
+        <div class="right">
+
+            <span
+                class="slippage"
+                id="slippageDisplay"
+            >
+                <i class="fas fa-sliders-h"></i>
+
+                <span id="slippageText">
+                    动态 0.5%
+                </span>
+
+            </span>
+
+
+            <span
+                class="gas-fee"
+                id="gasFeeWrapper"
+            >
+                <i class="fas fa-gas-pump"></i>
+
+                Gas:
+
+                <span
+                    id="gasFeeDisplay"
+                    class="mono"
+                >
+                    $0.00
+                </span>
+
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="rate-row">
+
+        <span class="rate-label">
+            参考汇率
+        </span>
+
+        <span
+            class="rate-value"
+            id="rateDisplay"
+        ></span>
+
+    </div>
+
+</div>
 
        
             <button class="btn-primary" id="swapActionBtn"><i class="fas fa-arrows-spin"></i> 兑换</button>
@@ -1432,19 +1492,237 @@ async function marketProxyRequest(
             updateDstInputEmptyState();
         }
 
-        function updateRateDisplay() {
-            const rateEl = document.getElementById('rateDisplay');
-            if (state.lastQuoteData && rateEl) {
-                const srcSymbol = state.srcTokenSymbol;
-                const dstSymbol = state.dstTokenSymbol;
-                const srcDecimals = getTokenInfo(state.chainId, srcSymbol).decimals;
-                const dstDecimals = getTokenInfo(state.chainId, dstSymbol).decimals;
-                const rate = parseFloat(state.lastQuoteData.toTokenAmount) / parseFloat(state.lastQuoteData.fromTokenAmount) * Math.pow(10, srcDecimals - dstDecimals);
-                rateEl.textContent = `1 ${srcSymbol} ≈ ${rate.toFixed(6)} ${dstSymbol}`;
-            } else if (rateEl) {
-                rateEl.textContent = `1 ${state.srcTokenSymbol} ≈ 94,179.60 ${state.dstTokenSymbol}`;
-            }
-        }
+
+
+function updateRateDisplay() {
+
+    const rateEl =
+        document.getElementById('rateDisplay');
+
+    if (!rateEl) {
+        return;
+    }
+
+   
+    if (
+        !state.lastQuoteData ||
+        !state.lastQuoteData.fromTokenAmount ||
+        !state.lastQuoteData.toTokenAmount
+    ) {
+
+        rateEl.textContent = '';
+
+        return;
+    }
+
+
+    const srcSymbol =
+        state.srcTokenSymbol;
+
+    const dstSymbol =
+        state.dstTokenSymbol;
+
+
+    const srcInfo =
+        getTokenInfo(
+            state.chainId,
+            srcSymbol
+        );
+
+    const dstInfo =
+        getTokenInfo(
+            state.chainId,
+            dstSymbol
+        );
+
+
+    if (!srcInfo || !dstInfo) {
+
+        rateEl.textContent = '';
+
+        return;
+    }
+
+
+    const srcDecimals =
+        Number(srcInfo.decimals ?? 18);
+
+    const dstDecimals =
+        Number(dstInfo.decimals ?? 18);
+
+
+    const fromRaw =
+        Number(
+            state.lastQuoteData.fromTokenAmount
+        );
+
+    const toRaw =
+        Number(
+            state.lastQuoteData.toTokenAmount
+        );
+
+
+    if (
+        !Number.isFinite(fromRaw) ||
+        !Number.isFinite(toRaw) ||
+        fromRaw <= 0 ||
+        toRaw <= 0
+    ) {
+
+        rateEl.textContent = '';
+
+        return;
+    }
+
+
+  
+    const rate =
+        (
+            toRaw /
+            fromRaw
+        ) *
+        Math.pow(
+            10,
+            srcDecimals - dstDecimals
+        );
+
+
+    if (
+        !Number.isFinite(rate) ||
+        rate <= 0
+    ) {
+
+        rateEl.textContent = '';
+
+        return;
+    }
+
+
+  
+    let rateText;
+
+    if (rate >= 1000) {
+
+        rateText =
+            rate.toLocaleString(
+                'en-US',
+                {
+                    maximumFractionDigits: 2
+                }
+            );
+
+    } else if (rate >= 1) {
+
+        rateText =
+            rate.toLocaleString(
+                'en-US',
+                {
+                    maximumFractionDigits: 6
+                }
+            );
+
+    } else if (rate >= 0.01) {
+
+        rateText =
+            rate.toLocaleString(
+                'en-US',
+                {
+                    maximumFractionDigits: 8
+                }
+            );
+
+    } else if (rate >= 0.000001) {
+
+        rateText =
+            rate.toLocaleString(
+                'en-US',
+                {
+                    minimumFractionDigits: 6,
+                    maximumFractionDigits: 12
+                }
+            );
+
+    } else {
+
+        rateText =
+            rate.toLocaleString(
+                'en-US',
+                {
+                    minimumFractionDigits: 6,
+                    maximumFractionDigits: 18
+                }
+            );
+
+    }
+
+
+    rateEl.textContent =
+        `1 ${srcSymbol} ≈ ${rateText} ${dstSymbol}`;
+
+}
+
+
+
+
+function updateMetaBlockVisibility(forceVisible = null) {
+
+    const metaBlock =
+        document.querySelector('.meta-block');
+
+    if (!metaBlock) {
+        return;
+    }
+
+
+    let shouldShow;
+
+
+    if (forceVisible !== null) {
+
+        shouldShow =
+            Boolean(forceVisible);
+
+    } else {
+
+        shouldShow =
+            Boolean(
+                state.lastQuoteData &&
+                state.lastQuoteData.fromTokenAmount &&
+                state.lastQuoteData.toTokenAmount
+            );
+
+    }
+
+
+    if (shouldShow) {
+
+        metaBlock.style.display = '';
+
+       
+        requestAnimationFrame(() => {
+
+            metaBlock.classList.add(
+                'quote-ready'
+            );
+
+        });
+
+    } else {
+
+        metaBlock.classList.remove(
+            'quote-ready'
+        );
+
+        metaBlock.style.display =
+            'none';
+
+    }
+
+}
+
+
+
+
 
         function updateWalletUI() {
             const status = document.getElementById('walletStatus');
@@ -1606,78 +1884,387 @@ async function marketProxyRequest(
             }
         }
 
-        function updateUsdPrices() {
-    const amount = parseFloat(document.getElementById('amountInput').value) || 0;
-    const srcToken = getTokenInfo(state.chainId, state.srcTokenSymbol);
-    const dstToken = getTokenInfo(state.chainId, state.dstTokenSymbol);
-    let srcPrice = 0;
-    if (state.lastQuoteData && state.lastQuoteData.fromToken && state.lastQuoteData.fromToken.tokenUnitPrice) {
-        srcPrice = parseFloat(state.lastQuoteData.fromToken.tokenUnitPrice);
-    } else if (state.nativePrice > 0) {
-        srcPrice = state.nativePrice;
-    } else {
-        if (state.srcTokenSymbol === 'USDT' || state.srcTokenSymbol === 'USDC') srcPrice = 1;
-        else if (state.srcTokenSymbol === 'ETH' || state.srcTokenSymbol === 'WETH') srcPrice = 3500;
-        else if (state.srcTokenSymbol === 'BNB') srcPrice = 580;
-        else if (state.srcTokenSymbol === 'DOGZ') srcPrice = 0.0000105;
-        else if (state.srcTokenSymbol === 'TRX') srcPrice = 0.1;
-        else srcPrice = 0.01;
-    }
-    state.usdPriceSrc = srcPrice;
-    const srcUsd = amount * srcPrice;
-    document.getElementById('srcUsdPrice').textContent = srcUsd > 0 ? `$${srcUsd.toFixed(2)}` : '$0.00';
+      
 
-    const dstEstimate = parseFloat(document.getElementById('dstEstimateInput').value) || 0;
-    let dstPrice = state.dstPrice;
-    if (dstPrice === 0) {
-        if (state.dstTokenSymbol === 'USDT' || state.dstTokenSymbol === 'USDC') dstPrice = 1;
-        else if (state.dstTokenSymbol === 'ETH' || state.dstTokenSymbol === 'WETH') dstPrice = 3500;
-        else if (state.dstTokenSymbol === 'BNB') dstPrice = 580;
-        else if (state.dstTokenSymbol === 'DOGZ') dstPrice = 0.0000105;
-        else if (state.dstTokenSymbol === 'TRX') dstPrice = 0.1;
-        else dstPrice = 0.01;
+function updateUsdPrices() {
+
+    const amountInput =
+        document.getElementById(
+            'amountInput'
+        );
+
+
+    const dstInput =
+        document.getElementById(
+            'dstEstimateInput'
+        );
+
+
+    const amount =
+        parseFloat(
+            amountInput
+                ? amountInput.value
+                : ''
+        ) || 0;
+
+
+    const dstEstimate =
+        parseFloat(
+            dstInput
+                ? dstInput.value
+                : ''
+        ) || 0;
+
+
+    const srcToken =
+        getTokenInfo(
+            state.chainId,
+            state.srcTokenSymbol
+        );
+
+
+    const dstToken =
+        getTokenInfo(
+            state.chainId,
+            state.dstTokenSymbol
+        );
+
+
+
+
+    let srcPrice =
+        parseFloat(
+            state.usdPriceSrc
+        ) || 0;
+
+
+   
+
+    if (
+        state.lastQuoteData &&
+        state.lastQuoteData.fromToken &&
+        state.lastQuoteData.fromToken.tokenUnitPrice
+    ) {
+
+        const quoteSrcPrice =
+            parseFloat(
+                state.lastQuoteData
+                    .fromToken
+                    .tokenUnitPrice
+            );
+
+
+        if (
+            Number.isFinite(
+                quoteSrcPrice
+            ) &&
+            quoteSrcPrice > 0
+        ) {
+
+            srcPrice =
+                quoteSrcPrice;
+
+        }
+
     }
-    state.usdPriceDst = dstPrice;
-    const dstUsd = dstEstimate * dstPrice;
-    document.getElementById('dstUsdPrice').textContent = dstUsd > 0 ? `$${dstUsd.toFixed(2)}` : '$0.00';
+
+
+   
+
+    else if (
+        state.nativePrice > 0
+    ) {
+
+        srcPrice =
+            parseFloat(
+                state.nativePrice
+            ) || 0;
+
+    }
+
+
+
+
+    else {
+
+        if (
+            state.srcTokenSymbol === 'USDT' ||
+            state.srcTokenSymbol === 'USDC'
+        ) {
+
+            srcPrice = 1;
+
+        }
+
+    }
+
+
+   
+
+    state.usdPriceSrc =
+        Number.isFinite(srcPrice)
+            ? srcPrice
+            : 0;
+
+
+
+
+    const srcUsd =
+        amount *
+        state.usdPriceSrc;
+
+
+    const srcUsdEl =
+        document.getElementById(
+            'srcUsdPrice'
+        );
+
+
+    if (srcUsdEl) {
+
+        srcUsdEl.textContent =
+            srcUsd > 0
+                ? `$${srcUsd.toFixed(2)}`
+                : '$0.00';
+
+    }
+
+
+
+
+    let dstPrice =
+        parseFloat(
+            state.usdPriceDst
+        ) || 0;
+
+
+  
+
+    if (
+        state.lastQuoteData &&
+        state.lastQuoteData.toToken &&
+        state.lastQuoteData.toToken.tokenUnitPrice
+    ) {
+
+        const quoteDstPrice =
+            parseFloat(
+                state.lastQuoteData
+                    .toToken
+                    .tokenUnitPrice
+            );
+
+
+        if (
+            Number.isFinite(
+                quoteDstPrice
+            ) &&
+            quoteDstPrice > 0
+        ) {
+
+            dstPrice =
+                quoteDstPrice;
+
+        }
+
+    }
+
+
+
+    else if (
+        dstPrice <= 0
+    ) {
+
+        if (
+            state.dstTokenSymbol === 'USDT' ||
+            state.dstTokenSymbol === 'USDC'
+        ) {
+
+            dstPrice = 1;
+
+        }
+
+    }
+
+
+   
+
+    state.usdPriceDst =
+        Number.isFinite(dstPrice)
+            ? dstPrice
+            : 0;
+
+
+  
+
+    const dstUsd =
+        dstEstimate *
+        state.usdPriceDst;
+
+
+    const dstUsdEl =
+        document.getElementById(
+            'dstUsdPrice'
+        );
+
+
+    if (dstUsdEl) {
+
+        dstUsdEl.textContent =
+            dstUsd > 0
+                ? `$${dstUsd.toFixed(2)}`
+                : '$0.00';
+
+    }
+
+
+
 
     let impactPercent = 0;
-    if (state.lastQuoteData) {
-        if (state.lastQuoteData.priceImpactPercent !== undefined && state.lastQuoteData.priceImpactPercent !== null) {
-            impactPercent = parseFloat(state.lastQuoteData.priceImpactPercent);
-        } else if (state.lastQuoteData.priceImpact !== undefined && state.lastQuoteData.priceImpact !== null) {
-            impactPercent = parseFloat(state.lastQuoteData.priceImpact);
-            if (Math.abs(impactPercent) < 1 && impactPercent !== 0) {
-                impactPercent = impactPercent * 100;
-            }
+
+
+    if (
+        state.lastQuoteData
+    ) {
+
+        if (
+            state.lastQuoteData.priceImpactPercent !==
+                undefined &&
+            state.lastQuoteData.priceImpactPercent !==
+                null
+        ) {
+
+            impactPercent =
+                parseFloat(
+                    state.lastQuoteData
+                        .priceImpactPercent
+                );
+
         }
-    }
-    state.realPriceImpact = impactPercent;
-    const badge = document.getElementById('changeBadge');
-    const display = impactPercent.toFixed(2);
-    badge.textContent = `${display}%`;
-    badge.className = 'change-badge';
-    if (impactPercent > 0.01) {
-        badge.classList.add('positive');
-    } else if (impactPercent < -0.01) {
-        badge.classList.add('negative');
-    } else {
-        badge.classList.add('neutral');
+
+        else if (
+            state.lastQuoteData.priceImpact !==
+                undefined &&
+            state.lastQuoteData.priceImpact !==
+                null
+        ) {
+
+            impactPercent =
+                parseFloat(
+                    state.lastQuoteData
+                        .priceImpact
+                );
+
+
+            if (
+                Math.abs(impactPercent) < 1 &&
+                impactPercent !== 0
+            ) {
+
+                impactPercent *= 100;
+
+            }
+
+        }
+
     }
 
-    const warning = document.getElementById('impactWarning');
-    const warnPercent = document.getElementById('impactWarningPercent');
-    const warnLoss = document.getElementById('impactWarningLoss');
-    const absImpact = Math.abs(impactPercent);
-    
-    const loss = dstUsd * (absImpact / 100);
-    if (loss >= 50 && dstUsd > 0) {
-        warning.classList.add('show');
-        warnPercent.textContent = impactPercent.toFixed(2) + '%';
-        warnLoss.textContent = `$${loss.toFixed(2)}`;
-    } else {
-        warning.classList.remove('show');
+
+    if (
+        !Number.isFinite(
+            impactPercent
+        )
+    ) {
+
+        impactPercent = 0;
+
     }
+
+
+    state.realPriceImpact =
+        impactPercent;
+
+
+    const badge =
+        document.getElementById(
+            'changeBadge'
+        );
+
+
+    if (badge) {
+
+        const display =
+            impactPercent.toFixed(2);
+
+
+        badge.textContent =
+            `${display}%`;
+
+
+        badge.className =
+            'change-badge';
+
+
+        if (
+            impactPercent > 0.01
+        ) {
+
+            badge.classList.add(
+                'positive'
+            );
+
+        }
+
+        else if (
+            impactPercent < -0.01
+        ) {
+
+            badge.classList.add(
+                'negative'
+            );
+
+        }
+
+        else {
+
+            badge.classList.add(
+                'neutral'
+            );
+
+        }
+
+    }
+
+
+ 
+
+    const warning = document.getElementById('impactWarning');
+const warnPercent = document.getElementById('impactWarningPercent');
+const warnLoss = document.getElementById('impactWarningLoss');
+
+
+const loss = dstUsd * (Math.abs(impactPercent) / 100);
+
+if (
+    impactPercent < 0 &&
+    loss > 50 &&
+    dstUsd > 0
+) {
+    warning.classList.add('show');
+
+    warnPercent.textContent =
+        impactPercent.toFixed(2) + '%';
+
+    warnLoss.textContent =
+        `$${loss.toFixed(2)}`;
+
+} else {
+
+    warning.classList.remove('show');
+
+
+
+    }
+
 }
 
         async function updateGasPrice() {
@@ -1900,30 +2487,309 @@ async function marketProxyRequest(
         }
 
       
-        async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
-            try {
-                let apiChainId = chainId;
-                if (isTronChain(chainId)) apiChainId = 195;
-                if (isNaN(apiChainId)) apiChainId = 1;
-                const params = {
-                    chainIndex: String(apiChainId),
-                    amount: amount,
-                    fromTokenAddress: srcToken.address,
-                    toTokenAddress: dstToken.address,
-                    swapMode: swapMode,
-                    userWalletAddress: state.walletAddress || '',
-                };
-                const data = await proxyRequest('/quote', params);
-                if (data.code !== '0') {
-                    return { error: data.msg || 'Quote error' };
-                }
-                const result = data.data[0];
-                if (!result) return { error: 'No quote data' };
-                return result;
-            } catch (e) {
-                return { error: e.message };
-            }
+    
+
+async function doQuote(
+    chainId,
+    srcToken,
+    dstToken,
+    amount,
+    swapMode
+) {
+
+    try {
+
+      
+        if (
+            amount === undefined ||
+            amount === null ||
+            String(amount).trim() === '' ||
+            Number(amount) <= 0
+        ) {
+
+            state.lastQuoteData = null;
+
+            updateRateDisplay();
+
+            updateMetaBlockVisibility(false);
+
+            return {
+                error: 'Amount is empty'
+            };
+
         }
+
+
+        let apiChainId =
+            chainId;
+
+
+        if (
+            isTronChain(chainId)
+        ) {
+
+            apiChainId = 195;
+
+        }
+
+
+        if (
+            isNaN(apiChainId)
+        ) {
+
+            apiChainId = 1;
+
+        }
+
+
+        const params = {
+
+            chainIndex:
+                String(apiChainId),
+
+            amount:
+                String(amount),
+
+            fromTokenAddress:
+                srcToken.address,
+
+            toTokenAddress:
+                dstToken.address,
+
+            swapMode:
+                swapMode,
+
+            userWalletAddress:
+                state.walletAddress || ''
+
+        };
+
+
+        const data =
+            await proxyRequest(
+                '/quote',
+                params
+            );
+
+
+       
+        if (
+            !data ||
+            data.code !== '0'
+        ) {
+
+            state.lastQuoteData = null;
+
+            updateRateDisplay();
+
+            updateMetaBlockVisibility(false);
+
+            return {
+                error:
+                    data?.msg ||
+                    'Quote error'
+            };
+
+        }
+
+
+        const result =
+            data.data?.[0];
+
+
+        if (!result) {
+
+            state.lastQuoteData = null;
+
+            updateRateDisplay();
+
+            updateMetaBlockVisibility(false);
+
+            return {
+                error:
+                    'No quote data'
+            };
+
+        }
+
+
+      
+        if (
+            !result.fromTokenAmount ||
+            !result.toTokenAmount
+        ) {
+
+            state.lastQuoteData = null;
+
+            updateRateDisplay();
+
+            updateMetaBlockVisibility(false);
+
+            return {
+                error:
+                    'Invalid quote data'
+            };
+
+        }
+
+
+        state.lastQuoteData =
+            result;
+
+
+        updateRateDisplay();
+
+
+      
+        updateMetaBlockVisibility(true);
+
+
+        return result;
+
+
+    } catch (e) {
+
+        console.error(
+            'doQuote error:',
+            e
+        );
+
+
+        state.lastQuoteData = null;
+
+        updateRateDisplay();
+
+        updateMetaBlockVisibility(false);
+
+
+        return {
+            error:
+                e?.message ||
+                'Quote request failed'
+        };
+
+    }
+
+}
+
+
+
+
+if (!state.quoteUsdPrices) {
+
+    state.quoteUsdPrices = {};
+
+}
+
+
+
+function getQuoteRate() {
+
+    const q =
+        state.lastQuoteData;
+
+
+    if (
+        !q ||
+        !q.fromTokenAmount ||
+        !q.toTokenAmount
+    ) {
+
+        return null;
+
+    }
+
+
+    const srcInfo =
+        getTokenInfo(
+            state.chainId,
+            state.srcTokenSymbol
+        );
+
+
+    const dstInfo =
+        getTokenInfo(
+            state.chainId,
+            state.dstTokenSymbol
+        );
+
+
+    if (
+        !srcInfo ||
+        !dstInfo
+    ) {
+
+        return null;
+
+    }
+
+
+    const fromRaw =
+        Number(
+            q.fromTokenAmount
+        );
+
+
+    const toRaw =
+        Number(
+            q.toTokenAmount
+        );
+
+
+    if (
+        !Number.isFinite(fromRaw) ||
+        !Number.isFinite(toRaw) ||
+        fromRaw <= 0 ||
+        toRaw <= 0
+    ) {
+
+        return null;
+
+    }
+
+
+    return (
+        toRaw /
+        fromRaw
+    ) *
+    Math.pow(
+        10,
+        Number(srcInfo.decimals ?? 18) -
+        Number(dstInfo.decimals ?? 18)
+    );
+
+}
+
+
+
+
+
+
+
+
+
+
+
+function clearCurrentQuote() {
+
+    state.lastQuoteData = null;
+
+
+    updateRateDisplay();
+
+
+    updateMetaBlockVisibility(false);
+
+
+   
+
+}
+
+
+
+
+
+
 
         async function quote() {
             const amount = document.getElementById('amountInput').value;
@@ -3713,7 +4579,9 @@ const tokenSearchInflight = new Map();
             renderTokenList();
         }
         
-        function renderLocalTokenItem(
+   
+
+function renderLocalTokenItem(
     container,
     symbol,
     info,
@@ -3742,7 +4610,7 @@ const tokenSearchInflight = new Map();
         symbol === currentSymbol;
 
 
-
+   
 
     const left =
         document.createElement(
@@ -3771,8 +4639,10 @@ const tokenSearchInflight = new Map();
 
     img.onerror =
         function() {
+
             this.src =
                 'https://via.placeholder.com/32';
+
         };
 
 
@@ -3855,6 +4725,8 @@ const tokenSearchInflight = new Map();
         'right';
 
 
+  
+
     let balance = '0';
 
 
@@ -3863,6 +4735,7 @@ const tokenSearchInflight = new Map();
         (
             symbol ===
                 state.srcTokenSymbol ||
+
             symbol ===
                 state.dstTokenSymbol
         )
@@ -3906,6 +4779,8 @@ const tokenSearchInflight = new Map();
     );
 
 
+  
+
     const usdDiv =
         document.createElement(
             'div'
@@ -3916,14 +4791,120 @@ const tokenSearchInflight = new Map();
         'balance-value';
 
 
+    const numericBalance =
+        parseFloat(
+            String(balance)
+                .replace(/,/g, '')
+        ) || 0;
+
+
+
+
+    let tokenUsdPrice = 0;
+
+
+ 
+
+    if (
+        symbol ===
+        state.srcTokenSymbol
+    ) {
+
+        tokenUsdPrice =
+            parseFloat(
+                state.usdPriceSrc
+            ) || 0;
+
+    }
+
+
+
+
+    if (
+        symbol ===
+        state.dstTokenSymbol
+    ) {
+
+        const dstStatePrice =
+            parseFloat(
+                state.usdPriceDst
+            ) || 0;
+
+
+        if (dstStatePrice > 0) {
+
+            tokenUsdPrice =
+                dstStatePrice;
+
+        }
+
+    }
+
+
+
+    if (
+        state.lastQuoteData &&
+        state.lastQuoteData.fromToken &&
+        state.lastQuoteData.fromToken.tokenUnitPrice &&
+        symbol === state.srcTokenSymbol
+    ) {
+
+        const quotePrice =
+            parseFloat(
+                state.lastQuoteData
+                    .fromToken
+                    .tokenUnitPrice
+            );
+
+
+        if (
+            Number.isFinite(quotePrice) &&
+            quotePrice > 0
+        ) {
+
+            tokenUsdPrice =
+                quotePrice;
+
+        }
+
+    }
+
+
+ 
+
+    if (
+        state.lastQuoteData &&
+        state.lastQuoteData.toToken &&
+        state.lastQuoteData.toToken.tokenUnitPrice &&
+        symbol === state.dstTokenSymbol
+    ) {
+
+        const quotePrice =
+            parseFloat(
+                state.lastQuoteData
+                    .toToken
+                    .tokenUnitPrice
+            );
+
+
+        if (
+            Number.isFinite(quotePrice) &&
+            quotePrice > 0
+        ) {
+
+            tokenUsdPrice =
+                quotePrice;
+
+        }
+
+    }
+
+
+
+
     const val =
-        parseFloat(balance) *
-        (
-            symbol === 'USDT' ||
-            symbol === 'USDC'
-                ? 1
-                : 0.01
-        );
+        numericBalance *
+        tokenUsdPrice;
 
 
     usdDiv.textContent =
@@ -3934,6 +4915,7 @@ const tokenSearchInflight = new Map();
     right.appendChild(
         usdDiv
     );
+
 
 
     if (isSelected) {
@@ -3967,7 +4949,6 @@ const tokenSearchInflight = new Map();
     container.appendChild(
         item
     );
-
 
 
 
@@ -4051,13 +5032,56 @@ const tokenSearchInflight = new Map();
             }
 
 
+          
+
             updateTokenUI();
 
+
+         
             closeTokenModal();
+
+
+        
 
             loadBalances();
 
-            quote();
+
+       
+
+            const amountInput =
+                document.getElementById(
+                    'amountInput'
+                );
+
+
+            const amount =
+                amountInput
+                    ? amountInput.value.trim()
+                    : '';
+
+
+            if (amount) {
+
+                quote();
+
+            } else {
+
+                state.lastQuoteData =
+                    null;
+
+
+                if (
+                    typeof setMetaVisibility ===
+                    'function'
+                ) {
+
+                    setMetaVisibility(
+                        false
+                    );
+
+                }
+
+            }
 
         }
     );
@@ -4826,16 +5850,70 @@ const tokenSearchInflight = new Map();
         }
 
       
-        function startPriceRefresh() {
-            if (state.quoteTimer) clearInterval(state.quoteTimer);
-            state.quoteTimer = setInterval(() => {
-                if (document.getElementById('amountInput').value) {
+
+
+function startPriceRefresh() {
+
+    if (state.quoteTimer) {
+
+        clearInterval(
+            state.quoteTimer
+        );
+
+    }
+
+
+    state.quoteTimer =
+        setInterval(
+            () => {
+
+                const amountInput =
+                    document.getElementById(
+                        'amountInput'
+                    );
+
+
+                const amount =
+                    amountInput
+                        ? amountInput.value.trim()
+                        : '';
+
+
+               
+                if (
+                    amount &&
+                    Number(amount) > 0
+                ) {
+
                     quote();
+
+                } else {
+
+                  
+                    clearCurrentQuote();
+
                 }
-                if (!state.isTron && state.provider) updateGasPrice();
+
+
+             
+                if (
+                    !state.isTron &&
+                    state.provider
+                ) {
+
+                    updateGasPrice();
+
+                }
+
+
+         
                 updateUsdPrices();
-            }, 5000);
-        }
+
+            },
+            5000
+        );
+
+}
 
       
         function getPreferredTheme() {
@@ -4924,12 +6002,86 @@ const tokenSearchInflight = new Map();
                 }
             });
             let quoteDebounceTimer;
-document.getElementById('amountInput').addEventListener('input', function() {
+
+
+document.getElementById('amountInput').addEventListener('input', function () {
+
+    const amount = this.value.trim();
+
+   
     clearTimeout(quoteDebounceTimer);
+
+
+   
+    if (!amount) {
+
+    
+        state.lastQuoteData = null;
+
+     
+        const dstInput =
+            document.getElementById('dstEstimateInput');
+
+        if (dstInput) {
+            dstInput.value = '';
+        }
+
+       
+        const srcUsd =
+            document.getElementById('srcUsdPrice');
+
+        if (srcUsd) {
+            srcUsd.textContent = '$0.00';
+        }
+
+        const dstUsd =
+            document.getElementById('dstUsdPrice');
+
+        if (dstUsd) {
+            dstUsd.textContent = '$0.00';
+        }
+
+       
+        if (typeof updateRateDisplay === 'function') {
+            updateRateDisplay();
+        }
+
+
+        if (typeof setMetaVisibility === 'function') {
+            setMetaVisibility(false);
+        } else {
+            const metaBlock =
+                document.querySelector('.meta-block');
+
+            if (metaBlock) {
+                metaBlock.style.display = 'none';
+            }
+        }
+
+      
+        state.lastQuoteData = null;
+
+        
+        if (typeof updateUsdPrices === 'function') {
+            updateUsdPrices();
+        }
+
+        adjustFontSize(this);
+
+        return;
+    }
+
+
+   
     quoteDebounceTimer = setTimeout(() => {
+
         quote();
-    }, 400); 
+
+    }, 400);
+
+
     adjustFontSize(this);
+
 });
 
             document.getElementById('slippageDisplay').addEventListener('click', function() {
