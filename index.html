@@ -1428,18 +1428,267 @@ async function marketProxyRequest(
             }
         }
         function showToast(msg, type) {
-            type = type || 'info';
-            const toast = document.getElementById('toast');
-            const icon = document.getElementById('toastIcon');
-            const msgEl = document.getElementById('toastMsg');
-            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-            icon.textContent = icons[type] || 'ℹ️';
-            msgEl.innerHTML = msg;
-            toast.className = 'toast ' + type;
-            toast.classList.remove('hidden');
-            clearTimeout(window.toastTimer);
-            window.toastTimer = setTimeout(() => toast.classList.add('hidden'), 10000);
-        }
+
+    type = type || 'info';
+
+    const toast =
+        document.getElementById('toast');
+
+    const icon =
+        document.getElementById('toastIcon');
+
+    const msgEl =
+        document.getElementById('toastMsg');
+
+
+    const icons = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+    };
+
+
+
+    let displayMsg =
+        String(msg || '').trim();
+
+
+   
+
+    if (
+        /Input value is too low/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '代币价值过小，获取报价失败，请提高输入数量后重试';
+
+
+ 
+
+    } else if (
+        /value difference from this transaction/i.test(displayMsg) &&
+        /higher than 90%/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '当前兑换报价变化过大，可能存在价格风险，请重新选择代币或重新报价';
+
+
+    
+
+    } else if (
+        /insufficient liquidity/i.test(displayMsg) ||
+        /liquidity is insufficient/i.test(displayMsg) ||
+        /not enough liquidity/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '当前交易流动性不足，请减少兑换数量或更换代币';
+
+
+
+    } else if (
+        /insufficient funds/i.test(displayMsg) ||
+        /insufficient balance/i.test(displayMsg) ||
+        /insufficient token balance/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '余额不足，请减少兑换数量后重试';
+
+
+
+    } else if (
+        /insufficient.*gas/i.test(displayMsg) ||
+        /gas.*insufficient/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            'Gas 余额不足，请充值网络 Gas 后重试';
+
+
+   
+    } else if (
+        /user rejected/i.test(displayMsg) ||
+        /user denied/i.test(displayMsg) ||
+        /user cancelled/i.test(displayMsg) ||
+        /user canceled/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '已取消操作';
+
+
+
+    } else if (
+        /invalid recipient/i.test(displayMsg) ||
+        /invalid receiver/i.test(displayMsg) ||
+        /invalid.*address/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '收款地址无效，请检查收款地址是否正确';
+
+
+    
+
+    } else if (
+        /could not coalesce error/i.test(displayMsg) &&
+        /403/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '网络节点请求被拒绝，请稍后重试';
+
+
+    } else if (
+        /RPC endpoint returned HTTP client error/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '网络节点请求失败，请稍后重试';
+
+
+    } else if (
+        /HTTP client error/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '网络请求失败，请稍后重试';
+
+
+   
+
+    } else if (
+        /failed to fetch/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '网络连接失败，请检查网络后重试';
+
+
+    } else if (
+        /network error/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '网络连接失败，请稍后重试';
+
+
+   
+    } else if (
+        /timeout/i.test(displayMsg) ||
+        /timed out/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '请求超时，请稍后重试';
+
+
+
+    } else if (
+        /execution reverted/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '交易执行失败，请检查兑换参数';
+
+
+    
+    } else if (
+        /transaction may fail/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '交易可能失败，请检查兑换数量和代币';
+
+
+
+    } else if (
+        /No quote data/i.test(displayMsg) ||
+        /quote.*not found/i.test(displayMsg)
+    ) {
+
+        displayMsg =
+            '暂时无法获取兑换报价，请尝试调整兑换数量或更换代币';
+
+    }
+
+
+
+    const MAX_TOAST_LENGTH = 90;
+
+
+    if (
+        displayMsg.length >
+        MAX_TOAST_LENGTH
+    ) {
+
+        displayMsg =
+            displayMsg.slice(
+                0,
+                MAX_TOAST_LENGTH
+            ) +
+            '…';
+
+    }
+
+
+ 
+
+    icon.textContent =
+        icons[type] || 'ℹ️';
+
+
+
+    msgEl.textContent =
+        displayMsg;
+
+
+    toast.className =
+        'toast ' + type;
+
+
+    toast.classList.remove(
+        'hidden'
+    );
+
+
+  
+
+    const toastDuration = {
+
+        success: 2000,
+
+        info: 2500,
+
+        warning: 3500,
+
+        error: 4000
+
+    };
+
+
+    clearTimeout(
+        window.toastTimer
+    );
+
+
+    window.toastTimer =
+        setTimeout(
+            () => {
+
+                toast.classList.add(
+                    'hidden'
+                );
+
+            },
+            toastDuration[type] ||
+            2500
+        );
+
+}
         function renderChainIcon(container, chain, size) {
             size = size || '28px';
             if (chain.iconUrl) {
