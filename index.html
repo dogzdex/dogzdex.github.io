@@ -614,13 +614,25 @@
         }
 
      
-        const PROXY_URL = 'https://okx-proxy.a1878069728.workers.dev';
-        const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator';
-        const SLIPPAGE_DEFAULT = 0.5;
-        const SLIPPAGE_MODE_DEFAULT = 'dynamic';
-        const IMPACT_WARNING_THRESHOLD = 1;
-        const REQUEST_TIMEOUT = 30000;
-        const MAX_RETRIES = 2;
+
+const PROXY_URL =
+    'https://okx-proxy.a1878069728.workers.dev';
+
+
+const OKX_API_BASE =
+    'https://web3.okx.com/api/v6/dex/aggregator';
+
+
+
+const OKX_MARKET_API_BASE =
+    'https://web3.okx.com/api/v6/dex/market';
+
+
+const SLIPPAGE_DEFAULT = 0.5;
+const SLIPPAGE_MODE_DEFAULT = 'dynamic';
+const IMPACT_WARNING_THRESHOLD = 1;
+const REQUEST_TIMEOUT = 30000;
+const MAX_RETRIES = 2;
 
  
         async function proxyRequest(endpoint, params, retryCount) {
@@ -645,27 +657,251 @@
                 });
                 clearTimeout(timeoutId);
                 if (!response.ok) {
-                    const errText = await response.text();
-                    throw new Error(`HTTP ${response.status}: ${errText}`);
-                }
+
+    const errText =
+        await response.text();
+
+
+    const error =
+        new Error(
+            `HTTP ${response.status}: ${errText}`
+        );
+
+
+    error.httpStatus =
+        response.status;
+
+
+  
+    if (
+        response.status === 429
+    ) {
+
+        throw error;
+
+    }
+
+
+    throw error;
+
+}
                 const json = await response.json();
                 console.log("OKX RESPONSE:", json);
                 return json;
             } catch (e) {
-                clearTimeout(timeoutId);
-                if (retryCount < MAX_RETRIES) {
-    console.warn(`请求失败，重试 ${retryCount+1}/${MAX_RETRIES}`, e);
-    
-    let delay = 1000 * (retryCount + 1);
-    if (e.message && (e.message.includes('429') || e.message.includes('Too Many Requests'))) {
-        delay = 5000 * (retryCount + 1); 
+
+    clearTimeout(timeoutId);
+
+
+   
+    if (
+        retryCount < MAX_RETRIES &&
+        e.httpStatus !== 429
+    ) {
+
+        console.warn(
+            `请求失败，重试 ${retryCount + 1}/${MAX_RETRIES}`,
+            e
+        );
+
+
+        await new Promise(
+            resolve =>
+                setTimeout(
+                    resolve,
+                    1000 *
+                    (retryCount + 1)
+                )
+        );
+
+
+        return proxyRequest(
+            endpoint,
+            params,
+            retryCount + 1
+        );
+
     }
-    await new Promise(resolve => setTimeout(resolve, delay));
-    return proxyRequest(endpoint, params, retryCount + 1);
+
+
+    throw e;
+
 }
-                throw e;
-            }
         }
+        
+        
+
+
+
+
+async function marketProxyRequest(
+    endpoint,
+    params,
+    retryCount
+) {
+
+    retryCount =
+        retryCount || 0;
+
+
+    const searchParams =
+        new URLSearchParams();
+
+
+    for (
+        const [key, value]
+        of Object.entries(params)
+    ) {
+
+        if (
+            value !== undefined &&
+            value !== null &&
+            value !== ''
+        ) {
+
+            searchParams.append(
+                key,
+                String(value)
+            );
+
+        }
+
+    }
+
+
+    const queryString =
+        searchParams.toString();
+
+
+    const fullUrl =
+        OKX_MARKET_API_BASE +
+        endpoint +
+        (
+            queryString
+                ? '?' + queryString
+                : ''
+        );
+
+
+
+    const payload = {
+        url: fullUrl
+    };
+
+
+    const controller =
+        new AbortController();
+
+
+    const timeoutId =
+        setTimeout(
+            () => controller.abort(),
+            REQUEST_TIMEOUT
+        );
+
+
+    try {
+
+        const response =
+            await fetch(
+                PROXY_URL,
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                    body:
+                        JSON.stringify(payload),
+
+                    signal:
+                        controller.signal
+                }
+            );
+
+
+        clearTimeout(timeoutId);
+
+
+        if (!response.ok) {
+
+            const errText =
+                await response.text();
+
+
+            const error =
+                new Error(
+                    `HTTP ${response.status}: ${errText}`
+                );
+
+
+            error.httpStatus =
+                response.status;
+
+
+            throw error;
+
+        }
+
+
+        const json =
+            await response.json();
+
+
+        console.log(
+            'OKX MARKET RESPONSE:',
+            json
+        );
+
+
+        return json;
+
+
+    } catch (e) {
+
+        clearTimeout(timeoutId);
+
+
+   
+
+        if (
+            retryCount < MAX_RETRIES &&
+            e.httpStatus !== 429
+        ) {
+
+            console.warn(
+                `Market API 请求失败，重试 ${retryCount + 1}/${MAX_RETRIES}`,
+                e
+            );
+
+
+            await new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        1000 *
+                        (retryCount + 1)
+                    )
+            );
+
+
+            return marketProxyRequest(
+                endpoint,
+                params,
+                retryCount + 1
+            );
+
+        }
+
+
+        throw e;
+
+    }
+
+}
+        
 
      
         const CHAINS = {
@@ -2272,99 +2508,547 @@ console.log(
 
      
         async function fetchTokenInfo(chainId, address) {
-            if (!address) return null;
-            const normalized = address.trim();
-            const cacheKey = `${chainId}_${normalized.toLowerCase()}`;
-            if (state.tokenCache[cacheKey]) return state.tokenCache[cacheKey];
 
-            const chain = getChain(chainId);
-            const isNative = normalized === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' ||
-                normalized === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' ||
-                (chain.isTron && normalized === chain.native);
-            if (isNative) {
-                const info = { symbol: chain.native, decimals: chain.isTron ? 6 : 18, icon: chain.iconUrl || 'https://via.placeholder.com/32' };
-                state.tokenCache[cacheKey] = info;
+    if (!address) {
+        return null;
+    }
+
+
+    const normalized =
+        String(address).trim();
+
+
+    const cacheKey =
+        `${chainId}_${normalized.toLowerCase()}`;
+
+
+    if (state.tokenCache[cacheKey]) {
+
+        return state.tokenCache[cacheKey];
+
+    }
+
+
+    const chain =
+        getChain(chainId);
+
+
+
+
+    const isNative =
+        normalized ===
+            '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' ||
+
+        normalized ===
+            'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' ||
+
+        (chain.isTron &&
+         normalized === chain.native);
+
+
+    if (isNative) {
+
+        const info = {
+
+            symbol: chain.native,
+
+            decimals:
+                chain.isTron
+                    ? 6
+                    : 18,
+
+            icon:
+                chain.iconUrl ||
+                'https://via.placeholder.com/32'
+
+        };
+
+
+        state.tokenCache[cacheKey] =
+            info;
+
+
+        return info;
+
+    }
+
+
+ 
+
+    try {
+
+        let apiChainId = chainId;
+
+        if (isTronChain(chainId)) {
+            apiChainId = 195;
+        }
+
+        if (isNaN(apiChainId)) {
+            apiChainId = 1;
+        }
+
+
+        const data =
+    await marketProxyRequest(
+        '/token/search',
+        {
+            chains:
+                String(apiChainId),
+
+            search:
+                normalized,
+
+            limit:
+                '100'
+        }
+    );
+
+
+        if (
+            data &&
+            data.code === '0' &&
+            Array.isArray(data.data)
+        ) {
+
+            const target =
+                normalized.toLowerCase();
+
+
+            const found =
+                data.data.find(token => {
+
+                    if (!token ||
+                        !token.tokenContractAddress) {
+                        return false;
+                    }
+
+                    return (
+                        token.tokenContractAddress
+                            .toLowerCase() ===
+                        target
+                    );
+
+                });
+
+
+            if (found) {
+
+                const info = {
+
+                    symbol:
+                        found.tokenSymbol ||
+                        found.tokenName ||
+                        'UNKNOWN',
+
+                    decimals:
+                        parseInt(
+                            found.decimal ??
+                            found.decimals ??
+                            18
+                        ) || 18,
+
+                    icon:
+                        found.tokenLogoUrl ||
+                        'https://via.placeholder.com/32'
+
+                };
+
+
+                state.tokenCache[cacheKey] =
+                    info;
+
+
                 return info;
+
             }
 
-            try {
-                let apiChainId = chainId;
-                if (isTronChain(chainId)) apiChainId = 195;
-                if (isNaN(apiChainId)) apiChainId = 1;
-                const data = await proxyRequest('/all-tokens', { chainIndex: String(apiChainId) });
-                if (data.code === '0') {
-                    const tokens = data.data || [];
-                    const found = tokens.find(t =>
-                        t.tokenContractAddress && (
-                            t.tokenContractAddress.toLowerCase() === normalized.toLowerCase() ||
-                            t.tokenContractAddress === normalized
-                        )
-                    );
-                    if (found) {
-                        const info = {
-                            symbol: found.tokenSymbol,
-                            decimals: parseInt(found.decimals) || 18,
-                            icon: found.tokenLogoUrl || 'https://via.placeholder.com/32'
-                        };
-                        state.tokenCache[cacheKey] = info;
-                        return info;
-                    }
-                }
-            } catch (e) { console.warn('API token fetch failed', e); }
+        }
 
-            if (!state.isConnected || !state.provider) return null;
-            try {
-                if (state.isTron && state.tronWeb) {
-                    const tronWeb = state.tronWeb;
-                    const contract = await tronWeb.contract().at(normalized);
-                    const symbol = await contract.symbol().call();
-                    const decimals = await contract.decimals().call();
-                    const info = { symbol, decimals: parseInt(decimals) || 6, icon: 'https://via.placeholder.com/32' };
-                    state.tokenCache[cacheKey] = info;
-                    return info;
-                } else if (!state.isTron && state.provider) {
-                    const contract = new ethers.Contract(normalized, [
+    } catch (e) {
+
+        console.warn(
+            'OKX token search failed:',
+            e
+        );
+
+    }
+
+
+ 
+
+    if (
+        !state.isConnected ||
+        !state.provider
+    ) {
+
+        return null;
+
+    }
+
+
+    try {
+
+     
+
+        if (
+            state.isTron &&
+            state.tronWeb
+        ) {
+
+            const tronWeb =
+                state.tronWeb;
+
+
+            const contract =
+                await tronWeb
+                    .contract()
+                    .at(normalized);
+
+
+            const symbol =
+                await contract
+                    .symbol()
+                    .call();
+
+
+            const decimals =
+                await contract
+                    .decimals()
+                    .call();
+
+
+            const info = {
+
+                symbol:
+                    typeof symbol === 'string'
+                        ? symbol
+                        : String(symbol),
+
+                decimals:
+                    parseInt(decimals) || 6,
+
+                icon:
+                    'https://via.placeholder.com/32'
+
+            };
+
+
+            state.tokenCache[cacheKey] =
+                info;
+
+
+            return info;
+
+        }
+
+
+   
+
+        if (
+            !state.isTron &&
+            state.provider
+        ) {
+
+            const contract =
+                new ethers.Contract(
+                    normalized,
+                    [
                         'function name() view returns (string)',
                         'function symbol() view returns (string)',
                         'function decimals() view returns (uint8)'
-                    ], state.provider);
-                    const symbol = await contract.symbol().catch(() => 'Unknown');
-                    const decimals = await contract.decimals().catch(() => 18);
-                    const info = { symbol, decimals: parseInt(decimals) || 18, icon: 'https://via.placeholder.com/32' };
-                    state.tokenCache[cacheKey] = info;
-                    return info;
-                }
-            } catch (e) { console.warn('On-chain token fetch failed:', e); }
-            return null;
+                    ],
+                    state.provider
+                );
+
+
+            const symbol =
+                await contract
+                    .symbol()
+                    .catch(() => 'Unknown');
+
+
+            const decimals =
+                await contract
+                    .decimals()
+                    .catch(() => 18);
+
+
+            const info = {
+
+                symbol:
+                    symbol || 'UNKNOWN',
+
+                decimals:
+                    parseInt(decimals) || 18,
+
+                icon:
+                    'https://via.placeholder.com/32'
+
+            };
+
+
+            state.tokenCache[cacheKey] =
+                info;
+
+
+            return info;
+
         }
 
-        async function searchTokensByName(chainId, query) {
-            if (!query || query.length < 1) return [];
-            let apiChainId = chainId;
-            if (isTronChain(chainId)) apiChainId = 195;
-            if (isNaN(apiChainId)) apiChainId = 1;
-            const cacheKey = `all_tokens_${apiChainId}`;
-            let allTokens = state.tokenCache[cacheKey];
-            if (!allTokens) {
-                try {
-                    const data = await proxyRequest('/all-tokens', { chainIndex: String(apiChainId) });
-                    if (data.code === '0' && data.data && data.data.length) {
-                        allTokens = data.data;
-                        state.tokenCache[cacheKey] = allTokens;
-                    } else {
-                        return [];
-                    }
-                } catch (e) {
-                    console.warn('获取代币列表失败:', e);
+    } catch (e) {
+
+        console.warn(
+            'On-chain token fetch failed:',
+            e
+        );
+
+    }
+
+
+    return null;
+}
+
+
+
+async function searchTokensByName(
+    chainId,
+    query
+) {
+
+    query =
+        String(query || '').trim();
+
+
+    if (!query) {
+        return [];
+    }
+
+
+
+
+    let apiChainId =
+        chainId;
+
+
+    if (
+        isTronChain(chainId)
+    ) {
+
+        apiChainId = 195;
+
+    }
+
+
+    if (
+        isNaN(apiChainId)
+    ) {
+
+        apiChainId = 1;
+
+    }
+
+
+    apiChainId =
+        String(apiChainId);
+
+
+ 
+
+    const cacheKey =
+        `${apiChainId}:${query.toLowerCase()}`;
+
+
+    if (
+        tokenSearchCache.has(
+            cacheKey
+        )
+    ) {
+
+        return tokenSearchCache.get(
+            cacheKey
+        );
+
+    }
+
+
+  
+
+    if (
+        tokenSearchInflight.has(
+            cacheKey
+        )
+    ) {
+
+        return tokenSearchInflight.get(
+            cacheKey
+        );
+
+    }
+
+
+    const requestPromise =
+        (async () => {
+
+            try {
+
+       
+
+                const data =
+                    await marketProxyRequest(
+                        '/token/search',
+                        {
+                            chains:
+                                apiChainId,
+
+                            search:
+                                query,
+
+                       
+
+                            limit: '100'
+                        }
+                    );
+
+
+                if (
+                    !data ||
+                    String(data.code) !== '0'
+                ) {
+
+                    console.warn(
+                        'OKX Token Search failed:',
+                        data
+                    );
+
+
                     return [];
+
                 }
+
+
+                const rawTokens =
+                    Array.isArray(data.data)
+                        ? data.data
+                        : [];
+
+
+               
+
+                const results =
+                    rawTokens
+
+                        .filter(
+                            token =>
+                                token &&
+                                token.tokenContractAddress
+                        )
+
+                        .map(
+                            token => ({
+
+                                chainIndex:
+                                    token.chainIndex ||
+                                    apiChainId,
+
+
+                                tokenName:
+                                    token.tokenName ||
+                                    '',
+
+
+                                tokenSymbol:
+                                    token.tokenSymbol ||
+                                    '',
+
+
+                                tokenContractAddress:
+                                    token.tokenContractAddress,
+
+
+                                tokenLogoUrl:
+                                    token.tokenLogoUrl ||
+                                    '',
+
+
+                                decimals:
+                                    parseInt(
+                                        token.decimal ??
+                                        token.decimals ??
+                                        18
+                                    ) || 18,
+
+
+                                explorerUrl:
+                                    token.explorerUrl ||
+                                    '',
+
+
+                                liquidity:
+                                    token.liquidity ||
+                                    '',
+
+
+                                marketCap:
+                                    token.marketCap ||
+                                    '',
+
+
+                                price:
+                                    token.price ||
+                                    '',
+
+
+                                tagList:
+                                    token.tagList ||
+                                    {}
+
+                            })
+                        );
+
+
+               
+
+                tokenSearchCache.set(
+                    cacheKey,
+                    results
+                );
+
+
+                return results;
+
+
+            } catch (e) {
+
+                console.warn(
+                    'OKX Token Search error:',
+                    e
+                );
+
+
+           
+
+                return [];
+
+            } finally {
+
+                tokenSearchInflight.delete(
+                    cacheKey
+                );
+
             }
-            const lowerQuery = query.toLowerCase();
-            return allTokens.filter(t =>
-                (t.tokenSymbol && t.tokenSymbol.toLowerCase().includes(lowerQuery)) ||
-                (t.tokenName && t.tokenName.toLowerCase().includes(lowerQuery))
-            );
-        }
+
+        })();
+
+
+    tokenSearchInflight.set(
+        cacheKey,
+        requestPromise
+    );
+
+
+    return requestPromise;
+
+}
 
         function addCustomToken(address, info) {
             const chainId = state.chainId;
@@ -2419,86 +3103,401 @@ console.log(
 
      
         let isNetworkView = false;
-        let previewTimeout = null;
+let previewTimeout = null;
 
-        function openTokenModal(mode) {
-            state.modalMode = mode;
-            const modal = document.getElementById('tokenModal');
-            const title = document.getElementById('modalTitle');
-            title.textContent = mode === 'src' ? '选择支付币种' : '选择接收币种';
-            modal.classList.add('active');
-            isNetworkView = false;
-            document.getElementById('networkView').classList.remove('active');
-            document.getElementById('networkView').style.display = 'none';
-            document.getElementById('mainView').style.display = 'block';
-            document.getElementById('tokenSearchInput').value = '';
-            document.getElementById('networkSearchInput').value = '';
-            hideTokenPreview();
-            renderMainView();
-            document.getElementById('tokenSearchInput').addEventListener('input', function() {
+
+let tokenSearchRequestId = 0;
+
+
+let tokenSearchTimer = null;
+
+
+const tokenSearchCache = new Map();
+
+
+const tokenSearchInflight = new Map();
+
+       function openTokenModal(mode) {
+
+    state.modalMode =
+        mode;
+
+
+    const modal =
+        document.getElementById(
+            'tokenModal'
+        );
+
+
+    const title =
+        document.getElementById(
+            'modalTitle'
+        );
+
+
+    title.textContent =
+        mode === 'src'
+            ? '选择支付币种'
+            : '选择接收币种';
+
+
+    modal.classList.add(
+        'active'
+    );
+
+
+    isNetworkView =
+        false;
+
+
+    document
+        .getElementById(
+            'networkView'
+        )
+        .classList.remove(
+            'active'
+        );
+
+
+    document
+        .getElementById(
+            'networkView'
+        )
+        .style.display =
+        'none';
+
+
+    document
+        .getElementById(
+            'mainView'
+        )
+        .style.display =
+        'block';
+
+
+    const tokenSearchInput =
+        document.getElementById(
+            'tokenSearchInput'
+        );
+
+
+    tokenSearchInput.value =
+        '';
+
+
+    document
+        .getElementById(
+            'networkSearchInput'
+        )
+        .value =
+        '';
+
+
+    hideTokenPreview();
+
+
+    renderMainView();
+
+
+
+    tokenSearchInput.oninput =
+        function() {
+
+            const value =
+                this.value.trim();
+
+
+            clearTimeout(
+                tokenSearchTimer
+            );
+
+
+            tokenSearchRequestId++;
+
+
+            if (!value) {
+
                 renderTokenList();
-                const val = this.value.trim();
-                if (val.length > 30 && (val.startsWith('0x') || val.startsWith('T') || val.length > 40)) {
-                    clearTimeout(previewTimeout);
-                    previewTimeout = setTimeout(async () => {
-                        const info = await fetchTokenInfo(state.chainId, val);
-                        if (info) {
-                            state.previewTokenInfo = info;
-                            showTokenPreview(info);
-                        } else {
-                            hideTokenPreview();
-                        }
-                    }, 500);
-                } else {
-                    hideTokenPreview();
-                }
-            });
-            document.getElementById('pasteContractBtn').addEventListener('click', async function(e) {
-                e.preventDefault();
-                try {
-                    let text = null;
-                    if (navigator.clipboard && navigator.clipboard.readText) {
-                        try { text = await navigator.clipboard.readText(); } catch (e) {}
-                    }
-                    if (!text && navigator.clipboard && navigator.clipboard.read) {
-                        try {
-                            const items = await navigator.clipboard.read();
-                            for (const item of items) {
-                                if (item.types.includes('text/plain')) {
-                                    const blob = await item.getType('text/plain');
-                                    text = await blob.text();
-                                    break;
-                                }
+
+                hideTokenPreview();
+
+                return;
+
+            }
+
+
+      
+
+            if (
+                value.length > 30 &&
+                (
+                    value.startsWith('0x') ||
+                    value.startsWith('T') ||
+                    value.length > 40
+                )
+            ) {
+
+                clearTimeout(
+                    previewTimeout
+                );
+
+
+                previewTimeout =
+                    setTimeout(
+                        async () => {
+
+                            const info =
+                                await fetchTokenInfo(
+                                    state.chainId,
+                                    value
+                                );
+
+
+                            if (info) {
+
+                                state.previewTokenInfo =
+                                    info;
+
+                                showTokenPreview(
+                                    info
+                                );
+
+                            } else {
+
+                                hideTokenPreview();
+
                             }
-                        } catch (e) {}
-                    }
-                    if (!text) {
-                        const input = document.createElement('input');
-                        input.style.position = 'fixed';
-                        input.style.opacity = '0';
-                        input.style.left = '-9999px';
-                        document.body.appendChild(input);
-                        input.focus();
-                        try {
-                            const success = document.execCommand('paste');
-                            if (success && input.value) text = input.value;
-                        } catch (e) {}
-                        document.body.removeChild(input);
-                    }
-                    if (text && text.trim()) {
-                        document.getElementById('tokenSearchInput').value = text.trim();
-                        const event = new Event('input', { bubbles: true });
-                        document.getElementById('tokenSearchInput').dispatchEvent(event);
-                        showToast('已粘贴合约地址', 'success');
-                    } else {
-                        showToast('无法读取剪贴板，请手动输入或长按输入框粘贴', 'warning');
-                    }
-                } catch (e) {
-                    console.warn('Paste error:', e);
-                    showToast('粘贴失败，请手动输入', 'warning');
+
+                        },
+                        500
+                    );
+
+            } else {
+
+                hideTokenPreview();
+
+            }
+
+
+        
+
+            tokenSearchTimer =
+                setTimeout(
+                    () => {
+
+                        renderTokenList();
+
+                    },
+                    400
+                );
+
+        };
+
+
+
+
+    const pasteBtn =
+        document.getElementById(
+            'pasteContractBtn'
+        );
+
+
+    pasteBtn.onclick =
+        async function(e) {
+
+            e.preventDefault();
+
+
+            try {
+
+                let text =
+                    null;
+
+
+           
+
+                if (
+                    navigator.clipboard &&
+                    navigator.clipboard.readText
+                ) {
+
+                    try {
+
+                        text =
+                            await navigator
+                                .clipboard
+                                .readText();
+
+                    } catch (e) {}
+
                 }
-            });
-        }
+
+
+         
+
+                if (
+                    !text &&
+                    navigator.clipboard &&
+                    navigator.clipboard.read
+                ) {
+
+                    try {
+
+                        const items =
+                            await navigator
+                                .clipboard
+                                .read();
+
+
+                        for (
+                            const item
+                            of items
+                        ) {
+
+                            if (
+                                item.types.includes(
+                                    'text/plain'
+                                )
+                            ) {
+
+                                const blob =
+                                    await item.getType(
+                                        'text/plain'
+                                    );
+
+
+                                text =
+                                    await blob.text();
+
+
+                                break;
+
+                            }
+
+                        }
+
+                    } catch (e) {}
+
+                }
+
+
+              
+
+                if (!text) {
+
+                    const input =
+                        document.createElement(
+                            'input'
+                        );
+
+
+                    input.style.position =
+                        'fixed';
+
+
+                    input.style.opacity =
+                        '0';
+
+
+                    input.style.left =
+                        '-9999px';
+
+
+                    document.body.appendChild(
+                        input
+                    );
+
+
+                    input.focus();
+
+
+                    try {
+
+                        const success =
+                            document.execCommand(
+                                'paste'
+                            );
+
+
+                        if (
+                            success &&
+                            input.value
+                        ) {
+
+                            text =
+                                input.value;
+
+                        }
+
+                    } catch (e) {}
+
+
+                    document.body.removeChild(
+                        input
+                    );
+
+                }
+
+
+              
+
+                if (
+                    text &&
+                    text.trim()
+                ) {
+
+                    tokenSearchInput.value =
+                        text.trim();
+
+
+                    tokenSearchInput.dispatchEvent(
+                        new Event(
+                            'input',
+                            {
+                                bubbles: true
+                            }
+                        )
+                    );
+
+
+                    showToast(
+                        '已粘贴合约地址',
+                        'success'
+                    );
+
+                } else {
+
+                    showToast(
+                        '无法读取剪贴板，请手动输入或长按输入框粘贴',
+                        'warning'
+                    );
+
+                }
+
+
+            } catch (e) {
+
+                console.warn(
+                    'Paste error:',
+                    e
+                );
+
+
+                showToast(
+                    '粘贴失败，请手动输入',
+                    'warning'
+                );
+
+            }
+
+        };
+
+
+
+
+    renderTokenList();
+
+}
 
         function showTokenPreview(info) {
             const preview = document.getElementById('tokenPreview');
@@ -2668,220 +3667,899 @@ console.log(
 
             renderTokenList();
         }
+        
+        function renderLocalTokenItem(
+    container,
+    symbol,
+    info,
+    currentSymbol
+) {
 
-        function renderTokenList() {
-            const container = document.getElementById('modalTokenList');
-            const chainId = state.chainId;
-            const tokens = getTokens(chainId);
-            const currentSymbol = state.modalMode === 'src' ? state.srcTokenSymbol : state.dstTokenSymbol;
-            const otherSymbol = state.modalMode === 'src' ? state.dstTokenSymbol : state.srcTokenSymbol;
-            const searchVal = document.getElementById('tokenSearchInput').value.toLowerCase().trim();
+    const item =
+        document.createElement(
+            'div'
+        );
 
-            container.innerHTML = '';
 
-            const sorted = Object.keys(tokens).sort();
-            let matched = false;
+    item.className =
+        'modal-token-item';
 
-            for (const symbol of sorted) {
-                if (symbol === otherSymbol) continue;
-                const info = tokens[symbol];
-                const match = symbol.toLowerCase().includes(searchVal) || info.address.toLowerCase().includes(searchVal);
-                if (!match) continue;
-                matched = true;
 
-                const isSelected = symbol === currentSymbol;
-                let balance = '0';
-                let usdValue = '0.00';
-                if (state.isConnected) {
-                    if (symbol === state.srcTokenSymbol || symbol === state.dstTokenSymbol) {
-                        const balEl = document.getElementById(symbol === state.srcTokenSymbol ? 'srcBalance' : 'dstBalance');
-                        if (balEl) balance = balEl.textContent;
-                    }
-                }
-                const val = parseFloat(balance) * (symbol === 'USDT' || symbol === 'USDC' ? 1 : 0.01);
-                usdValue = val.toFixed(2);
+    item.dataset.symbol =
+        symbol;
 
-                const item = document.createElement('div');
-                item.className = 'modal-token-item';
-                item.dataset.symbol = symbol;
-                item.dataset.address = info.address;
 
-                const left = document.createElement('div');
-                left.className = 'left';
-                const img = document.createElement('img');
-                img.src = info.icon || 'https://via.placeholder.com/32';
-                img.alt = symbol;
-                left.appendChild(img);
-                const textDiv = document.createElement('div');
-                const nameDiv = document.createElement('div');
-                nameDiv.className = 'name';
-                nameDiv.textContent = symbol;
-                textDiv.appendChild(nameDiv);
-                const subDiv = document.createElement('div');
-                subDiv.className = 'sub';
-                subDiv.textContent = info.address.slice(0, 6) + '...' + info.address.slice(-4);
-                textDiv.appendChild(subDiv);
-                left.appendChild(textDiv);
-                item.appendChild(left);
+    item.dataset.address =
+        info.address;
 
-                const right = document.createElement('div');
-                right.className = 'right';
-                const balDiv = document.createElement('div');
-                balDiv.className = 'balance-amount';
-                balDiv.textContent = balance;
-                right.appendChild(balDiv);
-                const usdDiv = document.createElement('div');
-                usdDiv.className = 'balance-value';
-                usdDiv.textContent = '$' + usdValue;
-                right.appendChild(usdDiv);
 
-                if (isSelected) {
-                    const check = document.createElement('div');
-                    check.style.cssText = 'color:var(--accent);font-size:12px;margin-top:2px;';
-                    check.textContent = '✔️';
-                    right.appendChild(check);
-                }
+    const isSelected =
+        symbol === currentSymbol;
 
-                item.appendChild(right);
-                container.appendChild(item);
 
-                item.addEventListener('click', function() {
-                    const sym = this.dataset.symbol;
-                    if (state.modalMode === 'src') {
-                        state.srcTokenSymbol = sym;
-                        if (state.srcTokenSymbol === state.dstTokenSymbol) {
-                            const keys = Object.keys(tokens);
-                            const other2 = keys.find(k => k !== state.srcTokenSymbol);
-                            if (other2) state.dstTokenSymbol = other2;
-                        }
-                    } else {
-                        state.dstTokenSymbol = sym;
-                        if (state.srcTokenSymbol === state.dstTokenSymbol) {
-                            const keys = Object.keys(tokens);
-                            const other2 = keys.find(k => k !== state.srcTokenSymbol);
-                            if (other2) state.dstTokenSymbol = other2;
-                        }
-                    }
-                    updateTokenUI();
-                    closeTokenModal();
-                    loadBalances();
-                    quote();
-                });
-            }
 
-            if (!matched && searchVal.length > 0) {
-                const isAddress = searchVal.startsWith('0x') || searchVal.startsWith('T') || searchVal.length > 40;
-                if (isAddress) {
-                    (async () => {
-                        const info = await fetchTokenInfo(chainId, searchVal);
-                        if (info && !Object.values(tokens).some(t => t.address.toLowerCase() === searchVal.toLowerCase())) {
-                            const addItem = document.createElement('div');
-                            addItem.className = 'modal-token-item';
-                            addItem.dataset.address = searchVal;
-                            addItem.dataset.symbol = info.symbol;
-                            addItem.dataset.new = 'true';
 
-                            const left = document.createElement('div');
-                            left.className = 'left';
-                            const img = document.createElement('img');
-                            img.src = info.icon || 'https://via.placeholder.com/32';
-                            left.appendChild(img);
-                            const textDiv = document.createElement('div');
-                            const nameDiv = document.createElement('div');
-                            nameDiv.className = 'name';
-                            nameDiv.textContent = info.symbol;
-                            textDiv.appendChild(nameDiv);
-                            const subDiv = document.createElement('div');
-                            subDiv.className = 'sub';
-                            subDiv.textContent = searchVal.slice(0, 6) + '...' + searchVal.slice(-4);
-                            textDiv.appendChild(subDiv);
-                            left.appendChild(textDiv);
-                            addItem.appendChild(left);
+    const left =
+        document.createElement(
+            'div'
+        );
 
-                            const right = document.createElement('div');
-                            right.className = 'right';
-                            const addBtn = document.createElement('button');
-                            addBtn.className = 'add-btn';
-                            addBtn.textContent = '添加';
-                            addBtn.style.cssText = 'background:var(--accent);color:white;border:none;border-radius:12px;padding:4px 12px;font-weight:600;cursor:pointer;font-size:13px;';
-                            right.appendChild(addBtn);
-                            addItem.appendChild(right);
 
-                            container.appendChild(addItem);
+    left.className =
+        'left';
 
-                            addBtn.addEventListener('click', async function(e) {
-                                e.stopPropagation();
-                                const info2 = await fetchTokenInfo(chainId, searchVal);
-                                if (info2) {
-                                    addCustomToken(searchVal, info2);
-                                } else {
-                                    showToast('无法获取代币信息，请重试', 'error');
-                                }
-                            });
-                        }
-                    })();
-                } else {
-                    (async () => {
-                        const results = await searchTokensByName(chainId, searchVal);
-                        if (results && results.length > 0) {
-                            for (const token of results) {
-                                const address = token.tokenContractAddress;
-                                const symbol = token.tokenSymbol;
-                                if (Object.values(tokens).some(t => t.address.toLowerCase() === address.toLowerCase())) continue;
-                                const addItem = document.createElement('div');
-                                addItem.className = 'modal-token-item';
-                                addItem.dataset.address = address;
-                                addItem.dataset.symbol = symbol;
-                                addItem.dataset.new = 'true';
 
-                                const left = document.createElement('div');
-                                left.className = 'left';
-                                const img = document.createElement('img');
-                                img.src = token.tokenLogoUrl || 'https://via.placeholder.com/32';
-                                left.appendChild(img);
-                                const textDiv = document.createElement('div');
-                                const nameDiv = document.createElement('div');
-                                nameDiv.className = 'name';
-                                nameDiv.textContent = symbol;
-                                textDiv.appendChild(nameDiv);
-                                const subDiv = document.createElement('div');
-                                subDiv.className = 'sub';
-                                subDiv.textContent = address.slice(0, 6) + '...' + address.slice(-4);
-                                textDiv.appendChild(subDiv);
-                                left.appendChild(textDiv);
-                                addItem.appendChild(left);
+    const img =
+        document.createElement(
+            'img'
+        );
 
-                                const right = document.createElement('div');
-                                right.className = 'right';
-                                const addBtn = document.createElement('button');
-                                addBtn.className = 'add-btn';
-                                addBtn.textContent = '添加';
-                                addBtn.style.cssText = 'background:var(--accent);color:white;border:none;border-radius:12px;padding:4px 12px;font-weight:600;cursor:pointer;font-size:13px;';
-                                right.appendChild(addBtn);
-                                addItem.appendChild(right);
 
-                                container.appendChild(addItem);
+    img.src =
+        info.icon ||
+        'https://via.placeholder.com/32';
 
-                                addBtn.addEventListener('click', async function(e) {
-                                    e.stopPropagation();
-                                    const info2 = await fetchTokenInfo(chainId, address);
-                                    if (info2) {
-                                        addCustomToken(address, info2);
-                                    } else {
-                                        showToast('无法获取代币信息，请重试', 'error');
-                                    }
-                                });
-                            }
-                        } else {
-                            const noResult = document.createElement('div');
-                            noResult.style.cssText = 'padding:12px;text-align:center;color:var(--text-muted);';
-                            noResult.textContent = '未找到匹配的代币，请尝试输入合约地址';
-                            container.appendChild(noResult);
-                        }
-                    })();
-                }
-            }
+
+    img.alt =
+        symbol;
+
+
+    img.onerror =
+        function() {
+            this.src =
+                'https://via.placeholder.com/32';
+        };
+
+
+    left.appendChild(
+        img
+    );
+
+
+    const textDiv =
+        document.createElement(
+            'div'
+        );
+
+
+    const nameDiv =
+        document.createElement(
+            'div'
+        );
+
+
+    nameDiv.className =
+        'name';
+
+
+    nameDiv.textContent =
+        symbol;
+
+
+    textDiv.appendChild(
+        nameDiv
+    );
+
+
+    const subDiv =
+        document.createElement(
+            'div'
+        );
+
+
+    subDiv.className =
+        'sub';
+
+
+    const address =
+        String(
+            info.address || ''
+        );
+
+
+    subDiv.textContent =
+        address.length > 12
+            ? `${address.slice(0, 6)}...${address.slice(-4)}`
+            : address;
+
+
+    textDiv.appendChild(
+        subDiv
+    );
+
+
+    left.appendChild(
+        textDiv
+    );
+
+
+    item.appendChild(
+        left
+    );
+
+
+
+
+    const right =
+        document.createElement(
+            'div'
+        );
+
+
+    right.className =
+        'right';
+
+
+    let balance = '0';
+
+
+    if (
+        state.isConnected &&
+        (
+            symbol ===
+                state.srcTokenSymbol ||
+            symbol ===
+                state.dstTokenSymbol
+        )
+    ) {
+
+        const balEl =
+            document.getElementById(
+                symbol ===
+                    state.srcTokenSymbol
+                    ? 'srcBalance'
+                    : 'dstBalance'
+            );
+
+
+        if (balEl) {
+
+            balance =
+                balEl.textContent;
+
         }
+
+    }
+
+
+    const balDiv =
+        document.createElement(
+            'div'
+        );
+
+
+    balDiv.className =
+        'balance-amount';
+
+
+    balDiv.textContent =
+        balance;
+
+
+    right.appendChild(
+        balDiv
+    );
+
+
+    const usdDiv =
+        document.createElement(
+            'div'
+        );
+
+
+    usdDiv.className =
+        'balance-value';
+
+
+    const val =
+        parseFloat(balance) *
+        (
+            symbol === 'USDT' ||
+            symbol === 'USDC'
+                ? 1
+                : 0.01
+        );
+
+
+    usdDiv.textContent =
+        '$' +
+        val.toFixed(2);
+
+
+    right.appendChild(
+        usdDiv
+    );
+
+
+    if (isSelected) {
+
+        const check =
+            document.createElement(
+                'div'
+            );
+
+
+        check.style.cssText =
+            'color:var(--accent);font-size:12px;margin-top:2px;';
+
+
+        check.textContent =
+            '✔️';
+
+
+        right.appendChild(
+            check
+        );
+
+    }
+
+
+    item.appendChild(
+        right
+    );
+
+
+    container.appendChild(
+        item
+    );
+
+
+
+
+    item.addEventListener(
+        'click',
+        function() {
+
+            if (
+                state.modalMode ===
+                'src'
+            ) {
+
+                state.srcTokenSymbol =
+                    symbol;
+
+
+                if (
+                    state.srcTokenSymbol ===
+                    state.dstTokenSymbol
+                ) {
+
+                    const keys =
+                        Object.keys(
+                            getTokens(
+                                state.chainId
+                            )
+                        );
+
+
+                    const other =
+                        keys.find(
+                            k =>
+                                k !== symbol
+                        );
+
+
+                    if (other) {
+
+                        state.dstTokenSymbol =
+                            other;
+
+                    }
+
+                }
+
+            } else {
+
+                state.dstTokenSymbol =
+                    symbol;
+
+
+                if (
+                    state.srcTokenSymbol ===
+                    state.dstTokenSymbol
+                ) {
+
+                    const keys =
+                        Object.keys(
+                            getTokens(
+                                state.chainId
+                            )
+                        );
+
+
+                    const other =
+                        keys.find(
+                            k =>
+                                k !== symbol
+                        );
+
+
+                    if (other) {
+
+                        state.srcTokenSymbol =
+                            other;
+
+                    }
+
+                }
+
+            }
+
+
+            updateTokenUI();
+
+            closeTokenModal();
+
+            loadBalances();
+
+            quote();
+
+        }
+    );
+
+}
+        
+               
+              
+        
+        
+
+        async function renderTokenList() {
+
+    const container =
+        document.getElementById(
+            'modalTokenList'
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const chainId =
+        state.chainId;
+
+
+    const tokens =
+        getTokens(chainId);
+
+
+    const currentSymbol =
+        state.modalMode === 'src'
+            ? state.srcTokenSymbol
+            : state.dstTokenSymbol;
+
+
+    const otherSymbol =
+        state.modalMode === 'src'
+            ? state.dstTokenSymbol
+            : state.srcTokenSymbol;
+
+
+    const searchVal =
+        document
+            .getElementById(
+                'tokenSearchInput'
+            )
+            .value
+            .trim();
+
+
+  
+
+    const requestId =
+        ++tokenSearchRequestId;
+
+
+    container.innerHTML = '';
+
+
+
+
+    if (!searchVal) {
+
+        const sorted =
+            Object.keys(tokens)
+                .sort();
+
+
+        for (const symbol of sorted) {
+
+            if (
+                symbol ===
+                otherSymbol
+            ) {
+                continue;
+            }
+
+
+            renderLocalTokenItem(
+                container,
+                symbol,
+                tokens[symbol],
+                currentSymbol
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+ 
+
+    const localResults = [];
+
+    for (
+        const symbol
+        of Object.keys(tokens)
+    ) {
+
+        if (
+            symbol ===
+            otherSymbol
+        ) {
+            continue;
+        }
+
+
+        const info =
+            tokens[symbol];
+
+
+        const symbolMatch =
+            symbol
+                .toLowerCase()
+                .includes(
+                    searchVal.toLowerCase()
+                );
+
+
+        const addressMatch =
+            info.address &&
+            info.address
+                .toLowerCase()
+                .includes(
+                    searchVal.toLowerCase()
+                );
+
+
+        if (
+            symbolMatch ||
+            addressMatch
+        ) {
+
+            localResults.push({
+                symbol,
+                info
+            });
+
+        }
+
+    }
+
+
+    for (
+        const item
+        of localResults
+    ) {
+
+        renderLocalTokenItem(
+            container,
+            item.symbol,
+            item.info,
+            currentSymbol
+        );
+
+    }
+
+
+
+
+    const isAddress =
+        /^0x[a-fA-F0-9]{40}$/.test(
+            searchVal
+        ) ||
+        /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(
+            searchVal
+        );
+
+
+    
+    if (
+        container.children.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div style="
+                padding:20px;
+                text-align:center;
+                color:var(--text-muted);
+            ">
+                搜索中...
+            </div>
+        `;
+
+    }
+
+
+    let results = [];
+
+
+    try {
+
+        results =
+            await searchTokensByName(
+                chainId,
+                searchVal
+            );
+
+    } catch (e) {
+
+        console.warn(
+            'Token search failed:',
+            e
+        );
+
+        results = [];
+
+    }
+
+
+
+    if (
+        requestId !==
+        tokenSearchRequestId
+    ) {
+
+        return;
+
+    }
+
+
+
+    if (
+        container.children.length === 1 &&
+        container.textContent.trim() ===
+            '搜索中...'
+    ) {
+
+        container.innerHTML = '';
+
+    }
+
+
+
+    const existingAddresses =
+        new Set(
+            Object.values(tokens)
+                .map(t =>
+                    String(
+                        t.address || ''
+                    ).toLowerCase()
+                )
+        );
+
+
+    let remoteCount = 0;
+
+
+    for (
+        const token
+        of results
+    ) {
+
+        const address =
+            token.tokenContractAddress;
+
+
+        if (!address) {
+            continue;
+        }
+
+
+      
+        if (
+            existingAddresses.has(
+                address.toLowerCase()
+            )
+        ) {
+            continue;
+        }
+
+
+       
+        const alreadyRendered =
+            container.querySelector(
+                `[data-address="${CSS.escape(address)}"]`
+            );
+
+
+        if (alreadyRendered) {
+            continue;
+        }
+
+
+        remoteCount++;
+
+
+        const addItem =
+            document.createElement(
+                'div'
+            );
+
+
+        addItem.className =
+            'modal-token-item';
+
+
+        addItem.dataset.address =
+            address;
+
+
+        addItem.dataset.symbol =
+            token.tokenSymbol || '';
+
+
+        addItem.dataset.new =
+            'true';
+
+
+    
+
+        const left =
+            document.createElement(
+                'div'
+            );
+
+
+        left.className =
+            'left';
+
+
+        const img =
+            document.createElement(
+                'img'
+            );
+
+
+        img.src =
+            token.tokenLogoUrl ||
+            'https://via.placeholder.com/32';
+
+
+        img.alt =
+            token.tokenSymbol ||
+            token.tokenName ||
+            'TOKEN';
+
+
+        img.onerror =
+            function() {
+                this.src =
+                    'https://via.placeholder.com/32';
+            };
+
+
+        left.appendChild(img);
+
+
+        const textDiv =
+            document.createElement(
+                'div'
+            );
+
+
+        const nameDiv =
+            document.createElement(
+                'div'
+            );
+
+
+        nameDiv.className =
+            'name';
+
+
+        nameDiv.textContent =
+            token.tokenSymbol ||
+            token.tokenName ||
+            'UNKNOWN';
+
+
+        textDiv.appendChild(
+            nameDiv
+        );
+
+
+        const subDiv =
+            document.createElement(
+                'div'
+            );
+
+
+        subDiv.className =
+            'sub';
+
+
+        const tokenName =
+            token.tokenName || '';
+
+
+        const shortAddress =
+            address.length > 12
+                ? `${address.slice(0, 6)}...${address.slice(-4)}`
+                : address;
+
+
+        if (
+            tokenName &&
+            tokenName.toLowerCase() !==
+                String(
+                    token.tokenSymbol || ''
+                ).toLowerCase()
+        ) {
+
+            subDiv.textContent =
+                `${tokenName} · ${shortAddress}`;
+
+        } else {
+
+            subDiv.textContent =
+                shortAddress;
+
+        }
+
+
+        textDiv.appendChild(
+            subDiv
+        );
+
+
+        left.appendChild(
+            textDiv
+        );
+
+
+        addItem.appendChild(
+            left
+        );
+
+
+
+        const right =
+            document.createElement(
+                'div'
+            );
+
+
+        right.className =
+            'right';
+
+
+        const addBtn =
+            document.createElement(
+                'button'
+            );
+
+
+        addBtn.className =
+            'add-btn';
+
+
+        addBtn.textContent =
+            '添加';
+
+
+        addBtn.style.cssText =
+            `
+            background:var(--accent);
+            color:white;
+            border:none;
+            border-radius:12px;
+            padding:4px 12px;
+            font-weight:600;
+            cursor:pointer;
+            font-size:13px;
+            `;
+
+
+        right.appendChild(
+            addBtn
+        );
+
+
+        addItem.appendChild(
+            right
+        );
+
+
+        container.appendChild(
+            addItem
+        );
+
+
+
+
+        addBtn.addEventListener(
+            'click',
+            function(e) {
+
+                e.stopPropagation();
+
+
+                const info = {
+
+                    symbol:
+                        token.tokenSymbol ||
+                        token.tokenName ||
+                        'UNKNOWN',
+
+                    decimals:
+                        parseInt(
+                            token.decimals
+                        ) || 18,
+
+                    icon:
+                        token.tokenLogoUrl ||
+                        'https://via.placeholder.com/32'
+
+                };
+
+
+                addCustomToken(
+                    address,
+                    info
+                );
+
+            }
+        );
+
+    }
+
+
+
+
+    if (
+        localResults.length === 0 &&
+        remoteCount === 0
+    ) {
+
+        container.innerHTML = `
+            <div style="
+                padding:20px;
+                text-align:center;
+                color:var(--text-muted);
+            ">
+                未找到匹配的代币
+            </div>
+        `;
+
+    }
+
+}
 
         function renderNetworkList() {
             const container = document.getElementById('networkList');
