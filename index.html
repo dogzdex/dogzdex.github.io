@@ -132,11 +132,90 @@
     .chain-display .chain-icon { width:18px; height:18px; border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; }
     .chain-display .chain-icon img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
     .chain-display .chain-name { font-size:14px; font-weight:600; color:var(--text-primary); }
-    .balance-display { display:flex; align-items:center; gap:4px; font-size:13px; font-weight:400; color:var(--text-muted); flex-shrink:0; }
-    .balance-display .wallet-icon { font-size:12px; color:var(--text-muted); }
-    .balance-display .balance-amount { font-weight:400; color:var(--text-muted); font-variant-numeric:tabular-nums; }
-    .balance-display .btn-max { padding:2px 10px; font-size:11px; border-radius:6px; flex-shrink:0; background:var(--accent-light); color:var(--accent); border:none; font-weight:600; cursor:pointer; height:26px; transition:all 0.15s; line-height:1; }
-    .balance-display .btn-max:hover { background:var(--accent); color:white; }
+   
+
+.balance-display {
+    display:flex;
+    align-items:center;
+
+   
+    gap:3px;
+
+    font-size:13px;
+
+    font-weight:400;
+
+    color:var(--text-muted);
+
+    flex-shrink:0;
+
+    white-space:nowrap;
+}
+
+
+.balance-display .wallet-icon {
+    font-size:10px;
+    color:var(--text-muted);
+
+    flex-shrink:0;
+}
+
+
+.balance-display .balance-amount {
+    font-weight:400;
+
+    color:var(--text-muted);
+
+    font-variant-numeric:tabular-nums;
+
+   
+    letter-spacing:-0.65px;
+
+    
+    max-width:120px;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+}
+
+
+.balance-display .btn-max {
+    padding:2px 8px;
+
+    font-size:10px;
+
+    letter-spacing:-0.2px;
+
+    border-radius:6px;
+
+    flex-shrink:0;
+
+    background:var(--accent-light);
+
+    color:var(--accent);
+
+    border:none;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    height:22px;
+
+    line-height:1;
+
+    transition:all 0.15s;
+}
+
+
+.balance-display .btn-max:hover {
+    background:var(--accent);
+
+    color:white;
+}
     .row-token-amount { display:flex; align-items:center; justify-content:space-between; gap:10px; }
     .token-selector { display:flex; align-items:center; gap:8px; cursor:pointer; flex-shrink:0; padding:4px 0; }
     .token-selector .token-icon { width:40px; height:40px; border-radius:50%; overflow:hidden; flex-shrink:0; }
@@ -204,15 +283,225 @@
     .modal-token-list::-webkit-scrollbar-track { background:transparent; border-radius:8px; }
     .modal-token-list::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:8px; }
     .modal-token-list::-webkit-scrollbar-thumb:hover { background:var(--accent); }
-    .modal-token-item { display:flex; align-items:center; justify-content:space-between; padding:10px 8px; border-radius:12px; cursor:pointer; transition:background 0.15s; color:var(--text-primary); }
-    .modal-token-item:hover { background:var(--bg-hover); }
-    .modal-token-item .left { display:flex; align-items:center; gap:10px; }
-    .modal-token-item .left img { width:32px; height:32px; border-radius:50%; }
-    .modal-token-item .left .name { font-weight:600; color:var(--text-primary); }
-    .modal-token-item .left .sub { font-size:12px; color:var(--text-muted); }
-    .modal-token-item .right { text-align:right; font-size:13px; line-height:1.4; }
-    .modal-token-item .right .balance-amount { font-weight:500; color:var(--text-primary); }
-    .modal-token-item .right .balance-value { font-size:12px; color:var(--text-muted); }
+
+
+.modal-token-item {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    width:100%;
+    min-width:0;
+
+    padding:10px 8px;
+    border-radius:12px;
+
+    cursor:pointer;
+    transition:background 0.15s;
+
+    color:var(--text-primary);
+
+ 
+    overflow:hidden;
+}
+
+.modal-token-item:hover {
+    background:var(--bg-hover);
+}
+
+
+
+.modal-token-item .left {
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+
+    min-width:0;
+
+    flex:1;
+
+    overflow:hidden;
+}
+
+.modal-token-item .left img {
+    width:32px;
+    height:32px;
+
+    border-radius:50%;
+
+    flex-shrink:0;
+
+    object-fit:cover;
+}
+
+
+
+.modal-token-item .left > div:not(.right) {
+    min-width:0;
+    flex:1;
+    overflow:hidden;
+}
+
+
+.modal-token-item .left .name {
+    font-weight:600;
+    color:var(--text-primary);
+
+   
+    min-width:0;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+    line-height:1.25;
+}
+
+
+.modal-token-item .left .sub {
+    font-size:12px;
+    color:var(--text-muted);
+
+    min-width:0;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+    line-height:1.25;
+}
+
+
+
+.modal-token-item .right {
+    text-align:right;
+
+    font-size:12px;
+    line-height:1.25;
+
+ 
+    flex-shrink:0;
+
+  
+    min-width:78px;
+
+    max-width:96px;
+
+    margin-left:8px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    justify-content:center;
+
+    overflow:hidden;
+}
+
+
+.modal-token-item .right .balance-amount {
+    font-weight:500;
+    color:var(--text-primary);
+
+   
+    max-width:100%;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+    font-variant-numeric:tabular-nums;
+
+    letter-spacing:-0.45px;
+}
+
+
+.modal-token-item .right .balance-value {
+    font-size:11px;
+    color:var(--text-muted);
+
+    max-width:100%;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+    font-variant-numeric:tabular-nums;
+
+    letter-spacing:-0.35px;
+}
+
+
+
+
+.modal-token-item .right .add-btn {
+    flex-shrink:0;
+
+   
+    height:28px;
+    min-height:28px;
+    max-height:28px;
+
+    min-width:50px;
+    width:50px;
+
+    padding:0 10px !important;
+
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    box-sizing:border-box;
+
+    white-space:nowrap;
+
+    line-height:1;
+
+    border-radius:10px !important;
+
+    font-size:12px !important;
+    font-weight:600;
+
+    overflow:hidden;
+
+   
+    flex-shrink:0;
+}
+
+
+
+
+@media (max-width:480px) {
+
+  
+    .modal-token-item .left {
+        gap:7px;
+    }
+
+   
+
+   
+
+    .modal-token-item .right .balance-amount {
+        font-size:10px;
+        letter-spacing:-0.55px;
+    }
+
+    
+
+    .modal-token-item .right .add-btn {
+        width:46px;
+        min-width:46px;
+        height:26px;
+        min-height:26px;
+        max-height:26px;
+
+        padding:0 7px !important;
+
+        font-size:11px !important;
+        border-radius:9px !important;
+    }
+}
     .modal-network-view { display:none; flex-direction:column; padding:0; }
     .modal-network-view.active { display:flex !important; }
     .modal-network-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; color:var(--text-primary); flex-shrink:0; }
@@ -298,8 +587,55 @@
         .chain-display .chain-prefix { font-size:12px; }
         .chain-display .chain-icon { width:16px; height:16px; font-size:10px; }
         .chain-display .chain-name { font-size:12px; }
-        .balance-display { font-size:12px; gap:3px; }
-        .balance-display .btn-max { font-size:10px; padding:2px 8px; height:22px; }
+        
+
+@media (max-width:480px) {
+
+    .balance-display {
+
+        font-size:10px;
+
+        gap:2px;
+
+        letter-spacing:-0.25px;
+
+    }
+
+
+    .balance-display .wallet-icon {
+        font-size:9px;
+    }
+
+
+    .balance-display .balance-amount {
+
+        font-size:11px;
+
+        letter-spacing:-0.7px;
+
+       
+        max-width:100px;
+
+    }
+
+
+    .balance-display .btn-max {
+
+        font-size:9px;
+
+        padding:2px 7px;
+
+        height:20px;
+
+        min-height:20px;
+
+        border-radius:5px;
+
+        letter-spacing:-0.2px;
+
+    }
+
+}
         .token-selector .token-icon { width:34px; height:34px; }
         .token-selector .token-name { font-size:16px; }
         .row-price { font-size:12px; }
@@ -325,7 +661,7 @@
         .modal-token-item .left .name { font-size:14px; }
         .modal-token-item .left .sub { font-size:11px; }
         .modal-token-item .right { font-size:12px; }
-        .modal-token-item .right .balance-value { font-size:11px; }
+        .modal-token-item .right .balance-value { font-size:10px; }
         .modal-settings-content { padding:16px; }
         .settings-options .opt { font-size:12px; padding:4px 10px; }
         .gas-options .opt { font-size:12px; padding:4px 0; }
@@ -5336,6 +5672,561 @@ function renderLocalTokenItem(
     );
 
 }
+
+
+function formatTokenBalance(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ''
+    ) {
+        return '0';
+    }
+
+
+    const raw =
+        String(value)
+            .replace(/,/g, '')
+            .trim();
+
+
+    const num =
+        Number(raw);
+
+
+    if (
+        !Number.isFinite(num)
+    ) {
+        return '0';
+    }
+
+
+    if (num === 0) {
+        return '0';
+    }
+
+
+   
+    if (
+        Math.abs(num) < 0.000001
+    ) {
+
+        return num
+            .toLocaleString(
+                'en-US',
+                {
+                    useGrouping: false,
+                    maximumSignificantDigits: 12
+                }
+            );
+
+    }
+
+
+    return num.toLocaleString(
+        'en-US',
+        {
+            useGrouping: true,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 6
+        }
+    );
+}
+
+
+
+function renderLocalTokenItem(
+    container,
+    symbol,
+    info,
+    currentSymbol
+) {
+
+    const item =
+        document.createElement(
+            'div'
+        );
+
+
+    item.className =
+        'modal-token-item';
+
+
+    item.dataset.symbol =
+        symbol;
+
+
+    item.dataset.address =
+        info.address;
+
+
+    const isSelected =
+        symbol === currentSymbol;
+
+
+
+
+    const left =
+        document.createElement(
+            'div'
+        );
+
+
+    left.className =
+        'left';
+
+
+    const img =
+        document.createElement(
+            'img'
+        );
+
+
+    img.src =
+        info.icon ||
+        'https://via.placeholder.com/32';
+
+
+    img.alt =
+        symbol;
+
+
+    img.onerror =
+        function() {
+
+            this.src =
+                'https://via.placeholder.com/32';
+
+        };
+
+
+    left.appendChild(
+        img
+    );
+
+
+    const textDiv =
+        document.createElement(
+            'div'
+        );
+
+
+    const nameDiv =
+        document.createElement(
+            'div'
+        );
+
+
+    nameDiv.className =
+        'name';
+
+
+    nameDiv.textContent =
+        symbol;
+
+
+    textDiv.appendChild(
+        nameDiv
+    );
+
+
+    const subDiv =
+        document.createElement(
+            'div'
+        );
+
+
+    subDiv.className =
+        'sub';
+
+
+    const address =
+        String(
+            info.address || ''
+        );
+
+
+    subDiv.textContent =
+        address.length > 12
+            ? `${address.slice(0, 6)}...${address.slice(-4)}`
+            : address;
+
+
+    textDiv.appendChild(
+        subDiv
+    );
+
+
+    left.appendChild(
+        textDiv
+    );
+
+
+    item.appendChild(
+        left
+    );
+
+
+
+
+    const right =
+        document.createElement(
+            'div'
+        );
+
+
+    right.className =
+        'right';
+
+
+    let balance =
+        '0';
+
+
+   
+    if (
+        state.isConnected &&
+        (
+            symbol ===
+                state.srcTokenSymbol ||
+
+            symbol ===
+                state.dstTokenSymbol
+        )
+    ) {
+
+        const balEl =
+            document.getElementById(
+
+                symbol ===
+                    state.srcTokenSymbol
+
+                    ? 'srcBalance'
+                    : 'dstBalance'
+
+            );
+
+
+        if (balEl) {
+
+            balance =
+                balEl.textContent;
+
+        }
+
+    }
+
+
+
+
+    const balDiv =
+        document.createElement(
+            'div'
+        );
+
+
+    balDiv.className =
+        'balance-amount';
+
+
+    balDiv.textContent =
+        formatTokenBalance(
+            balance
+        );
+
+
+    
+    balDiv.title =
+        String(balance);
+
+
+    right.appendChild(
+        balDiv
+    );
+
+
+
+    const usdDiv =
+        document.createElement(
+            'div'
+        );
+
+
+    usdDiv.className =
+        'balance-value';
+
+
+    const numericBalance =
+        parseFloat(
+            String(balance)
+                .replace(/,/g, '')
+        ) || 0;
+
+
+    let tokenUsdPrice =
+        0;
+
+
+
+    if (
+        symbol ===
+        state.srcTokenSymbol
+    ) {
+
+        tokenUsdPrice =
+            parseFloat(
+                state.usdPriceSrc
+            ) || 0;
+
+    }
+
+
+  
+
+    if (
+        symbol ===
+        state.dstTokenSymbol
+    ) {
+
+        const dstStatePrice =
+            parseFloat(
+                state.usdPriceDst
+            ) || 0;
+
+
+        if (
+            dstStatePrice > 0
+        ) {
+
+            tokenUsdPrice =
+                dstStatePrice;
+
+        }
+
+    }
+
+
+  
+
+    if (
+        state.lastQuoteData &&
+        state.lastQuoteData.fromToken &&
+        state.lastQuoteData.fromToken.tokenUnitPrice &&
+        symbol ===
+            state.srcTokenSymbol
+    ) {
+
+        const quotePrice =
+            parseFloat(
+                state.lastQuoteData
+                    .fromToken
+                    .tokenUnitPrice
+            );
+
+
+        if (
+            Number.isFinite(
+                quotePrice
+            ) &&
+            quotePrice > 0
+        ) {
+
+            tokenUsdPrice =
+                quotePrice;
+
+        }
+
+    }
+
+
+
+
+    if (
+        state.lastQuoteData &&
+        state.lastQuoteData.toToken &&
+        state.lastQuoteData.toToken.tokenUnitPrice &&
+        symbol ===
+            state.dstTokenSymbol
+    ) {
+
+        const quotePrice =
+            parseFloat(
+                state.lastQuoteData
+                    .toToken
+                    .tokenUnitPrice
+            );
+
+
+        if (
+            Number.isFinite(
+                quotePrice
+            ) &&
+            quotePrice > 0
+        ) {
+
+            tokenUsdPrice =
+                quotePrice;
+
+        }
+
+    }
+
+
+ 
+
+    const val =
+        numericBalance *
+        tokenUsdPrice;
+
+
+    usdDiv.textContent =
+        '$' +
+        val.toFixed(2);
+
+
+    right.appendChild(
+        usdDiv
+    );
+
+
+
+    if (isSelected) {
+
+        const check =
+            document.createElement(
+                'div'
+            );
+
+
+        check.style.cssText =
+            `
+            color:var(--accent);
+            font-size:11px;
+            margin-top:1px;
+            line-height:1;
+            `;
+
+
+        check.textContent =
+            '✔️';
+
+
+        right.appendChild(
+            check
+        );
+
+    }
+
+
+    item.appendChild(
+        right
+    );
+
+
+    container.appendChild(
+        item
+    );
+
+
+
+    item.addEventListener(
+        'click',
+        function() {
+
+            if (
+                state.modalMode ===
+                'src'
+            ) {
+
+                state.srcTokenSymbol =
+                    symbol;
+
+
+                if (
+                    state.srcTokenSymbol ===
+                    state.dstTokenSymbol
+                ) {
+
+                    const keys =
+                        Object.keys(
+                            getTokens(
+                                state.chainId
+                            )
+                        );
+
+
+                    const other =
+                        keys.find(
+                            k =>
+                                k !==
+                                symbol
+                        );
+
+
+                    if (other) {
+
+                        state.dstTokenSymbol =
+                            other;
+
+                    }
+
+                }
+
+            } else {
+
+                state.dstTokenSymbol =
+                    symbol;
+
+
+                if (
+                    state.srcTokenSymbol ===
+                    state.dstTokenSymbol
+                ) {
+
+                    const keys =
+                        Object.keys(
+                            getTokens(
+                                state.chainId
+                            )
+                        );
+
+
+                    const other =
+                        keys.find(
+                            k =>
+                                k !==
+                                symbol
+                        );
+
+
+                    if (other) {
+
+                        state.srcTokenSymbol =
+                            other;
+
+                    }
+
+                }
+
+            }
+
+
+            updateTokenUI();
+
+            closeTokenModal();
+
+            loadBalances();
+
+            quote();
+
+        }
+
+    );
+
+}
         
                
               
@@ -5777,37 +6668,43 @@ function renderLocalTokenItem(
             'right';
 
 
-        const addBtn =
-            document.createElement(
-                'button'
-            );
+       
+
+const addBtn =
+    document.createElement(
+        'button'
+    );
+
+addBtn.className =
+    'add-btn';
+
+addBtn.type =
+    'button';
+
+addBtn.textContent =
+    '添加';
 
 
-        addBtn.className =
-            'add-btn';
+
+addBtn.style.background =
+    'var(--accent)';
+
+addBtn.style.color =
+    'white';
+
+addBtn.style.border =
+    'none';
+
+addBtn.style.cursor =
+    'pointer';
 
 
-        addBtn.textContent =
-            '添加';
+right.appendChild(
+    addBtn
+);
 
 
-        addBtn.style.cssText =
-            `
-            background:var(--accent);
-            color:white;
-            border:none;
-            border-radius:12px;
-            padding:4px 12px;
-            font-weight:600;
-            cursor:pointer;
-            font-size:13px;
-            `;
-
-
-        right.appendChild(
-            addBtn
-        );
-
+      
 
         addItem.appendChild(
             right
