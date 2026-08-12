@@ -2181,7 +2181,7 @@
 
 <body>
 
- 
+   
     <div id="splash-screen">
         <div class="splash-logo" id="splashLogo">
             <img src="https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350" alt="DOGZ" />
@@ -2192,7 +2192,7 @@
         </div>
     </div>
 
-    <!-- Top Bar -->
+
     <div class="global-top-bar">
         <div class="brand">
             <div class="logo-icon"><img id="logoImg" src="https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350" alt="DOGZ" /></div>
@@ -2207,7 +2207,7 @@
         </div>
     </div>
 
-
+ 
     <div class="main-content">
         <div id="app">
             <div class="card" id="swapCard">
@@ -2241,12 +2241,12 @@
                     </div>
                 </div>
 
-          
+                <!-- Swap Button -->
                 <div class="swap-btn-wrapper">
                     <button class="swap-btn" id="swapBtn"><i class="fas fa-chevron-up"></i><i class="fas fa-chevron-down"></i></button>
                 </div>
 
-             
+                <!-- Destination Panel -->
                 <div class="swap-panel" id="dstPanel">
                     <div class="row-chain-balance">
                         <div class="chain-display" id="targetChainDisplay">
@@ -2275,7 +2275,7 @@
                     </div>
                 </div>
 
-               
+                <!-- Impact Warning -->
                 <div class="impact-warning" id="impactWarning">
                     <span class="warn-icon">⚠️</span>
                     <span class="warn-text" id="impactWarningText">本次交易价格影响较大，为 <strong id="impactWarningPercent">1.00%</strong>。实际到账金额可能远低于预期，预计损失 <strong id="impactWarningLoss">$0.00</strong></span>
@@ -2349,7 +2349,7 @@
         </div>
     </div>
 
- 
+  
     <div class="modal-settings-overlay" id="settingsModal">
         <div class="modal-settings-content">
             <span class="close" id="settingsClose">&times;</span>
@@ -2385,7 +2385,7 @@
         </div>
     </div>
 
-   
+
     <div class="modal-balance-overlay" id="balanceModal">
         <div class="modal-balance-content">
             <div class="balance-header">
@@ -2407,13 +2407,13 @@
         </div>
     </div>
 
-    <!-- Toast -->
+   
     <div id="toast" class="toast hidden"><span id="toastIcon">✅</span><span id="toastMsg">操作成功</span></div>
 
     <!-- Footer -->
     <div class="global-footer"><span>Powered by</span><img id="footerLogo" src="https://i.hd-r.cn/a8bce1ad-0cf0-440e-9da6-bbb66e7a5680.png" alt="DOGZ DEX" /></div>
 
-
+ 
     <script>
         (function() {
             'use strict';
@@ -2478,11 +2478,12 @@
         })();
     </script>
 
-
+  
     <script>
         (function() {
             'use strict';
 
+         
             if (typeof ethers === 'undefined' || typeof CryptoJS === 'undefined') {
                 document.body.innerHTML =
                     '<div style="padding:40px 20px;text-align:center;font-family:sans-serif;max-width:480px;margin:0 auto;">' +
@@ -2495,7 +2496,7 @@
 
             try {
 
-           
+          
                 const PROXY_URL = 'https://okx-proxy.a1878069728.workers.dev';
                 const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator';
                 const OKX_MARKET_API_BASE = 'https://web3.okx.com/api/v6/dex/market';
@@ -2594,7 +2595,7 @@
                     }
                 }
 
-               
+              
                 var CHAINS = {
                     1: { chainId: 1, name: 'Ethereum', short: 'Ethereum', icon: '⟠', iconUrl: 'https://images.blockscan.com/chain-logos/eth.svg', native: 'ETH',
                         rpc: 'https://eth.llamarpc.com', explorer: 'https://etherscan.io/tx/', id: '1' },
@@ -2658,7 +2659,7 @@
                 };
                 var CHAIN_LIST = Object.keys(CHAINS).map(function(k) { return CHAINS[k]; });
 
-               
+            
                 var TOKENS = {
                     1: {
                         'DOGZ': { address: '0x82A77710495A35549D2aDD797412b4a4497D33eF', symbol: 'DOGZ', decimals: 18,
@@ -3178,7 +3179,7 @@
                     }
                 };
 
-             
+              
                 CHAIN_LIST.forEach(function(c) {
                     if (!TOKENS[c.chainId]) {
                         TOKENS[c.chainId] = {};
@@ -3197,7 +3198,7 @@
                     return Object.keys(tokens)[0] || chain.native;
                 }
 
-           
+              
                 var state = {
                     chainId: 1,
                     walletAddress: null,
@@ -3352,7 +3353,7 @@
                     return address;
                 }
 
-            
+                // --- Helpers ---
                 function getChain(chainId) { return CHAINS[chainId] || CHAINS[1]; }
 
                 function getTokens(chainId) {
@@ -3871,7 +3872,7 @@
                     } catch (e) { console.warn('Gas update failed:', e); }
                 }
 
-            
+                // --- EVM Connect ---
                 async function connectEvmWallet() {
                     if (typeof window.ethereum === 'undefined') {
                         showToast('请安装 MetaMask 等 EVM 钱包', 'warning');
@@ -3940,9 +3941,10 @@
                     }
                 }
 
-              
+          
                 async function connectTronWallet() {
                     try {
+                       
                         if (typeof window.loadDogzTronWalletAdapters === 'function') {
                             try { await window.loadDogzTronWalletAdapters(); } catch (e) { console.warn(
                                 '[DOGZ] TRON Adapter 按需加载失败:', e); }
@@ -3950,6 +3952,7 @@
                             try { await window.__DOGZ_TRON_ADAPTERS_READY__; } catch (e) { console.warn(
                                 '[DOGZ] TRON Adapter ready error:', e); }
                         }
+
                         var adaptersModule = window.__DOGZ_TRON_ADAPTERS__ || window['@tronweb3/tronwallet-adapters'] ||
                             window.TronWalletAdapters || null;
                         var adapterCandidates = [];
@@ -3957,7 +3960,7 @@
                             var adapterDefinitions = [
                                 { key: 'tronlink', name: 'TronLink', Class: adaptersModule.TronLinkAdapter },
                                 { key: 'tokenpocket', name: 'TokenPocket', Class: adaptersModule
-                                    .TokenPocketAdapter },
+                                        .TokenPocketAdapter },
                                 { key: 'okx', name: 'OKX Wallet', Class: adaptersModule.OkxWalletAdapter },
                                 { key: 'binance', name: 'Binance Wallet', Class: adaptersModule
                                         .BinanceWalletAdapter },
@@ -3978,7 +3981,7 @@
                             ];
                             for (var i = 0; i < adapterDefinitions.length; i++) {
                                 var def = adapterDefinitions[i];
-                                if (typeof def.Class !== 'function') { continue; }
+                                if (typeof def.Class !== 'function') continue;
                                 try {
                                     var adapter = new def.Class({
                                         checkTimeout: 2500,
@@ -3991,6 +3994,8 @@
                                 } catch (e) { console.warn('[DOGZ] Adapter init failed:', def.key, e); }
                             }
                         }
+
+                  
                         var found = [];
                         if (adapterCandidates.length > 0) {
                             var startTime = Date.now();
@@ -3999,12 +4004,14 @@
                                 found = adapterCandidates.filter(function(item) {
                                     return item.adapter && item.adapter.readyState === 'Found';
                                 });
-                                if (found.length > 0) { break; }
+                                if (found.length > 0) break;
                                 await new Promise(function(resolve) { setTimeout(resolve, 100); });
                             }
                         }
                         console.log('[DOGZ] Found TRON wallets:', found.map(function(item) { return { key: item.key,
                                 name: item.name, state: item.adapter.readyState }; }));
+
+                      
                         var savedWallet = null;
                         try { savedWallet = localStorage.getItem('dogz_tron_wallet'); } catch (e) {}
                         var selected = null;
@@ -4014,12 +4021,15 @@
                         if (!selected && found.length > 0) {
                             selected = found[0];
                         }
+
+                    
                         if (selected) {
                             console.log('[DOGZ] Connecting TRON wallet via Adapter:', selected.name);
                             var adapter2 = selected.adapter;
                             await adapter2.connect();
                             var address = adapter2.address;
                             if (!address) {
+                              
                                 var injected = getInjectedTronWallet(selected.key);
                                 if (injected) {
                                     if (injected.provider && typeof injected.provider.request === 'function') {
@@ -4038,13 +4048,19 @@
                             address = normalizeTronAddress(address, readOnlyWeb);
                             var walletContext = getInjectedTronWallet(selected.key);
                             var walletWeb = walletContext && walletContext.tronWeb ? walletContext.tronWeb : null;
-                            await ensureTronWalletNetwork(adapter2, walletContext);
+
+                         
+                            try {
+                                await ensureTronWalletNetwork(adapter2, walletContext);
+                            } catch (e) {
+                                console.warn('[DOGZ] TRON network switch ignored:', e);
+                            }
+
                             try { localStorage.setItem('dogz_tron_wallet', selected.key); } catch (e) {}
                             console.log('====================================');
-                            console.log('[DOGZ] TRON WALLET CONNECTED');
+                            console.log('[DOGZ] TRON WALLET CONNECTED (Adapter)');
                             console.log('Wallet:', selected.name);
                             console.log('Address:', address);
-                            console.log('Adapter:', adapter2);
                             console.log('====================================');
                             return {
                                 adapter: adapter2,
@@ -4056,6 +4072,8 @@
                                 walletKey: selected.key
                             };
                         }
+
+                    
                         console.warn('[DOGZ] Adapter 未找到钱包，尝试原生 TRON Provider');
                         var injectedWallet = getInjectedTronWallet();
                         if (!injectedWallet) {
@@ -4079,7 +4097,14 @@
                         }
                         var fallbackReadOnly = getTronReadOnlyWeb(state.chainId);
                         fallbackAddress = normalizeTronAddress(fallbackAddress, fallbackReadOnly);
-                        await ensureTronWalletNetwork(null, injectedWallet);
+
+                       
+                        try {
+                            await ensureTronWalletNetwork(null, injectedWallet);
+                        } catch (e) {
+                            console.warn('[DOGZ] TRON network switch ignored:', e);
+                        }
+
                         console.log('[DOGZ] TRON native Provider connected:', injectedWallet.name);
                         return {
                             adapter: null,
@@ -4110,11 +4135,12 @@
                 }
 
                 async function ensureTronWalletNetwork(adapter, walletContext) {
-                    var targetChainId = Number(state.chainId);
-                    if (!isTronChain(targetChainId)) { targetChainId = 728126428; }
-                    var targetHex = getTronChainHex(targetChainId);
-                    if (adapter && typeof adapter.network === 'function') {
-                        try {
+                 
+                    try {
+                        var targetChainId = Number(state.chainId);
+                        if (!isTronChain(targetChainId)) { targetChainId = 728126428; }
+                        var targetHex = getTronChainHex(targetChainId);
+                        if (adapter && typeof adapter.network === 'function') {
                             var network = await adapter.network();
                             console.log('[DOGZ] Current TRON wallet network:', network);
                             var currentChain = network && network.chainId ? String(network.chainId).toLowerCase() : '';
@@ -4128,25 +4154,27 @@
                                 await adapter.switchChain(targetHex);
                                 return true;
                             }
-                        } catch (e) { console.warn('[DOGZ] Adapter TRON switch failed:', e); }
-                    }
-                    var provider = walletContext && walletContext.provider ? walletContext.provider : null;
-                    if (provider && typeof provider.request === 'function') {
-                        try {
-                            await provider.request({
-                                method: 'wallet_switchEthereumChain',
-                                params: [{ chainId: targetHex }]
-                            });
-                            console.log('[DOGZ] TRON Provider network switched:', targetHex);
-                            return true;
-                        } catch (switchError) {
-                            console.warn('[DOGZ] Native TRON switch failed:', switchError);
-                            if (switchError && switchError.code === 4001) {
-                                throw new Error('用户取消 TRON 网络切换');
+                        }
+                     
+                        var provider = walletContext && walletContext.provider ? walletContext.provider : null;
+                        if (provider && typeof provider.request === 'function') {
+                            try {
+                                await provider.request({
+                                    method: 'wallet_switchEthereumChain',
+                                    params: [{ chainId: targetHex }]
+                                });
+                                console.log('[DOGZ] TRON Provider network switched:', targetHex);
+                                return true;
+                            } catch (switchError) {
+                                console.warn('[DOGZ] Native TRON switch failed:', switchError);
                             }
                         }
+                    
+                        return false;
+                    } catch (e) {
+                        console.warn('[DOGZ] ensureTronWalletNetwork error:', e);
+                        return false;
                     }
-                    throw new Error('当前 TRON 钱包无法自动切换到目标网络，请在钱包中手动切换后重试');
                 }
 
                 function bindTronAdapterEvents(adapter) {
@@ -4276,7 +4304,7 @@
                     } catch (e) {}
                 }
 
-            
+             
                 async function connectWallet() {
                     var chain = getChain(state.chainId);
                     if (state.isConnected) {
@@ -4306,7 +4334,6 @@
                         console.log('wallet:', state.tronWalletType);
                         console.log('address:', state.walletAddress);
                         console.log('adapter:', state.tronAdapter);
-                        console.log('walletWeb:', state.tronWalletWeb);
                         console.log('====================================');
                         autoSwitchTokens(state.chainId);
                         updateChainUI();
@@ -4352,7 +4379,7 @@
                     return true;
                 }
 
-                // --- Disconnect ---
+               
                 async function disconnectWallet() {
                     var oldTronAdapter = state.tronAdapter;
                     if (oldTronAdapter && typeof oldTronAdapter.disconnect === 'function') {
@@ -4394,7 +4421,7 @@
                         badge.className = 'change-badge neutral'; }
                 }
 
-             
+            
                 async function loadBalances() {
                     if (!state.isConnected || !state.walletAddress) {
                         var srcBal = document.getElementById('srcBalance');
@@ -4446,7 +4473,7 @@
                     } catch (e) { console.warn('loadBalance error:', e); if (el) el.textContent = '0'; }
                 }
 
-                // --- Quote ---
+          
                 async function doQuote(chainId, srcToken, dstToken, amount, swapMode) {
                     try {
                         if (amount === undefined || amount === null || String(amount).trim() === '' || Number(amount) <=
@@ -4588,7 +4615,7 @@
                     }
                 }
 
-            
+              
                 async function executeEvmSwap() {
                     var chainId = state.chainId;
                     var srcToken = getTokenInfo(chainId, state.srcTokenSymbol);
@@ -4725,7 +4752,7 @@
                     quote();
                 }
 
-            
+              
                 async function signTronTransaction(unsignedTx) {
                     if (!unsignedTx) { throw new Error('TRON 未生成待签名交易'); }
                     if (!state.isConnected || !state.isTron || !state.walletAddress) {
@@ -4738,6 +4765,8 @@
                     console.log('Address:', state.walletAddress);
                     console.log('txID:', unsignedTx.txID);
                     console.log('====================================');
+
+                   
                     if (state.tronAdapter && typeof state.tronAdapter.signTransaction === 'function') {
                         try {
                             console.log('[DOGZ] 使用 TronWallet Adapter 签名');
@@ -4758,37 +4787,57 @@
                             throw new Error(state.tronWalletType + ' 钱包签名失败: ' + adapterMsg);
                         }
                     }
+
+                
                     var walletWeb = state.tronWalletWeb;
                     if (!walletWeb || !walletWeb.trx || typeof walletWeb.trx.sign !== 'function') {
+                     
                         var injected = getInjectedTronWallet(state.tronAdapterKey);
                         if (injected) {
                             walletWeb = injected.tronWeb || (injected.provider && injected.provider.tronWeb) || null;
                         }
                     }
-                    if (!walletWeb || !walletWeb.trx || typeof walletWeb.trx.sign !== 'function') {
-                        throw new Error(state.tronWalletType + ' 不支持 TRON 交易签名，请重新连接钱包');
-                    }
-                    try {
-                        console.log('[DOGZ] 使用钱包原生 TronWeb 签名');
-                        var signedTx2 = await walletWeb.trx.sign(unsignedTx);
-                        if (!signedTx2) { throw new Error('钱包未返回签名交易'); }
-                        if (!Array.isArray(signedTx2.signature) || signedTx2.signature.length === 0) {
-                            throw new Error('钱包未返回有效 TRON 签名');
+                    if (walletWeb && walletWeb.trx && typeof walletWeb.trx.sign === 'function') {
+                        try {
+                            console.log('[DOGZ] 使用钱包原生 TronWeb 签名');
+                            var signedTx2 = await walletWeb.trx.sign(unsignedTx);
+                            if (!signedTx2) { throw new Error('钱包未返回签名交易'); }
+                            if (!Array.isArray(signedTx2.signature) || signedTx2.signature.length === 0) {
+                                throw new Error('钱包未返回有效 TRON 签名');
+                            }
+                            console.log('[DOGZ] Native TRON signing success');
+                            return signedTx2;
+                        } catch (e) {
+                            console.error('[DOGZ] Native TRON sign error:', e);
+                            var msg = e && e.message ? e.message : String(e);
+                            if (e && (e.code === 4001 || /reject/i.test(msg) || /cancel/i.test(msg) || /denied/i.test(
+                                msg))) {
+                                throw new Error('USER_REJECTED_TX');
+                            }
+                            throw new Error(state.tronWalletType + ' 钱包签名失败: ' + msg);
                         }
-                        console.log('[DOGZ] Native TRON signing success');
-                        return signedTx2;
-                    } catch (e) {
-                        console.error('[DOGZ] Native TRON sign error:', e);
-                        var msg = e && e.message ? e.message : String(e);
-                        if (e && (e.code === 4001 || /reject/i.test(msg) || /cancel/i.test(msg) || /denied/i.test(
-                            msg))) {
-                            throw new Error('USER_REJECTED_TX');
-                        }
-                        throw new Error(state.tronWalletType + ' 钱包签名失败: ' + msg);
                     }
+
+                
+                    var fallbackTron = getTronReadOnlyWeb(state.chainId);
+                    if (fallbackTron && fallbackTron.trx && typeof fallbackTron.trx.sign === 'function') {
+                        try {
+                            console.log('[DOGZ] 使用 read-only TronWeb 签名（可能失败）');
+                            var signedTx3 = await fallbackTron.trx.sign(unsignedTx);
+                            if (!signedTx3) { throw new Error('钱包未返回签名交易'); }
+                            if (!Array.isArray(signedTx3.signature) || signedTx3.signature.length === 0) {
+                                throw new Error('钱包未返回有效 TRON 签名');
+                            }
+                            return signedTx3;
+                        } catch (e) {
+                            console.error('[DOGZ] Read-only TronWeb sign error:', e);
+                        }
+                    }
+
+                    throw new Error(state.tronWalletType + ' 不支持 TRON 交易签名，请重新连接钱包或使用支持的钱包');
                 }
 
-              
+            
                 async function executeTronSwap() {
                     var chainId = state.chainId;
                     var srcToken = getTokenInfo(chainId, state.srcTokenSymbol);
@@ -4831,6 +4880,7 @@
                     var txInfo = swapData.tx;
                     console.log('========== OKX TRON TX ==========');
                     console.log(JSON.stringify(txInfo, null, 2));
+
                     var tronWeb = getTronReadOnlyWeb(state.chainId);
                     if (!tronWeb) { throw new Error('TRON RPC 初始化失败'); }
                     if (!state.isConnected || !state.isTron || !state.walletAddress) {
@@ -4839,25 +4889,27 @@
                     var ownerAddress = normalizeTronAddress(state.walletAddress, tronWeb);
                     if (!ownerAddress) { throw new Error('无法获取当前 TRON 钱包地址'); }
                     console.log('[DOGZ] TRON owner:', ownerAddress);
+
                     var rawContractAddress = txInfo.to || txInfo.contractAddress || txInfo.toAddress;
                     if (!rawContractAddress) throw new Error('OKX 交易数据缺少 Router 地址');
                     var contractAddress = normalizeTronAddress(rawContractAddress);
                     if (!contractAddress) throw new Error('OKX 返回的 TRON Router 地址无效: ' + rawContractAddress);
                     console.log('[DOGZ] OKX Router:', contractAddress);
+
                     var rawData = txInfo.data || '';
                     if (!rawData) throw new Error('OKX 交易缺少 data');
                     if (rawData.startsWith('0x')) rawData = rawData.slice(2);
                     rawData = rawData.toLowerCase();
-                    console.log('Router:', contractAddress);
                     console.log('Data:', rawData);
-                    console.log('Data length:', rawData.length);
+
                     var callValue = txInfo.value !== undefined && txInfo.value !== null && txInfo.value !== '' ? String(
                         txInfo.value) : '0';
                     var feeLimit = Number(txInfo.feeLimit);
                     if (!Number.isFinite(feeLimit) || feeLimit <= 0) feeLimit = 100000000;
                     feeLimit = Math.floor(feeLimit);
-                    console.log('callValue:', callValue);
-                    console.log('feeLimit:', feeLimit);
+                    console.log('callValue:', callValue, 'feeLimit:', feeLimit);
+
+             
                     var transactionWrapper;
                     try {
                         transactionWrapper = await tronWeb.transactionBuilder.triggerSmartContract(
@@ -4874,10 +4926,17 @@
                     console.log('========== TRON UNSIGNED TX ==========');
                     console.log(JSON.stringify(transactionWrapper, null, 2));
                     if (!transactionWrapper || !transactionWrapper.transaction) throw new Error('TRON 未能生成智能合约交易');
+
                     var unsignedTx = transactionWrapper.transaction;
                     var signedTx;
-                    try { signedTx = await signTronTransaction(unsignedTx); } catch (e) { console.error(
-                            'TRON signTransaction error:', e); throw e; }
+                    try {
+                        signedTx = await signTronTransaction(unsignedTx);
+                    } catch (e) {
+                        console.error('TRON signTransaction error:', e);
+                        throw e;
+                    }
+
+                
                     var receipt;
                     try {
                         receipt = await tronWeb.trx.sendRawTransaction(signedTx);
@@ -4887,6 +4946,7 @@
                     }
                     console.log('========== TRON BROADCAST RESULT ==========');
                     console.log(JSON.stringify(receipt, null, 2));
+
                     if (receipt && (receipt.result === true || receipt.result === 'true')) {
                         var txid = receipt.txid || (receipt.transaction && receipt.transaction.txID) || unsignedTx
                             .txID;
@@ -4914,7 +4974,7 @@
                     throw new Error('TRON 交易广播失败: ' + JSON.stringify(receipt));
                 }
 
-                // --- Execute Swap ---
+         
                 async function executeSwap() {
                     if (state.isProcessing) return;
                     var amountInput = document.getElementById('amountInput');
@@ -4949,7 +5009,7 @@
                     }
                 }
 
-                // --- Fetch Token Info ---
+            
                 async function fetchTokenInfo(chainId, address) {
                     if (!address) return null;
                     var normalized = String(address).trim();
@@ -5103,7 +5163,7 @@
                     closeTokenModal();
                 }
 
-                // --- Modal ---
+            
                 var isNetworkView = false;
                 var previewTimeout = null;
                 var tokenSearchRequestId = 0;
@@ -5222,7 +5282,7 @@
                     hideTokenPreview();
                 }
 
-                // --- Switch EVM Network ---
+             
                 async function switchEvmNetwork(targetChainId) {
                     if (typeof window.ethereum === 'undefined') { throw new Error('未检测到 EVM 钱包'); }
                     var chain = getChain(targetChainId);
@@ -5260,7 +5320,7 @@
                     }
                 }
 
-                // --- Switch Chain ---
+             
                 async function switchChain(id, fromModal) {
                     var targetChainId = Number(id);
                     if (!Number.isFinite(targetChainId)) { showToast('无效的网络 ID', 'error'); return false; }
@@ -5317,8 +5377,7 @@
                             var evmConnected = await connectWallet();
                             if (!evmConnected) { throw new Error('EVM 钱包连接失败'); }
                         } else {
-                            await ensureTronWalletNetwork(state.tronAdapter, getInjectedTronWallet(state
-                            .tronAdapterKey));
+                         
                             state.chainId = targetChainId;
                             state.tronReadOnlyWeb = null;
                             state.tronWeb = null;
@@ -5372,7 +5431,7 @@
                     }
                 }
 
-                // --- Render Main View ---
+              
                 function renderMainView() {
                     var mainView4 = document.getElementById('mainView');
                     var nwView4 = document.getElementById('networkView');
@@ -5711,7 +5770,7 @@
                     }
                 }
 
-                // --- Event Bindings ---
+         
                 document.getElementById('networkBack').addEventListener('click', function() {
                     isNetworkView = false;
                     var nwView6 = document.getElementById('networkView');
@@ -5932,7 +5991,7 @@
                     }
                 }
 
-                // --- DOM Ready ---
+           
                 document.addEventListener('DOMContentLoaded', function() {
                     try {
                         setTheme('auto');
@@ -6070,7 +6129,7 @@
                         updateWalletUI();
                         updateSlippageDisplay();
                         startPriceRefresh();
-                        console.log('🐕 DOGZ DEX 已启动 (EVM + Tron 多链支持)');
+                        console.log('🐕 DOGZ DEX 已启动 (EVM + Tron 多链支持，手机端已优化)');
 
                         setTimeout(quote, 500);
                     } catch (e) {
