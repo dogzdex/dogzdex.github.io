@@ -3657,9 +3657,20 @@ function getTronWalletSigningWeb(walletKey) {
                     }
 
                   
+                
                     var walletWeb = null;
                     try { walletWeb = getTronWalletSigningWeb(walletKey); } catch (e) { walletWeb =
                         null; }
+
+                  
+                    if (unsignedTx && typeof unsignedTx.visible !== 'boolean') {
+                        unsignedTx = {
+                            visible: false,
+                            txID: unsignedTx.txID,
+                            raw_data: unsignedTx.raw_data,
+                            raw_data_hex: unsignedTx.raw_data_hex
+                        };
+                    }
 
                     if (walletWeb && walletWeb.trx && typeof walletWeb.trx.sign === 'function') {
                         try {
@@ -3667,7 +3678,7 @@ function getTronWalletSigningWeb(walletKey) {
                             var normalized2 = normalizeTronSignedTx(signedTx, unsignedTx);
                             if (normalized2 && normalized2.signature && normalized2.signature.length >
                                 0) {
-                                console.log('[DOGZ] Signed via walletWeb.trx.sign()');
+                                console.log('[DOGZ] Signed via walletWeb.trx.sign(object)');
                                 return normalized2;
                             }
                             throw new Error('钱包返回的签名交易格式无效');
@@ -3675,6 +3686,32 @@ function getTronWalletSigningWeb(walletKey) {
                             var msg2 = e && e.message ? e.message : String(e);
                             if (e && (e.code === 4001 || /reject|denied|cancel/i.test(msg2))) {
                                 throw new Error('USER_REJECTED_TX');
+                            }
+                            
+                            if (/invalid transition/i.test(msg2) && unsignedTx.raw_data_hex) {
+                                try {
+                                    console.warn('[DOGZ] 对象签名失败(' + msg2 +
+                                        ')，尝试使用 raw_data_hex 字符串重签');
+                                    var signedTx2 = await walletWeb.trx.sign(unsignedTx
+                                        .raw_data_hex);
+                                    var normalized3 = normalizeTronSignedTx(signedTx2,
+                                        unsignedTx);
+                                    if (normalized3 && normalized3.signature && normalized3
+                                        .signature.length > 0) {
+                                        console.log(
+                                            '[DOGZ] Signed via walletWeb.trx.sign(raw_data_hex)'
+                                            );
+                                        return normalized3;
+                                    }
+                                } catch (e2) {
+                                    var msg3 = e2 && e2.message ? e2.message : String(e2);
+                                    if (e2 && (e2.code === 4001 || /reject|denied|cancel/i
+                                            .test(msg3))) {
+                                        throw new Error('USER_REJECTED_TX');
+                                    }
+                                    throw new Error((state.tronWalletType || 'TRON 钱包') +
+                                        ' 签名失败: ' + msg3);
+                                }
                             }
                             throw new Error((state.tronWalletType || 'TRON 钱包') + ' 签名失败: ' +
                                 msg2);
@@ -6011,15 +6048,21 @@ try {
 
 
     var unsignedTx =
-    transactionWrapper.transaction;
+        transactionWrapper.transaction;
 
+    if (!unsignedTx) {
+        throw new Error(
+            'TRON 未能生成智能合约交易'
+        );
+    }
 
-if (!unsignedTx) {
-
-    throw new Error(
-        'TRON 未能生成智能合约交易'
-    );
-}
+ 
+    unsignedTx = {
+        visible: false,
+        txID: unsignedTx.txID,
+        raw_data: unsignedTx.raw_data,
+        raw_data_hex: unsignedTx.raw_data_hex
+    };
 
 
 var contractList =
