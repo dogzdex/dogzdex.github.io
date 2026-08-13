@@ -3663,13 +3663,9 @@ function getTronWalletSigningWeb(walletKey) {
                         null; }
 
                   
+                    
                     if (unsignedTx && typeof unsignedTx.visible !== 'boolean') {
-                        unsignedTx = {
-                            visible: false,
-                            txID: unsignedTx.txID,
-                            raw_data: unsignedTx.raw_data,
-                            raw_data_hex: unsignedTx.raw_data_hex
-                        };
+                        unsignedTx.visible = false;
                     }
 
                     if (walletWeb && walletWeb.trx && typeof walletWeb.trx.sign === 'function') {
@@ -5524,7 +5520,16 @@ if (
           
 
 async function signTronTransaction(unsignedTx) {
-    return signTronTransactionUniversal(unsignedTx, state.tronAdapterKey);
+    try {
+        return await signTronTransactionUniversal(unsignedTx, state.tronAdapterKey);
+    } catch (e) {
+       
+        console.error('[DOGZ] TRON 签名失败，完整错误对象:', e);
+        try {
+            console.error('[DOGZ] 错误 JSON:', JSON.stringify(e, Object.getOwnPropertyNames(e)));
+        } catch (jsonErr) {}
+        throw e;
+    }
 }
  
 
@@ -6087,12 +6092,11 @@ try {
     }
 
  
-    unsignedTx = {
-        visible: false,
-        txID: unsignedTx.txID,
-        raw_data: unsignedTx.raw_data,
-        raw_data_hex: unsignedTx.raw_data_hex
-    };
+  
+    if (typeof unsignedTx.visible !== 'boolean') {
+        unsignedTx.visible = false;
+    }
+    console.log('[DOGZ] unsignedTx keys:', Object.keys(unsignedTx));
 
 
 var contractList =
@@ -6207,18 +6211,43 @@ if (
 
 
 console.log(
-    '========== TRON UNSIGNED TX =========='
-);
+        '========== TRON UNSIGNED TX =========='
+    );
 
-console.log(
-    JSON.stringify(
-        unsignedTx,
-        null,
-        2
-    )
-);
+    console.log(
+        JSON.stringify(
+            unsignedTx,
+            null,
+            2
+        )
+    );
 
-
+    try {
+        var simulateResult = await walletWeb.transactionBuilder
+            .triggerConstantContract(
+                contractAddress,
+                '',
+                {
+                    callValue: callValue,
+                    rawParameter: rawData
+                },
+                [],
+                ownerAddress
+            );
+        console.log('[DOGZ] 预执行模拟结果:', JSON.stringify(simulateResult, null, 2));
+        if (simulateResult && simulateResult.result && simulateResult.result.result === false) {
+            var revertMsg = simulateResult.result.message || '';
+            try {
+                if (revertMsg && walletWeb.toUtf8) {
+                    revertMsg = walletWeb.toUtf8(revertMsg);
+                }
+            } catch (e) {}
+            throw new Error('交易预执行失败，可能会在链上回滚: ' + (revertMsg || '未知原因'));
+        }
+    } catch (simError) {
+        console.warn('[DOGZ] 预执行模拟异常（不中断流程，仅记录）:', simError);
+       
+    }
 
     var signedTx;
 
