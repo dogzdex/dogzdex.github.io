@@ -3591,6 +3591,103 @@ function getTronWalletSigningWeb(walletKey) {
 }
 
 
+                function normalizeTronSignedTx(res, unsignedTx) {
+                    if (!res) return null;
+                 
+                    if (res.raw_data && Array.isArray(res.signature) && res.signature.length > 0) {
+                        return res;
+                    }
+               
+                    if (res.transaction && res.transaction.raw_data && Array.isArray(res.transaction
+                            .signature)) {
+                        return res.transaction;
+                    }
+                
+                    if (typeof res === 'string' || Array.isArray(res)) {
+                        var sigArr = Array.isArray(res) ? res : [res];
+                        if (sigArr.length > 0 && unsignedTx) {
+                            var merged = JSON.parse(JSON.stringify(unsignedTx));
+                            merged.signature = sigArr;
+                            return merged;
+                        }
+                    }
+                    return null;
+                }
+
+                async function signTronTransactionUniversal(unsignedTx, walletKey) {
+                    if (!unsignedTx) throw new Error('TRON 未生成待签名交易');
+                    if (!state.isConnected || !state.isTron || !state.walletAddress) {
+                        throw new Error('TRON 钱包未连接，请重新连接');
+                    }
+
+                    console.log('====================================');
+                    console.log('[DOGZ] TRON UNIVERSAL SIGN START');
+                    console.log('Wallet:', state.tronWalletType, 'Key:', walletKey);
+                    console.log('txID:', unsignedTx.txID);
+                    console.log('====================================');
+
+                    var injected = getInjectedTronWallet(walletKey);
+                    var provider = injected ? injected.provider : null;
+
+               
+                    if (provider && typeof provider.request === 'function') {
+                        var methodsToTry = ['tron_signTransaction', 'sign_transaction'];
+                        for (var i = 0; i < methodsToTry.length; i++) {
+                            try {
+                                var res = await provider.request({
+                                    method: methodsToTry[i],
+                                    params: [unsignedTx]
+                                });
+                                var normalized = normalizeTronSignedTx(res, unsignedTx);
+                                if (normalized && normalized.signature && normalized.signature.length >
+                                    0) {
+                                    console.log('[DOGZ] Signed via provider.request(' +
+                                        methodsToTry[i] + ')');
+                                    return normalized;
+                                }
+                            } catch (e) {
+                                var msg = e && e.message ? e.message : String(e);
+                                if (e && (e.code === 4001 || /reject|denied|cancel/i.test(msg))) {
+                                    throw new Error('USER_REJECTED_TX');
+                                }
+                                console.warn('[DOGZ] provider.request(' + methodsToTry[i] +
+                                    ') 不支持或失败，尝试下一种方式:', e);
+                            }
+                        }
+                    }
+
+                  
+                    var walletWeb = null;
+                    try { walletWeb = getTronWalletSigningWeb(walletKey); } catch (e) { walletWeb =
+                        null; }
+
+                    if (walletWeb && walletWeb.trx && typeof walletWeb.trx.sign === 'function') {
+                        try {
+                            var signedTx = await walletWeb.trx.sign(unsignedTx);
+                            var normalized2 = normalizeTronSignedTx(signedTx, unsignedTx);
+                            if (normalized2 && normalized2.signature && normalized2.signature.length >
+                                0) {
+                                console.log('[DOGZ] Signed via walletWeb.trx.sign()');
+                                return normalized2;
+                            }
+                            throw new Error('钱包返回的签名交易格式无效');
+                        } catch (e) {
+                            var msg2 = e && e.message ? e.message : String(e);
+                            if (e && (e.code === 4001 || /reject|denied|cancel/i.test(msg2))) {
+                                throw new Error('USER_REJECTED_TX');
+                            }
+                            throw new Error((state.tronWalletType || 'TRON 钱包') + ' 签名失败: ' +
+                                msg2);
+                        }
+                    }
+
+                    throw new Error((state.tronWalletType || 'TRON 钱包') + ' 未提供可用的签名接口');
+                }
+
+
+
+
+
 
 
 
@@ -5387,403 +5484,8 @@ if (
           
 
 async function signTronTransaction(unsignedTx) {
-
-    if (!unsignedTx) {
-        throw new Error(
-            'TRON 未生成待签名交易'
-        );
-    }
-
-
-    if (
-        !state.isConnected ||
-        !state.isTron ||
-        !state.walletAddress
-    ) {
-        throw new Error(
-            'TRON 钱包未连接，请重新连接'
-        );
-    }
-
-
-    console.log(
-        '===================================='
-    );
-
-    console.log(
-        '[DOGZ] TRON WALLET SIGN START'
-    );
-
-    console.log(
-        'Wallet:',
-        state.tronWalletType
-    );
-
-    console.log(
-        'WalletKey:',
-        state.tronAdapterKey
-    );
-
-    console.log(
-        'Address:',
-        state.walletAddress
-    );
-
-    console.log(
-        'txID:',
-        unsignedTx.txID
-    );
-
-    console.log(
-        'ContractType:',
-        unsignedTx.raw_data &&
-        unsignedTx.raw_data.contract &&
-        unsignedTx.raw_data.contract[0]
-            ? unsignedTx.raw_data.contract[0].type
-            : 'UNKNOWN'
-    );
-
-    console.log(
-        '===================================='
-    );
-
-
-
-    var walletWeb;
-
-    try {
-
-        walletWeb =
-            getTronWalletSigningWeb(
-                state.tronAdapterKey
-            );
-
-    } catch (e) {
-
-        console.error(
-            '[DOGZ] Cannot get wallet TronWeb:',
-            e
-        );
-
-        throw new Error(
-            state.tronWalletType +
-            ' 无法获取钱包签名接口: ' +
-            (
-                e && e.message
-                    ? e.message
-                    : String(e)
-            )
-        );
-    }
-
-
-    if (
-        !walletWeb ||
-        !walletWeb.trx ||
-        typeof walletWeb.trx.sign !== 'function'
-    ) {
-
-        throw new Error(
-            state.tronWalletType +
-            ' 当前没有可用的 TronWeb.trx.sign 签名接口'
-        );
-    }
-
-
-    console.log(
-        '[DOGZ] Wallet TronWeb resolved:',
-        walletWeb
-    );
-
-
-    var walletAddress = null;
-
-
-    try {
-
-        if (
-            walletWeb.defaultAddress
-        ) {
-
-            walletAddress =
-                walletWeb.defaultAddress.base58 ||
-                walletWeb.defaultAddress.hex ||
-                null;
-        }
-
-    } catch (e) {
-
-        console.warn(
-            '[DOGZ] Cannot read wallet defaultAddress:',
-            e
-        );
-    }
-
-
-    if (!walletAddress) {
-        walletAddress = state.walletAddress;
-    }
-
-
-    if (!walletAddress) {
-
-        throw new Error(
-            '无法获取当前 TRON 钱包地址'
-        );
-    }
-
-
-    var readOnlyWeb =
-        getTronReadOnlyWeb(
-            state.chainId
-        );
-
-
-    walletAddress =
-        normalizeTronAddress(
-            walletAddress,
-            readOnlyWeb
-        );
-
-
-    console.log(
-        '[DOGZ] Signing wallet address:',
-        walletAddress
-    );
-
-
-    if (
-        !unsignedTx.txID ||
-        !unsignedTx.raw_data ||
-        !unsignedTx.raw_data_hex
-    ) {
-
-        throw new Error(
-            'TRON 待签名交易结构不完整'
-        );
-    }
-
-
-    if (
-        !Array.isArray(
-            unsignedTx.raw_data.contract
-        ) ||
-        unsignedTx.raw_data.contract.length !== 1
-    ) {
-
-        throw new Error(
-            'TRON 待签名交易 Contract 结构异常'
-        );
-    }
-
-
-    var contractType =
-        unsignedTx.raw_data.contract[0].type;
-
-
-    if (
-        contractType !==
-        'TriggerSmartContract'
-    ) {
-
-        throw new Error(
-            'TRON 交易类型异常: ' +
-            String(contractType)
-        );
-    }
-
-
-
-    try {
-
-        var contractValue =
-            unsignedTx.raw_data.contract[0]
-                .parameter &&
-            unsignedTx.raw_data.contract[0]
-                .parameter.value;
-
-
-        if (contractValue) {
-
-            var rawOwner =
-                contractValue.owner_address;
-
-
-            if (rawOwner) {
-
-                var txOwner =
-                    normalizeTronAddress(
-                        rawOwner,
-                        readOnlyWeb
-                    );
-
-
-                if (
-                    txOwner !==
-                    walletAddress
-                ) {
-
-                    throw new Error(
-                        '交易 owner_address 与当前钱包地址不一致'
-                    );
-                }
-            }
-        }
-
-    } catch (ownerError) {
-
-        throw new Error(
-            'TRON 交易 owner 地址校验失败: ' +
-            (
-                ownerError &&
-                ownerError.message
-                    ? ownerError.message
-                    : String(ownerError)
-            )
-        );
-    }
-
-
-
-    var signedTx;
-
-    try {
-
-        console.log(
-            '[DOGZ] Calling walletWeb.trx.sign(unsignedTx)'
-        );
-
-        signedTx =
-            await walletWeb.trx.sign(
-                unsignedTx
-            );
-
-    } catch (e) {
-
-        console.error(
-            '[DOGZ] walletWeb.trx.sign error:',
-            e
-        );
-
-        var msg =
-            e && e.message
-                ? e.message
-                : String(e);
-
-
-        if (
-            e &&
-            (
-                e.code === 4001 ||
-                /reject/i.test(msg) ||
-                /cancel/i.test(msg) ||
-                /denied/i.test(msg) ||
-                /user rejected/i.test(msg)
-            )
-        ) {
-
-            throw new Error(
-                'USER_REJECTED_TX'
-            );
-        }
-
-
-        throw new Error(
-            state.tronWalletType +
-            ' 钱包签名失败: ' +
-            msg
-        );
-    }
-
-
-    if (!signedTx) {
-
-        throw new Error(
-            '钱包未返回签名交易'
-        );
-    }
-
-
-    if (
-        !signedTx.raw_data
-    ) {
-
-        throw new Error(
-            '钱包返回的 TRON 签名交易格式无效'
-        );
-    }
-
-
-    if (
-        !Array.isArray(
-            signedTx.signature
-        ) ||
-        signedTx.signature.length === 0
-    ) {
-
-        throw new Error(
-            '钱包返回的 TRON 交易没有有效签名'
-        );
-    }
-
-
- 
-    if (!signedTx.txID) {
-
-        try {
-
-            if (
-                walletWeb.utils &&
-                walletWeb.utils.transaction &&
-                typeof walletWeb.utils.transaction.txJsonToPb === 'function'
-            ) {
-
-                console.warn(
-                    '[DOGZ] Wallet returned signed transaction without txID'
-                );
-            }
-
-        } catch (e) {
-
-            console.warn(
-                '[DOGZ] txID validation skipped:',
-                e
-            );
-        }
-    }
-
-
-    console.log(
-        '[DOGZ] TRON wallet signing SUCCESS'
-    );
-
-    console.log(
-        '[DOGZ] Signature count:',
-        signedTx.signature.length
-    );
-
-    console.log(
-        '[DOGZ] Signed txID:',
-        signedTx.txID
-    );
-
-
-    console.log(
-        '========== TRON SIGNED TX =========='
-    );
-
-    console.log(
-        JSON.stringify(
-            signedTx,
-            null,
-            2
-        )
-    );
-
-
-    return signedTx;
+    return signTronTransactionUniversal(unsignedTx, state.tronAdapterKey);
 }
-
  
 
 async function executeTronSwap() {
@@ -6028,64 +5730,11 @@ if (!tronWeb) {
 
 
 
-var walletWeb;
-
-try {
-
-    walletWeb =
-        getTronWalletSigningWeb(
-            state.tronAdapterKey
-        );
-
-} catch (e) {
-
-    throw new Error(
-        state.tronWalletType +
-        ' 钱包交易接口不可用: ' +
-        (
-            e && e.message
-                ? e.message
-                : String(e)
-        )
-    );
-}
-
-
-if (
-    !walletWeb ||
-    !walletWeb.transactionBuilder ||
-    typeof walletWeb.transactionBuilder.triggerSmartContract !== 'function'
-) {
-
-    throw new Error(
-        state.tronWalletType +
-        ' 没有可用的 TRON transactionBuilder'
-    );
-}
-
-
-if (
-    !walletWeb.trx ||
-    typeof walletWeb.trx.sign !== 'function'
-) {
-
-    throw new Error(
-        state.tronWalletType +
-        ' 没有可用的 TRON trx.sign'
-    );
-}
-
 
 console.log(
-    '[DOGZ] ReadOnly TronWeb:',
+    '[DOGZ] Using canonical ReadOnly TronWeb to build tx:',
     tronWeb
 );
-
-console.log(
-    '[DOGZ] Wallet TronWeb:',
-    walletWeb
-);
-
 
 
     var ownerAddress =
@@ -6308,7 +5957,7 @@ try {
 
 
     transactionWrapper =
-        await walletWeb
+        await tronWeb
             .transactionBuilder
             .triggerSmartContract(
                 contractAddress,
