@@ -5221,7 +5221,10 @@ if (
                             } else {
                                 if (!token.address || token.address === '0x') { if (el) el.textContent = '0'; return; }
                                 var contract = await tronWeb.contract().at(token.address);
-                                var bal2 = await contract.balanceOf(state.walletAddress).call();
+                               
+                                var callOptions = state.walletAddress ? { from: state.walletAddress } : {};
+                                var bal2 = await contract.balanceOf(state.walletAddress).call(
+                                    callOptions);
                                 if (el) el.textContent = formatBalance(bal2, token.decimals);
                             }
                         } else {
@@ -5768,16 +5771,43 @@ if (!tronWeb) {
 
 
 
-console.log(
-    '[DOGZ] Using canonical ReadOnly TronWeb to build tx:',
-    tronWeb
-);
+    var walletWeb;
+
+    try {
+        walletWeb = getTronWalletSigningWeb(state.tronAdapterKey);
+    } catch (e) {
+        throw new Error(
+            state.tronWalletType +
+            ' 钱包交易接口不可用: ' +
+            (e && e.message ? e.message : String(e))
+        );
+    }
+
+    if (
+        !walletWeb ||
+        !walletWeb.transactionBuilder ||
+        typeof walletWeb.transactionBuilder.triggerSmartContract !== 'function'
+    ) {
+        throw new Error(
+            state.tronWalletType + ' 没有可用的 TRON transactionBuilder'
+        );
+    }
+
+    if (!walletWeb.trx || typeof walletWeb.trx.sign !== 'function') {
+        throw new Error(state.tronWalletType + ' 没有可用的 TRON trx.sign');
+    }
+
+   
+    var addrWeb = walletWeb || tronWeb;
+
+    console.log('[DOGZ] Wallet TronWeb (build+sign):', walletWeb);
+    console.log('[DOGZ] ReadOnly TronWeb (broadcast only):', tronWeb);
 
 
     var ownerAddress =
         normalizeTronAddress(
             state.walletAddress,
-            tronWeb
+            addrWeb
         );
 
     if (!ownerAddress) {
@@ -5806,10 +5836,10 @@ console.log(
     }
 
 
-    var contractAddress =
+   var contractAddress =
         normalizeTronAddress(
             rawContractAddress,
-            tronWeb
+            addrWeb
         );
 
     if (!contractAddress) {
@@ -5994,7 +6024,7 @@ try {
 
 
     transactionWrapper =
-        await tronWeb
+        await walletWeb
             .transactionBuilder
             .triggerSmartContract(
                 contractAddress,
@@ -6136,7 +6166,7 @@ try {
         builtOwner =
             normalizeTronAddress(
                 builtOwner,
-                tronWeb
+                addrWeb
             );
 
 
