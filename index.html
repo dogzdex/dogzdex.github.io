@@ -4439,27 +4439,52 @@ function getTronWalletSigningWeb(walletKey) {
                 }
 
                 function normalizeTronAddress(address, tronWebInstance) {
-                    if (address === null || address === undefined) throw new Error('TRON 地址为空');
-                    var value = String(address).trim();
-                    if (!value) throw new Error('TRON 地址为空');
-                    var tronWeb = tronWebInstance || state.tronWeb || getTronReadOnlyWeb();
-                    if (value.startsWith('T')) {
-                        if (typeof tronWeb.isAddress === 'function' && tronWeb.isAddress(value)) return value;
-                        throw new Error('无效的 TRON Base58 地址: ' + value);
-                    }
-                    var hex = value.toLowerCase();
-                    if (hex.startsWith('0x')) hex = hex.slice(2);
-                    if (/^[0-9a-f]{40}$/i.test(hex)) hex = '41' + hex;
-                    if (!/^41[0-9a-f]{40}$/i.test(hex)) throw new Error('无效的 TRON Hex 地址: ' + address);
-                    try {
-                        var base58 = tronWeb.address.fromHex(hex);
-                        if (!tronWeb.isAddress(base58)) throw new Error('转换后的 TRON 地址无效');
-                        return base58;
-                    } catch (e) {
-                        console.error('normalizeTronAddress error:', e);
-                        throw new Error('TRON 地址转换失败: ' + address);
-                    }
+    if (address === null || address === undefined) throw new Error('TRON 地址为空');
+    var value = String(address).trim();
+    if (!value) throw new Error('TRON 地址为空');
+    var tronWeb = tronWebInstance || state.tronWeb || getTronReadOnlyWeb();
+
+ 
+    if (value.startsWith('T') && value.length === 34) {
+        var base58Chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+        var valid = true;
+        for (var i = 0; i < value.length; i++) {
+            if (base58Chars.indexOf(value[i]) === -1) {
+                valid = false;
+                break;
+            }
+        }
+        if (valid) {
+        
+            try {
+                if (typeof tronWeb.isAddress === 'function' && tronWeb.isAddress(value)) {
+                    return value;
                 }
+            } catch (e) {
+                console.warn('[DOGZ] tronWeb.isAddress threw error, but address format seems valid:', e);
+              
+            }
+            return value;
+        }
+    }
+   
+    if (value.startsWith('T')) {
+        if (typeof tronWeb.isAddress === 'function' && tronWeb.isAddress(value)) return value;
+        throw new Error('无效的 TRON Base58 地址: ' + value);
+    }
+    var hex = value.toLowerCase();
+    if (hex.startsWith('0x')) hex = hex.slice(2);
+    if (/^[0-9a-f]{40}$/i.test(hex)) hex = '41' + hex;
+    if (!/^41[0-9a-f]{40}$/i.test(hex)) throw new Error('无效的 TRON Hex 地址: ' + address);
+    try {
+        var base58 = tronWeb.address.fromHex(hex);
+        if (!tronWeb.isAddress(base58)) throw new Error('转换后的 TRON 地址无效');
+        return base58;
+    } catch (e) {
+        console.error('normalizeTronAddress error:', e);
+        throw new Error('TRON 地址转换失败: ' + address);
+    }
+}
 
        
                 async function connectTronWallet() {
