@@ -5600,12 +5600,13 @@ async function signTronTransaction(unsignedTx) {
                             throw new Error('OKX 返回的授权 calldata 无效');
                         }
 
+                       
                         var approveTxWrapper = await walletWeb.transactionBuilder
                             .triggerSmartContract(
                                 approveContractAddr,
                                 '',
                                 {
-                                    feeLimit: 100000000,
+                                    feeLimit: 15000000,
                                     callValue: 0,
                                     rawParameter: approveCalldataRaw
                                 },
@@ -6094,23 +6095,30 @@ if (!tronWeb) {
 
    
 
-    var feeLimit =
-        Number(
-            txInfo.feeLimit
-        );
+   
+    var feeLimit = Number(txInfo.feeLimit);
 
-    if (
-        !Number.isFinite(feeLimit) ||
-        feeLimit <= 0
-    ) {
-        feeLimit =
-            100000000;
+    if (!Number.isFinite(feeLimit) || feeLimit <= 0) {
+        var estimatedGas = Number(txInfo.gas || (state.lastQuoteData &&
+            state.lastQuoteData.estimateGasFee) || 0);
+        if (Number.isFinite(estimatedGas) && estimatedGas > 0) {
+         
+            feeLimit = Math.ceil(estimatedGas * 420 * 1.5);
+        }
+        if (!Number.isFinite(feeLimit) || feeLimit <= 0) {
+            feeLimit = 30000000;
+        }
+        feeLimit = Math.min(feeLimit, 50000000); 
     }
 
-    feeLimit =
-        Math.floor(
-            feeLimit
-        );
+    feeLimit = Math.floor(feeLimit);
+
+    console.log('[DOGZ] TRON feeLimit 计算依据:', {
+        okxFeeLimit: txInfo.feeLimit,
+        okxGas: txInfo.gas,
+        finalFeeLimit: feeLimit,
+        finalFeeLimitInTRX: feeLimit / 1000000
+    });
 
 
     console.log(
