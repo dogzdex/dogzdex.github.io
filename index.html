@@ -13,12 +13,12 @@
               https://esm.sh;
           style-src 'unsafe-inline'
               https://cdn.tailwindcss.com
-              https://cdnjs.cloudflare.com
+              https://cdnjs.cloudflare
               https://fonts.googleapis.com;
           img-src * data: blob:;
           connect-src *;
           font-src
-              https://cdnjs.cloudflare.com
+              https://cdnjs.cloudflare
               https://fonts.gstatic.com;
           frame-src *;
           child-src *;
@@ -2537,7 +2537,7 @@
                 const SLIPPAGE_DEFAULT = 0.5;
                 const SLIPPAGE_MODE_DEFAULT = 'dynamic';
                 const IMPACT_WARNING_THRESHOLD = 1;
-                const REQUEST_TIMEOUT = 30000;
+                const REQUEST_TIMEOUT = 15000; // 优化：超时从30秒减至15秒
                 const MAX_RETRIES = 2;
 
                 async function proxyRequest(endpoint, params, retryCount) {
@@ -4882,6 +4882,16 @@ async function dogzBuildSolanaTransaction(
 
    
     try {
+        if (window.solana && window.solana.isTrust) {
+            return { provider: window.solana, name: 'Trust Wallet' };
+        }
+        if (window.trustWallet && window.trustWallet.solana) {
+            return { provider: window.trustWallet.solana, name: 'Trust Wallet' };
+        }
+    } catch (e) {}
+
+   
+    try {
         if (
             window.phantom &&
             window.phantom.solana &&
@@ -5088,7 +5098,7 @@ async function dogzBuildSolanaTransaction(
         showToast(
             isFileProtocol
                 ? '当前页面通过 file:// 打开，无法检测 Solana 钱包，请使用 HTTPS 地址'
-                : '未检测到 Solana 钱包，请安装 Phantom、OKX Wallet、Solflare、Backpack 或在 TokenPocket DApp 浏览器中打开',
+                : '未检测到 Solana 钱包，请安装 Phantom、OKX Wallet、Solflare、Backpack、Trust Wallet 或在 TokenPocket DApp 浏览器中打开',
             'warning'
         );
 
@@ -5113,8 +5123,8 @@ async function dogzBuildSolanaTransaction(
                         window.okxwallet.solana
                     ),
 
-                solana:
-                    !!window.solana
+                trust: !!window.trustWallet,
+                solana: !!window.solana
             }
         );
 
@@ -5288,6 +5298,8 @@ async function dogzBuildSolanaTransaction(
 
                 isPhantom:
                     !!provider.isPhantom,
+
+                isTrust: !!provider.isTrust,
 
                 hasSignTransaction:
                     typeof provider.signTransaction ===
@@ -7435,16 +7447,11 @@ async function executeSolanaSwap() {
         slippagePercent = String(state.slippageValue);
     }
 
-  
+    
     var routeProfiles = [
-        { name: 'normal', pathNum: '3', maxCalldataSize: '1000', maxAccounts: '48', singleRouteOnly: 'false' },
-        { name: 'compact-1', pathNum: '2', maxCalldataSize: '900', maxAccounts: '42', singleRouteOnly: 'true' },
-        { name: 'compact-2', pathNum: '1', maxCalldataSize: '800', maxAccounts: '36', singleRouteOnly: 'true' },
-        { name: 'compact-3', pathNum: '1', maxCalldataSize: '700', maxAccounts: '32', singleRouteOnly: 'true' },
-        { name: 'ultra', pathNum: '1', maxCalldataSize: '600', maxAccounts: '24', singleRouteOnly: 'true' },
-        { name: 'micro', pathNum: '1', maxCalldataSize: '500', maxAccounts: '20', singleRouteOnly: 'true' },
-        { name: 'nano', pathNum: '1', maxCalldataSize: '400', maxAccounts: '16', singleRouteOnly: 'true' },
-        { name: 'pico', pathNum: '1', maxCalldataSize: '300', maxAccounts: '12', singleRouteOnly: 'true' },
+        { name: 'compact-2', maxCalldataSize: '800', maxAccounts: '36', singleRouteOnly: 'true' },
+        { name: 'compact-3', maxCalldataSize: '700', maxAccounts: '32', singleRouteOnly: 'true' },
+        { name: 'micro', maxCalldataSize: '500', maxAccounts: '20', singleRouteOnly: 'true' },
     ];
 
     var connection = getSolanaConnection();
@@ -7474,7 +7481,7 @@ async function executeSolanaSwap() {
                 autoSlippage: 'false',
                 maxCalldataSize: profile.maxCalldataSize,
                 maxAccounts: profile.maxAccounts,
-                pathNum: profile.pathNum,
+                pathNum: '1', 
                 singleRouteOnly: profile.singleRouteOnly,
                 priceTolerance: '0'
             };
@@ -7501,22 +7508,8 @@ async function executeSolanaSwap() {
 
             console.log('[DOGZ] Solana tx ready:', built.size, 'bytes');
 
-            
-            try {
-                var simulation = await connection.simulateTransaction(
-                    built.transaction,
-                    { sigVerify: false, replaceRecentBlockhash: false }
-                );
-                if (simulation && simulation.value && simulation.value.err) {
-                    console.error('[DOGZ] Solana simulation error:', simulation.value.err);
-                    console.error('[DOGZ] Solana simulation logs:', simulation.value.logs);
-                
-                }
-            } catch (simulationError) {
-                console.warn('[DOGZ] Solana simulation skipped:', simulationError.message);
-            }
+        
 
-      
             if (typeof provider.signAndSendTransaction === 'function') {
                 var txid = await provider.signAndSendTransaction(built.transaction);
                 console.log('[DOGZ] Solana tx sent:', txid);
@@ -7555,12 +7548,12 @@ async function executeSolanaSwap() {
             var errorMessage = e && e.message ? e.message : String(e);
             console.error('[DOGZ] Solana attempt failed:', errorMessage);
 
-           
+         
             if (e && (e.code === 4001 || /reject|denied|user rejected|cancel/i.test(errorMessage))) {
                 throw e;
             }
 
-          
+         
             if (
                 errorMessage === 'SOLANA_TX_TOO_LARGE' ||
                 errorMessage === 'SOLANA_TOO_MANY_ACCOUNTS' ||
@@ -7574,12 +7567,12 @@ async function executeSolanaSwap() {
                 continue;
             }
 
-         
+           
             throw e;
         }
     }
 
-
+   
     if (lastError && (
         lastError.message === 'SOLANA_TX_TOO_LARGE' ||
         lastError.message === 'SOLANA_TOO_MANY_ACCOUNTS' ||
