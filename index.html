@@ -38,15 +38,93 @@
     rel="stylesheet"
     />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js">
-    </script>
+  
+ 
+<script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js">
-    </script>
+<script>
+(function () {
+    'use strict';
 
-    <script src="https://cdn.jsdelivr.net/npm/tronweb@5.1.0/dist/TronWeb.js">
-    </script>
 
+    try {
+        var BufferCtor =
+            window.buffer &&
+            window.buffer.Buffer;
+
+        if (
+            BufferCtor &&
+            typeof BufferCtor.from === 'function'
+        ) {
+            window.Buffer = BufferCtor;
+
+            if (typeof globalThis !== 'undefined') {
+                globalThis.Buffer = BufferCtor;
+            }
+
+            console.log(
+                '[DOGZ] Browser Buffer polyfill ready:',
+                typeof window.Buffer.from === 'function'
+            );
+        } else {
+            console.warn(
+                '[DOGZ] buffer@6 loaded but buffer.Buffer is unavailable'
+            );
+        }
+    } catch (e) {
+        console.warn(
+            '[DOGZ] Buffer polyfill init failed:',
+            e
+        );
+    }
+})();
+</script>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js">
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js">
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/tronweb@5.1.0/dist/TronWeb.js">
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js">
+</script>
+
+
+
+
+<script>
+(function () {
+    'use strict';
+
+    console.log(
+        '[DOGZ] Core libraries:',
+        {
+            ethers:
+                typeof window.ethers !== 'undefined',
+
+            CryptoJS:
+                typeof window.CryptoJS !== 'undefined',
+
+            TronWeb:
+                typeof window.TronWeb !== 'undefined',
+
+            solanaWeb3:
+                typeof window.solanaWeb3 !== 'undefined',
+
+            Buffer:
+                typeof window.Buffer !== 'undefined' &&
+                typeof window.Buffer.from === 'function'
+        }
+    );
+})();
+</script>
     <script>
         (function() {
             'use strict';
@@ -64,7 +142,8 @@
                 '[DOGZ] Core libraries:', {
                     ethers: typeof window.ethers !== 'undefined',
                     CryptoJS: typeof window.CryptoJS !== 'undefined',
-                    TronWeb: typeof window.TronWeb !== 'undefined'
+                    TronWeb: typeof window.TronWeb !== 'undefined',
+                    solanaWeb3: typeof window.solanaWeb3 !== 'undefined'
                 }
             );
 
@@ -2207,7 +2286,7 @@
         </div>
     </div>
 
-    <!-- Main Content -->
+  
     <div class="main-content">
         <div id="app">
             <div class="card" id="swapCard">
@@ -2655,11 +2734,14 @@
                     57073: { chainId: 57073, name: 'Ink', short: 'Ink', icon: '🖊️', iconUrl: 'https://web3.okx.com/cdn/assets/imgs/338/INK.png?x-oss-process=image/format,webp/ignore-error,1',
                         native: 'INK', rpc: 'https://ink.drpc.org', explorer: '', id: '57073' },
                     143: { chainId: 143, name: 'Monad', short: 'Monad', icon: '🔮', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/mon_36000_new.png?x-oss-process=image/format,webp/ignore-error,1',
-                        native: 'MON', rpc: 'https://infra.originstake.com/monad/evm', explorer: '', id: '143' }
+                        native: 'MON', rpc: 'https://infra.originstake.com/monad/evm', explorer: '', id: '143' },
+                   
+                    501: { chainId: 501, name: 'Solana', short: 'Solana', icon: '◎', iconUrl: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1', native: 'SOL',
+                        rpc: 'https://api.mainnet-beta.solana.com', explorer: 'https://solscan.io/tx/', id: 'solana', isSolana: true }
                 };
                 var CHAIN_LIST = Object.keys(CHAINS).map(function(k) { return CHAINS[k]; });
 
-                // --- Tokens ---
+              
                 var TOKENS = {
                     1: {
                         'DOGZ': { address: '0x82A77710495A35549D2aDD797412b4a4497D33eF', symbol: 'DOGZ', decimals: 18,
@@ -3176,6 +3258,23 @@
                             icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d-107/type=default_90_0?v=1756473338168&x-oss-process=image/format,webp/ignore-error,1' },
                         'USDT': { address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', symbol: 'USDT', decimals: 6,
                             icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
+                    },
+                   
+                    501: {
+                        'SOL': { address: '11111111111111111111111111111111', symbol: 'SOL', decimals: 9,
+                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1' },
+                        'USDC': { address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', symbol: 'USDC', decimals: 6,
+                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v-110/type=default_90_0?v=1785867002008&x-oss-process=image/format,webp/ignore-error,1' },
+                        'USDT': { address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB', symbol: 'USDT', decimals: 6,
+                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                        'WSOL': { address: 'So11111111111111111111111111111111111111112', symbol: 'WSOL', decimals: 9,
+                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1' },
+                        'JUP': { address: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', decimals: 6,
+                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/501-JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN-96?v=1744225771822&x-oss-process=image/format,webp/ignore-error,1' },
+                        'RAY': { address: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R', symbol: 'RAY', decimals: 6,
+                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/501-4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R-96?v=1744224535655&x-oss-process=image/format,webp/ignore-error,1' },
+                        'BONK': { address: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', symbol: 'BONK', decimals: 5,
+                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263-107/type=default_90_0?v=1786685817074&x-oss-process=image/format,webp/ignore-error,1' }
                     }
                 };
 
@@ -3198,7 +3297,7 @@
                     return Object.keys(tokens)[0] || chain.native;
                 }
 
-                // --- State ---
+               
                 var state = {
                     chainId: 1,
                     walletAddress: null,
@@ -3211,6 +3310,10 @@
                     tronWalletType: null,
                     tronAdapterKey: null,
                     isTron: false,
+                    isSolana: false,
+                    solanaConnection: null,
+                    solanaProvider: null, 
+                    solanaPublicKey: null,
                     isConnected: false,
                     srcTokenSymbol: 'USDT',
                     dstTokenSymbol: 'DOGZ',
@@ -3711,13 +3814,6 @@ function getTronWalletSigningWeb(walletKey) {
     throw new Error((state.tronWalletType || 'TRON 钱包') + ' 无法完成签名');
 }
 
-
-
-
-
-
-
-
                 async function requestInjectedTronAccounts(provider) {
 
   
@@ -3873,7 +3969,7 @@ function getTronWalletSigningWeb(walletKey) {
                     return address;
                 }
 
-                // --- Helpers ---
+               
                 function getChain(chainId) { return CHAINS[chainId] || CHAINS[1]; }
 
                 function getTokens(chainId) {
@@ -3891,6 +3987,8 @@ function getTronWalletSigningWeb(walletKey) {
                 }
 
                 function isTronChain(chainId) { var c = getChain(chainId); return c && c.isTron || false; }
+
+                function isSolanaChain(chainId) { var c = getChain(chainId); return c && c.isSolana || false; }
 
                 function formatBalance(bn, decimals) {
                     if (!bn) return '0';
@@ -3927,6 +4025,11 @@ function getTronWalletSigningWeb(walletKey) {
                     var chain = getChain(chainId);
                     if (chain.isTron) {
                         return /^[A-Za-z0-9]{34}$/.test(address);
+                    } else if (chain.isSolana) {
+                        try {
+                            new window.solanaWeb3.PublicKey(address);
+                            return true;
+                        } catch (e) { return false; }
                     } else {
                         return ethers.isAddress(address);
                     }
@@ -4344,7 +4447,7 @@ function getTronWalletSigningWeb(walletKey) {
                 }
 
                 async function updateGasPrice() {
-                    if (state.isTron || !state.provider) return;
+                    if (state.isTron || state.isSolana || !state.provider) return;
                     try {
                         var feeData = await state.provider.getFeeData();
                         var gasPrice = feeData.gasPrice || feeData.maxFeePerGas;
@@ -4425,6 +4528,707 @@ function getTronWalletSigningWeb(walletKey) {
                         return null;
                     }
                 }
+
+              
+               
+
+          
+                
+
+
+
+async function dogzSolanaRpcFetch(
+    url,
+    options
+) {
+
+  
+
+    var rpcPayload;
+
+
+    try {
+
+        rpcPayload =
+            typeof options?.body === 'string'
+                ? JSON.parse(options.body)
+                : options?.body;
+
+
+    } catch (e) {
+
+        console.error(
+            '[DOGZ] Solana RPC JSON parse error:',
+            e
+        );
+
+        throw e;
+    }
+
+
+    var response =
+        await fetch(
+            PROXY_URL,
+            {
+                method:
+                    'POST',
+
+                headers:
+                    {
+                        'Content-Type':
+                            'application/json'
+                    },
+
+                body:
+                    JSON.stringify(
+                        {
+                            type:
+                                'solana-rpc',
+
+                            payload:
+                                rpcPayload
+                        }
+                    )
+            }
+        );
+
+
+    return response;
+}
+
+
+
+
+
+                function getSolanaConnection() {
+
+    if (
+        !state.solanaConnection
+    ) {
+
+        var chain =
+            getChain(501);
+
+
+        var rpcUrl =
+            chain &&
+            chain.rpc
+                ? chain.rpc
+                : 'https://api.mainnet-beta.solana.com';
+
+
+        console.log(
+            '[DOGZ] Creating Solana Connection:',
+            rpcUrl
+        );
+
+
+        state.solanaConnection =
+            new window.solanaWeb3.Connection(
+                rpcUrl,
+                {
+                    commitment:
+                        'confirmed',
+
+                    fetch:
+                        dogzSolanaRpcFetch,
+
+                    disableRetryOnRateLimit:
+                        false
+                }
+            );
+    }
+
+
+    return state.solanaConnection;
+}
+
+      
+               function detectSolanaProvider() {
+
+   
+    try {
+        if (
+            window.phantom &&
+            window.phantom.solana &&
+            window.phantom.solana.isPhantom
+        ) {
+            return {
+                provider: window.phantom.solana,
+                name: 'Phantom'
+            };
+        }
+    } catch (e) {
+        console.warn(
+            '[DOGZ] Phantom detection error:',
+            e
+        );
+    }
+
+
+  
+    try {
+        if (
+            window.okxwallet &&
+            window.okxwallet.solana
+        ) {
+            return {
+                provider: window.okxwallet.solana,
+                name: 'OKX Wallet'
+            };
+        }
+    } catch (e) {
+        console.warn(
+            '[DOGZ] OKX Solana detection error:',
+            e
+        );
+    }
+
+
+
+    try {
+        if (
+            window.solflare &&
+            (
+                window.solflare.isSolflare ||
+                typeof window.solflare.connect === 'function'
+            )
+        ) {
+            return {
+                provider: window.solflare,
+                name: 'Solflare'
+            };
+        }
+    } catch (e) {
+        console.warn(
+            '[DOGZ] Solflare detection error:',
+            e
+        );
+    }
+
+
+ 
+    try {
+        if (
+            window.backpack &&
+            window.backpack.solana
+        ) {
+            return {
+                provider: window.backpack.solana,
+                name: 'Backpack'
+            };
+        }
+    } catch (e) {
+        console.warn(
+            '[DOGZ] Backpack detection error:',
+            e
+        );
+    }
+
+
+
+    try {
+        if (
+            window.solana &&
+            typeof window.solana.connect === 'function' &&
+            (
+                window.solana.isPhantom ||
+                typeof window.solana.signTransaction === 'function'
+            )
+        ) {
+            return {
+                provider: window.solana,
+                name:
+                    window.solana.isPhantom
+                        ? 'Phantom'
+                        : 'Solana Wallet'
+            };
+        }
+    } catch (e) {
+        console.warn(
+            '[DOGZ] window.solana detection error:',
+            e
+        );
+    }
+
+
+ 
+    return null;
+}
+
+            
+               async function waitForSolanaProvider() {
+
+    var found =
+        detectSolanaProvider();
+
+    if (found) {
+        return found;
+    }
+
+  
+    for (
+        var i = 0;
+        i < 25;
+        i++
+    ) {
+
+        await new Promise(
+            function (resolve) {
+                setTimeout(
+                    resolve,
+                    200
+                );
+            }
+        );
+
+        found =
+            detectSolanaProvider();
+
+        if (found) {
+            console.log(
+                '[DOGZ] Solana provider detected:',
+                found.name
+            );
+
+            return found;
+        }
+    }
+
+    return null;
+}
+
+                async function connectSolanaWallet() {
+
+    if (
+        typeof window.solanaWeb3 === 'undefined'
+    ) {
+        showToast(
+            'Solana Web3.js 未加载，请刷新页面重试',
+            'error'
+        );
+
+        return null;
+    }
+
+
+
+    var protocol =
+        window.location.protocol;
+
+    var hostname =
+        window.location.hostname;
+
+  
+
+    if (
+        protocol === 'http:' &&
+        hostname !== 'localhost' &&
+        hostname !== '127.0.0.1'
+    ) {
+
+        console.warn(
+            '[DOGZ] Current Solana page is HTTP:',
+            window.location.href
+        );
+
+        showToast(
+            '电脑端 Phantom 不会在 HTTP 内网 IP 页面注入，请使用 https://dogz.dpdns.org 打开',
+            'warning'
+        );
+
+      
+    }
+
+
+
+    var detected =
+        await waitForSolanaProvider();
+
+
+    if (!detected) {
+
+        var isFileProtocol =
+            window.location.protocol === 'file:';
+
+        showToast(
+            isFileProtocol
+                ? '当前页面通过 file:// 打开，无法检测 Solana 钱包，请使用 HTTPS 地址'
+                : '未检测到 Solana 钱包，请安装 Phantom、OKX Wallet、Solflare、Backpack 或在 TokenPocket DApp 浏览器中打开',
+            'warning'
+        );
+
+        console.warn(
+            '[DOGZ] Solana provider not found',
+            {
+                protocol:
+                    window.location.protocol,
+
+                hostname:
+                    window.location.hostname,
+
+                phantom:
+                    !!(
+                        window.phantom &&
+                        window.phantom.solana
+                    ),
+
+                okx:
+                    !!(
+                        window.okxwallet &&
+                        window.okxwallet.solana
+                    ),
+
+                solana:
+                    !!window.solana
+            }
+        );
+
+        return null;
+    }
+
+
+    var provider =
+        detected.provider;
+
+
+    console.log(
+        '[DOGZ] Solana provider:',
+        detected.name,
+        provider
+    );
+
+
+  
+
+    try {
+
+        var resp =
+            await provider.connect();
+
+
+        var publicKey =
+            resp &&
+            resp.publicKey
+                ? resp.publicKey
+                : provider.publicKey;
+
+
+       
+        if (
+            typeof publicKey === 'string'
+        ) {
+            publicKey =
+                new window.solanaWeb3.PublicKey(
+                    publicKey
+                );
+        }
+
+
+        if (
+            !publicKey &&
+            provider.publicKey
+        ) {
+            publicKey =
+                provider.publicKey;
+        }
+
+
+        if (!publicKey) {
+            throw new Error(
+                '钱包连接成功，但无法获取 Solana 公钥'
+            );
+        }
+
+
+        var address =
+            publicKey.toString();
+
+
+       
+        try {
+            new window.solanaWeb3.PublicKey(
+                address
+            );
+        } catch (e) {
+            throw new Error(
+                '钱包返回了无效的 Solana 地址'
+            );
+        }
+
+
+     
+
+        if (
+            !provider.__dogzEventsBound &&
+            typeof provider.on === 'function'
+        ) {
+
+            provider.__dogzEventsBound =
+                true;
+
+
+            provider.on(
+                'accountChanged',
+                function (newPublicKey) {
+
+                    try {
+
+                        if (!newPublicKey) {
+                            disconnectWallet();
+                            return;
+                        }
+
+
+                        if (
+                            typeof newPublicKey ===
+                            'string'
+                        ) {
+                            newPublicKey =
+                                new window.solanaWeb3.PublicKey(
+                                    newPublicKey
+                                );
+                        }
+
+
+                        state.walletAddress =
+                            newPublicKey.toString();
+
+                        state.solanaPublicKey =
+                            newPublicKey;
+
+
+                        updateWalletUI();
+
+                        loadBalances();
+
+                        quote();
+
+                    } catch (e) {
+
+                        console.error(
+                            '[DOGZ] Solana accountChanged error:',
+                            e
+                        );
+                    }
+                }
+            );
+
+
+            provider.on(
+                'disconnect',
+                function () {
+
+                    if (state.isSolana) {
+                        disconnectWallet();
+                    }
+                }
+            );
+        }
+
+
+     
+
+        var connection =
+            getSolanaConnection();
+
+
+        state.solanaConnection =
+            connection;
+
+        state.solanaProvider =
+            provider;
+
+        state.solanaPublicKey =
+            publicKey;
+
+
+        console.log(
+            '[DOGZ] Solana connected:',
+            {
+                wallet:
+                    detected.name,
+
+                address:
+                    address,
+
+                isPhantom:
+                    !!provider.isPhantom,
+
+                hasSignTransaction:
+                    typeof provider.signTransaction ===
+                    'function',
+
+                hasSignAndSend:
+                    typeof provider.signAndSendTransaction ===
+                    'function'
+            }
+        );
+
+
+        return {
+            provider:
+                provider,
+
+            connection:
+                connection,
+
+            address:
+                address,
+
+            publicKey:
+                publicKey
+        };
+
+
+    } catch (e) {
+
+        console.error(
+            '[DOGZ] Solana connect error:',
+            e
+        );
+
+
+        var msg =
+            e &&
+            e.message
+                ? e.message
+                : String(e);
+
+
+        if (
+            e &&
+            (
+                e.code === 4001 ||
+                /reject|denied|cancel/i.test(msg)
+            )
+        ) {
+
+            showToast(
+                '用户取消连接',
+                'warning'
+            );
+
+        } else {
+
+            showToast(
+                'Solana 钱包连接失败: ' +
+                msg,
+                'error'
+            );
+        }
+
+
+        return null;
+    }
+}
+
+                function getSolanaProvider() {
+                    return state.solanaProvider || (detectSolanaProvider() || {}).provider || null;
+                }
+
+              
+                async function loadSolanaBalance(tokenSymbol) {
+                    var connection = getSolanaConnection();
+                    var publicKey = state.solanaPublicKey;
+                    if (!publicKey) return '0';
+                    var token = getTokenInfo(state.chainId, tokenSymbol);
+                    var decimals = token.decimals || 9;
+                    try {
+                        if (tokenSymbol === 'SOL' || token.address === '11111111111111111111111111111111') {
+                            var balance = await connection.getBalance(publicKey);
+                            return formatBalance(BigInt(balance), decimals);
+                        } else {
+                            var tokenAccounts = await connection.getTokenAccountsByOwner(publicKey, {
+                                mint: new window.solanaWeb3.PublicKey(token.address)
+                            });
+                            if (!tokenAccounts || tokenAccounts.value.length === 0) return '0';
+                            var accountInfo = await connection.getTokenAccountBalance(tokenAccounts.value[0].pubkey);
+                            return accountInfo && accountInfo.value ? (accountInfo.value.uiAmountString || '0') : '0';
+                        }
+                    } catch (e) {
+                        console.warn('[DOGZ] loadSolanaBalance error:', e);
+                        return '0';
+                    }
+                }
+
+              
+              
+    
+
+function dogzBase64ToUint8Array(value) {
+
+    if (value instanceof Uint8Array) {
+        return value;
+    }
+
+   
+    if (
+        value &&
+        typeof value === 'object' &&
+        value.type === 'Buffer' &&
+        Array.isArray(value.data)
+    ) {
+        return new Uint8Array(value.data);
+    }
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        throw new Error(
+            'Solana instruction data 为空'
+        );
+    }
+
+    var base64 = String(value).trim();
+
+    if (!base64) {
+        return new Uint8Array(0);
+    }
+
+
+    base64 =
+        base64
+            .replace(/-/g, '+')
+            .replace(/_/g, '/');
+
+  
+    while (base64.length % 4 !== 0) {
+        base64 += '=';
+    }
+
+    var binary;
+
+    try {
+        binary = window.atob(base64);
+    } catch (e) {
+        throw new Error(
+            'Solana instruction Base64 解码失败: ' +
+            String(e && e.message ? e.message : e)
+        );
+    }
+
+    var bytes =
+        new Uint8Array(binary.length);
+
+    for (
+        var i = 0;
+        i < binary.length;
+        i++
+    ) {
+        bytes[i] =
+            binary.charCodeAt(i);
+    }
+
+    return bytes;
+}
+              
+              
+              
+        
+              
+              
 
                 function getTronNetworkConfig(chainId) {
                     var id = Number(chainId);
@@ -5082,7 +5886,8 @@ if (
                     var chain = getChain(state.chainId);
                     if (state.isConnected) {
                         var targetIsTron = !!chain.isTron;
-                        if (state.isTron === targetIsTron) {
+                        var targetIsSolana = !!chain.isSolana;
+                        if ((state.isTron === targetIsTron) && (state.isSolana === targetIsSolana)) {
                             return true;
                         }
                         await disconnectWallet();
@@ -5127,6 +5932,7 @@ if (
                         state.tronWalletType = tronResult.walletType || 'TRON Wallet';
                         state.tronAdapterKey = tronResult.walletKey || 'unknown';
                         state.isTron = true;
+                        state.isSolana = false;
                         state.isConnected = true;
                         console.log('====================================');
                         console.log('[DOGZ] TRON CONNECTED');
@@ -5151,31 +5957,50 @@ if (
                         if (gasFeeDisplay) { gasFeeDisplay.textContent = '--'; }
                         showToast(state.tronWalletType + ' 已连接', 'success');
                         return true;
-                    }
-                    var evmResult = await connectEvmWallet();
-                    if (!evmResult) { return false; }
-                    state.provider = evmResult.provider;
-                    state.signer = evmResult.signer;
-                    state.walletAddress = evmResult.address;
-                    state.tronWeb = null;
-                    state.tronReadOnlyWeb = null;
-                    state.tronWalletWeb = null;
-                    state.tronAdapter = null;
-                    state.tronWalletType = null;
-                    state.tronAdapterKey = null;
-                    state.isTron = false;
-                    state.isConnected = true;
-                    if (state.chainId !== evmResult.chainId) {
-                        state.chainId = evmResult.chainId;
+                    } else if (chain.isSolana) {
+                        var solResult = await connectSolanaWallet();
+                        if (!solResult) return false;
+                        state.isSolana = true;
+                        state.isTron = false;
+                        state.isConnected = true;
+                        state.provider = solResult.connection; 
+                        state.signer = null;
+                        state.walletAddress = solResult.address;
+                        state.solanaPublicKey = solResult.publicKey;
                         autoSwitchTokens(state.chainId);
                         updateChainUI();
+                        updateWalletUI();
+                        await loadBalances();
+                        await quote();
+                        showToast('Solana 钱包已连接', 'success');
+                        return true;
+                    } else {
+                        var evmResult = await connectEvmWallet();
+                        if (!evmResult) { return false; }
+                        state.provider = evmResult.provider;
+                        state.signer = evmResult.signer;
+                        state.walletAddress = evmResult.address;
+                        state.tronWeb = null;
+                        state.tronReadOnlyWeb = null;
+                        state.tronWalletWeb = null;
+                        state.tronAdapter = null;
+                        state.tronWalletType = null;
+                        state.tronAdapterKey = null;
+                        state.isTron = false;
+                        state.isSolana = false;
+                        state.isConnected = true;
+                        if (state.chainId !== evmResult.chainId) {
+                            state.chainId = evmResult.chainId;
+                            autoSwitchTokens(state.chainId);
+                            updateChainUI();
+                        }
+                        updateWalletUI();
+                        await loadBalances();
+                        await quote();
+                        await updateGasPrice();
+                        showToast('EVM 钱包已连接', 'success');
+                        return true;
                     }
-                    updateWalletUI();
-                    await loadBalances();
-                    await quote();
-                    await updateGasPrice();
-                    showToast('EVM 钱包已连接', 'success');
-                    return true;
                 }
 
               
@@ -5183,6 +6008,11 @@ if (
                     var oldTronAdapter = state.tronAdapter;
                     if (oldTronAdapter && typeof oldTronAdapter.disconnect === 'function') {
                         try { await oldTronAdapter.disconnect(); } catch (e) { console.warn('[DOGZ] TRON Adapter disconnect:',
+                                e); }
+                    }
+                   
+                    if (state.solanaProvider && typeof state.solanaProvider.disconnect === 'function') {
+                        try { await state.solanaProvider.disconnect(); } catch (e) { console.warn('[DOGZ] Solana disconnect:',
                                 e); }
                     }
                     state.isConnected = false;
@@ -5196,6 +6026,10 @@ if (
                     state.tronAdapterKey = null;
                     state.tronWalletType = null;
                     state.isTron = false;
+                    state.isSolana = false;
+                    state.solanaConnection = null;
+                    state.solanaProvider = null;
+                    state.solanaPublicKey = null;
                     updateWalletUI();
                     var srcBal = document.getElementById('srcBalance');
                     var dstBal = document.getElementById('dstBalance');
@@ -5232,6 +6066,8 @@ if (
                     try {
                         if (state.isTron) {
                             if (!state.tronWeb) getTronReadOnlyWeb();
+                        } else if (state.isSolana) {
+                      
                         } else {
                             if (!state.provider) return;
                         }
@@ -5261,6 +6097,9 @@ if (
                                     callOptions);
                                 if (el) el.textContent = formatBalance(bal2, token.decimals);
                             }
+                        } else if (state.isSolana) {
+                            var balSol = await loadSolanaBalance(symbol);
+                            if (el) el.textContent = balSol;
                         } else {
                             if (token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
                                 var bal3 = await state.provider.getBalance(state.walletAddress);
@@ -5287,15 +6126,52 @@ if (
                         }
                         var apiChainId = chainId;
                         if (isTronChain(chainId)) apiChainId = 195;
+                        else if (isSolanaChain(chainId)) apiChainId = 501;
                         if (isNaN(apiChainId)) apiChainId = 1;
                         var params = {
-                            chainIndex: String(apiChainId),
-                            amount: String(amount),
-                            fromTokenAddress: srcToken.address,
-                            toTokenAddress: dstToken.address,
-                            swapMode: swapMode,
-                            userWalletAddress: state.walletAddress || ''
-                        };
+    chainIndex: String(apiChainId),
+    amount: String(amount),
+    fromTokenAddress: srcToken.address,
+    toTokenAddress: dstToken.address,
+    swapMode: swapMode,
+    userWalletAddress: state.walletAddress || ''
+};
+
+
+if (isSolanaChain(chainId)) {
+
+    var quoteSlippage = 0.5;
+
+    if (state.slippageMode === 'dynamic') {
+
+        quoteSlippage = 0.5;
+
+    } else {
+
+        var configuredSlippage = parseFloat(state.slippageValue);
+
+        if (
+            Number.isFinite(configuredSlippage) &&
+            configuredSlippage > 0
+        ) {
+            quoteSlippage = configuredSlippage;
+        }
+    }
+
+ 
+    quoteSlippage = Math.max(
+        0.01,
+        Math.min(99, quoteSlippage)
+    );
+
+    params.slippagePercent =
+        String(quoteSlippage);
+
+    console.log(
+        '[DOGZ][Solana] quote slippage:',
+        params.slippagePercent
+    );
+}
                         var data = await proxyRequest('/quote', params);
                         if (!data || data.code !== '0') {
                             state.lastQuoteData = null;
@@ -5394,7 +6270,7 @@ if (
                             state.nativePrice = parseFloat(result.fromToken.tokenUnitPrice);
                         }
                         updateRateDisplay();
-                        if (!state.isTron && state.provider) await updateGasPrice();
+                        if (!state.isTron && !state.isSolana && state.provider) await updateGasPrice();
                         updateUsdPrices();
                     } catch (e) {
                         console.warn('Quote error:', e);
@@ -5417,7 +6293,7 @@ if (
                     }
                 }
 
-          
+             
                 async function executeEvmSwap() {
                     var chainId = state.chainId;
                     var srcToken = getTokenInfo(chainId, state.srcTokenSymbol);
@@ -5554,23 +6430,18 @@ if (
                     quote();
                 }
 
-           
-          
-
-async function signTronTransaction(unsignedTx) {
-    try {
-        return await signTronTransactionUniversal(unsignedTx, state.tronAdapterKey);
-    } catch (e) {
-       
-        console.error('[DOGZ] TRON 签名失败，完整错误对象:', e);
-        try {
-            console.error('[DOGZ] 错误 JSON:', JSON.stringify(e, Object.getOwnPropertyNames(e)));
-        } catch (jsonErr) {}
-        throw e;
-    }
-}
- 
-
+            
+                async function signTronTransaction(unsignedTx) {
+                    try {
+                        return await signTronTransactionUniversal(unsignedTx, state.tronAdapterKey);
+                    } catch (e) {
+                        console.error('[DOGZ] TRON 签名失败，完整错误对象:', e);
+                        try {
+                            console.error('[DOGZ] 错误 JSON:', JSON.stringify(e, Object.getOwnPropertyNames(e)));
+                        } catch (jsonErr) {}
+                        throw e;
+                    }
+                }
 
                 async function ensureTronApproval(walletWeb, tronWeb, ownerAddress, signatureDataArr) {
                     if (!signatureDataArr || !Array.isArray(signatureDataArr) || signatureDataArr
@@ -5720,11 +6591,1238 @@ async function signTronTransaction(unsignedTx) {
 
 
 
+function getSolanaBaseSlippage() {
+
+    var value = 0.5;
+
+    if (state.slippageMode === 'dynamic') {
+
+        value = 0.5;
+
+    } else {
+
+        var configured =
+            parseFloat(state.slippageValue);
+
+        if (
+            Number.isFinite(configured) &&
+            configured > 0
+        ) {
+            value = configured;
+        }
+    }
+
+  
+    value = Math.max(
+        0.01,
+        Math.min(99, value)
+    );
+
+    return value;
+}
 
 
 
+function getSolanaSlippageCandidates() {
 
-async function executeTronSwap() {
+    var base =
+        getSolanaBaseSlippage();
+
+    var result = [base];
+
+    var candidates = [
+        1,
+        2,
+        5
+    ];
+
+    candidates.forEach(function(value) {
+
+        if (
+            value > base &&
+            value < 100
+        ) {
+            result.push(value);
+        }
+
+    });
+
+    /*
+     * 去重
+     */
+    return Array.from(
+        new Set(
+            result.map(function(v) {
+                return Number(v);
+            })
+        )
+    );
+}
+
+
+/**
+ * 判断 Solana simulation 是否属于滑点失败
+ */
+function isSolanaSlippageError(simulation) {
+
+    if (!simulation) {
+        return false;
+    }
+
+    var text = '';
+
+    try {
+
+        text += JSON.stringify(
+            simulation.value && simulation.value.err
+        );
+
+    } catch (e) {}
+
+    try {
+
+        if (
+            simulation.value &&
+            simulation.value.logs
+        ) {
+
+            text += ' ' +
+                simulation.value.logs.join(' ');
+        }
+
+    } catch (e) {}
+
+    text = String(text).toLowerCase();
+
+    return (
+        text.includes('slippage') ||
+        text.includes('slippage tolerance') ||
+        text.includes('exceeded slippage') ||
+        text.includes('price impact') ||
+        text.includes('minimum out') ||
+        text.includes('insufficient output')
+    );
+}
+
+
+
+async function requestSolanaSwapInstruction(
+    baseParams,
+    slippagePercent,
+    options
+) {
+
+    options =
+        options || {};
+
+    var params =
+        Object.assign(
+            {},
+            baseParams
+        );
+
+    params.slippagePercent =
+        String(slippagePercent);
+
+    params.autoSlippage =
+        'false';
+
+    if (
+        options.maxAccounts !== undefined &&
+        options.maxAccounts !== null
+    ) {
+
+        params.maxAccounts =
+            String(options.maxAccounts);
+    }
+
+    if (
+        options.singleRouteOnly
+    ) {
+
+        params.singleRouteOnly =
+            'true';
+    }
+
+    if (
+        options.directRoute
+    ) {
+
+        params.directRoute =
+            'true';
+    }
+
+
+    if (
+        state.lastQuoteData &&
+        state.lastQuoteData.contextSlot
+    ) {
+
+        params.contextSlot =
+            String(
+                state.lastQuoteData.contextSlot
+            );
+    }
+
+    console.log(
+        '[DOGZ][Solana] request swap-instruction:',
+        params
+    );
+
+    var data =
+        await proxyRequest(
+            '/swap-instruction',
+            params
+        );
+
+    if (
+        !data ||
+        data.code !== '0'
+    ) {
+
+        throw new Error(
+            data &&
+            data.msg
+                ? data.msg
+                : 'OKX Solana Swap 指令请求失败'
+        );
+    }
+
+    var swapData =
+        data.data;
+
+    if (
+        !swapData ||
+        !Array.isArray(
+            swapData.instructionLists
+        ) ||
+        swapData.instructionLists.length === 0
+    ) {
+
+        throw new Error(
+            'OKX 未返回有效的 Solana instructionLists'
+        );
+    }
+
+    return swapData;
+}
+
+
+
+function createSolanaInstructions(
+    instructionLists
+) {
+
+    if (
+        !Array.isArray(instructionLists) ||
+        instructionLists.length === 0
+    ) {
+
+        throw new Error(
+            'Solana instructionLists 为空'
+        );
+    }
+
+    return instructionLists.map(
+        function(ins, index) {
+
+            if (!ins.programId) {
+
+                throw new Error(
+                    'Solana instruction #' +
+                    index +
+                    ' 缺少 programId'
+                );
+            }
+
+            if (
+                !Array.isArray(
+                    ins.accounts
+                )
+            ) {
+
+                throw new Error(
+                    'Solana instruction #' +
+                    index +
+                    ' accounts 无效'
+                );
+            }
+
+            if (
+                typeof ins.data !== 'string'
+            ) {
+
+                throw new Error(
+                    'Solana instruction #' +
+                    index +
+                    ' data 无效'
+                );
+            }
+
+            var keys =
+                ins.accounts.map(
+                    function(acc) {
+
+                        return {
+
+                            pubkey:
+                                new window.solanaWeb3.PublicKey(
+                                    acc.pubkey
+                                ),
+
+                            isSigner:
+                                !!acc.isSigner,
+
+                            isWritable:
+                                !!acc.isWritable
+                        };
+
+                    }
+                );
+
+          
+            var data =
+                dogzBase64ToUint8Array(
+                    ins.data
+                );
+
+            if (
+                !(data instanceof Uint8Array)
+            ) {
+
+                data =
+                    new Uint8Array(data);
+            }
+
+            return new window.solanaWeb3.TransactionInstruction({
+
+                programId:
+                    new window.solanaWeb3.PublicKey(
+                        ins.programId
+                    ),
+
+                keys:
+                    keys,
+
+                data:
+                    data
+
+            });
+
+        }
+    );
+}
+
+
+
+async function loadSolanaLookupTables(
+    connection,
+    addresses
+) {
+
+    var result = [];
+
+    if (
+        !Array.isArray(addresses) ||
+        addresses.length === 0
+    ) {
+
+        return result;
+    }
+
+    var unique =
+        Array.from(
+            new Set(
+                addresses
+            )
+        );
+
+    for (
+        var i = 0;
+        i < unique.length;
+        i++
+    ) {
+
+        var address =
+            unique[i];
+
+        try {
+
+            var publicKey =
+                new window.solanaWeb3.PublicKey(
+                    address
+                );
+
+            var response =
+                await connection.getAddressLookupTable(
+                    publicKey
+                );
+
+            if (
+                response &&
+                response.value
+            ) {
+
+                result.push(
+                    response.value
+                );
+
+            } else {
+
+                console.warn(
+                    '[DOGZ][Solana] ALT 不存在:',
+                    address
+                );
+
+            }
+
+        } catch (e) {
+
+            console.warn(
+                '[DOGZ][Solana] ALT 加载失败:',
+                address,
+                e
+            );
+
+        }
+
+    }
+
+    return result;
+}
+
+
+
+async function buildSolanaVersionedTransaction(
+    swapData,
+    connection
+) {
+
+    var payer =
+        new window.solanaWeb3.PublicKey(
+            state.walletAddress
+        );
+
+    var instructions =
+        createSolanaInstructions(
+            swapData.instructionLists
+        );
+
+    var lookupTables =
+        await loadSolanaLookupTables(
+            connection,
+            swapData.addressLookupTableAccount
+        );
+
+  
+    var latestBlockhash =
+        await connection.getLatestBlockhash(
+            'processed'
+        );
+
+    var messageV0 =
+        new window.solanaWeb3.TransactionMessage({
+
+            payerKey:
+                payer,
+
+            recentBlockhash:
+                latestBlockhash.blockhash,
+
+            instructions:
+                instructions
+
+        }).compileToV0Message(
+            lookupTables
+        );
+
+    var transaction =
+        new window.solanaWeb3.VersionedTransaction(
+            messageV0
+        );
+
+  
+    var serialized;
+
+    try {
+
+        serialized =
+            transaction.serialize();
+
+    } catch (e) {
+
+        throw new Error(
+            'Solana 交易序列化失败: ' +
+            (
+                e && e.message
+                    ? e.message
+                    : String(e)
+            )
+        );
+
+    }
+
+    var byteLength =
+        serialized.length;
+
+    console.log(
+        '[DOGZ][Solana] transaction size:',
+        byteLength,
+        'bytes'
+    );
+
+    if (
+        byteLength > 1232
+    ) {
+
+        var sizeError =
+            new Error(
+                'SOLANA_TX_TOO_LARGE:' +
+                byteLength
+            );
+
+        sizeError.solanaTxTooLarge =
+            true;
+
+        sizeError.txSize =
+            byteLength;
+
+        throw sizeError;
+    }
+
+    return {
+
+        transaction:
+            transaction,
+
+        latestBlockhash:
+            latestBlockhash,
+
+        size:
+            byteLength
+
+    };
+}
+
+
+
+async function simulateSolanaTransaction(
+    connection,
+    transaction
+) {
+
+    console.log(
+        '[DOGZ][Solana] 开始签名前模拟...'
+    );
+
+    var simulation =
+        await connection.simulateTransaction(
+            transaction,
+            {
+                commitment:
+                    'processed',
+
+                replaceRecentBlockhash:
+                    true,
+
+                sigVerify:
+                    false
+            }
+        );
+
+    console.log(
+        '[DOGZ][Solana] simulation result:',
+        simulation
+    );
+
+    if (
+        simulation &&
+        simulation.value &&
+        simulation.value.err
+    ) {
+
+        var logs =
+            simulation.value.logs || [];
+
+        console.error(
+            '[DOGZ][Solana] simulation error:',
+            simulation.value.err
+        );
+
+        console.error(
+            '[DOGZ][Solana] simulation logs:',
+            logs
+        );
+
+        var error =
+            new Error(
+                'SOLANA_SIMULATION_FAILED'
+            );
+
+        error.solanaSimulation =
+            simulation;
+
+        throw error;
+    }
+
+    return simulation;
+}
+
+
+
+             
+                async function executeSolanaSwap() {
+
+    var chainId =
+        Number(state.chainId);
+
+    if (
+        !isSolanaChain(chainId)
+    ) {
+
+        throw new Error(
+            '当前网络不是 Solana'
+        );
+    }
+
+    if (
+        !state.isConnected ||
+        !state.isSolana ||
+        !state.walletAddress
+    ) {
+
+        throw new Error(
+            'Solana 钱包尚未连接'
+        );
+    }
+
+    var srcToken =
+        getTokenInfo(
+            chainId,
+            state.srcTokenSymbol
+        );
+
+    var dstToken =
+        getTokenInfo(
+            chainId,
+            state.dstTokenSymbol
+        );
+
+    if (
+        !srcToken.address ||
+        !dstToken.address
+    ) {
+
+        throw new Error(
+            '无法获取 Solana 代币地址'
+        );
+    }
+
+    var amountInput =
+        document.getElementById(
+            'amountInput'
+        );
+
+    var amount =
+        amountInput
+            ? amountInput.value.trim()
+            : '';
+
+    if (
+        !amount ||
+        parseFloat(amount) <= 0
+    ) {
+
+        throw new Error(
+            '请输入有效兑换数量'
+        );
+    }
+
+    var amountWei =
+        toWei(
+            amount,
+            Number(
+                srcToken.decimals || 9
+            )
+        ).toString();
+
+    var connection =
+        getSolanaConnection();
+
+    var provider =
+        getSolanaProvider();
+
+    if (!provider) {
+
+        throw new Error(
+            'Solana 钱包未连接'
+        );
+    }
+
+   
+    var baseParams = {
+
+        chainIndex:
+            '501',
+
+        amount:
+            amountWei,
+
+        fromTokenAddress:
+            srcToken.address,
+
+        toTokenAddress:
+            dstToken.address,
+
+        userWalletAddress:
+            state.walletAddress,
+
+        autoSlippage:
+            'false'
+
+    };
+
+    var slippageCandidates =
+        getSolanaSlippageCandidates();
+
+
+    var accountLimits = [
+
+        null,
+        64,
+        48,
+        40,
+        32
+
+    ];
+
+    var lastError =
+        null;
+
+    for (
+        var s = 0;
+        s < slippageCandidates.length;
+        s++
+    ) {
+
+        var currentSlippage =
+            slippageCandidates[s];
+
+        console.log(
+            '===================================='
+        );
+
+        console.log(
+            '[DOGZ][Solana] 尝试滑点:',
+            currentSlippage + '%'
+        );
+
+        console.log(
+            '===================================='
+        );
+
+     
+        for (
+            var a = 0;
+            a < accountLimits.length;
+            a++
+        ) {
+
+            var maxAccounts =
+                accountLimits[a];
+
+            var options = {};
+
+            if (
+                maxAccounts !== null
+            ) {
+
+                options.maxAccounts =
+                    maxAccounts;
+
+            }
+
+           
+            if (
+                maxAccounts === 32
+            ) {
+
+                options.singleRouteOnly =
+                    true;
+
+            }
+
+            try {
+
+                console.log(
+                    '[DOGZ][Solana] request:',
+                    {
+                        slippage:
+                            currentSlippage,
+
+                        maxAccounts:
+                            maxAccounts,
+
+                        singleRouteOnly:
+                            !!options.singleRouteOnly
+                    }
+                );
+
+             
+                var swapData =
+                    await requestSolanaSwapInstruction(
+                        baseParams,
+                        currentSlippage,
+                        options
+                    );
+
+                var built =
+                    await buildSolanaVersionedTransaction(
+                        swapData,
+                        connection
+                    );
+
+                console.log(
+                    '[DOGZ][Solana] transaction size:',
+                    built.size
+                );
+
+            
+                if (
+                    built.size > 1232
+                ) {
+
+                    continue;
+
+                }
+
+             
+                try {
+
+                    var simulation =
+                        await simulateSolanaTransaction(
+                            connection,
+                            built.transaction
+                        );
+
+                  
+                    console.log(
+                        '[DOGZ][Solana] simulation SUCCESS'
+                    );
+
+                    console.log(
+                        '[DOGZ][Solana] final transaction size:',
+                        built.size
+                    );
+
+                    console.log(
+                        '[DOGZ][Solana] final slippage:',
+                        currentSlippage + '%'
+                    );
+
+                   
+                    if (
+                        Number(currentSlippage) >
+                        Number(
+                            getSolanaBaseSlippage()
+                        )
+                    ) {
+
+                        showToast(
+                            'Solana 行情变化，已自动将滑点调整至 ' +
+                            currentSlippage +
+                            '%',
+                            'warning'
+                        );
+                    }
+
+               
+                    if (
+                        typeof provider.signAndSendTransaction ===
+                        'function'
+                    ) {
+
+                        try {
+
+                            var txResult =
+                                await provider.signAndSendTransaction(
+                                    built.transaction
+                                );
+
+                         
+                            var txid =
+                                typeof txResult === 'string'
+                                    ? txResult
+                                    : (
+                                        txResult &&
+                                        (
+                                            txResult.signature ||
+                                            txResult.txid
+                                        )
+                                    );
+
+                            if (!txid) {
+
+                                console.warn(
+                                    '[DOGZ][Solana] 钱包返回值:',
+                                    txResult
+                                );
+
+                                txid =
+                                    String(
+                                        txResult
+                                    );
+                            }
+
+                            console.log(
+                                '[DOGZ] Solana tx sent:',
+                                txid
+                            );
+
+                            showToast(
+                                '✅ Solana 兑换交易已提交！哈希: ' +
+                                txid,
+                                'success'
+                            );
+
+                            var amountEl =
+                                document.getElementById(
+                                    'amountInput'
+                                );
+
+                            if (amountEl) {
+                                amountEl.value = '';
+                            }
+
+                            var dstEstimateEl =
+                                document.getElementById(
+                                    'dstEstimateInput'
+                                );
+
+                            if (dstEstimateEl) {
+
+                                dstEstimateEl.value =
+                                    '0';
+
+                                updateDstInputEmptyState();
+                            }
+
+                            state.lastQuoteData =
+                                null;
+
+                            setTimeout(
+                                function() {
+
+                                    loadBalances();
+                                    quote();
+
+                                },
+                                1200
+                            );
+
+                            return;
+
+                        } catch (walletError) {
+
+                          
+                            var walletMessage =
+                                walletError &&
+                                walletError.message
+                                    ? walletError.message
+                                    : String(
+                                        walletError
+                                    );
+
+                            console.error(
+                                '[DOGZ][Solana] wallet signAndSend error:',
+                                walletError
+                            );
+
+                            if (
+                                walletError &&
+                                (
+                                    walletError.code === 4001 ||
+                                    /reject|denied|cancel|user rejected/i.test(
+                                        walletMessage
+                                    )
+                                )
+                            ) {
+
+                                throw new Error(
+                                    'USER_REJECTED_TX'
+                                );
+
+                            }
+
+                            throw walletError;
+                        }
+
+                    }
+
+                  
+                    if (
+                        typeof provider.signTransaction ===
+                        'function'
+                    ) {
+
+                        var signedTx =
+                            await provider.signTransaction(
+                                built.transaction
+                            );
+
+                      
+                        var raw =
+                            signedTx.serialize();
+
+                        console.log(
+                            '[DOGZ][Solana] signed tx size:',
+                            raw.length
+                        );
+
+                        if (
+                            raw.length > 1232
+                        ) {
+
+                            throw new Error(
+                                '签名后的 Solana 交易超过 1232 bytes'
+                            );
+                        }
+
+                        var txid2 =
+                            await connection.sendRawTransaction(
+                                raw,
+                                {
+                                    skipPreflight:
+                                        false,
+
+                                    maxRetries:
+                                        5
+                                }
+                            );
+
+                        await connection.confirmTransaction(
+                            {
+                                signature:
+                                    txid2,
+
+                                blockhash:
+                                    built.latestBlockhash.blockhash,
+
+                                lastValidBlockHeight:
+                                    built.latestBlockhash.lastValidBlockHeight
+
+                            },
+                            'confirmed'
+                        );
+
+                        console.log(
+                            '[DOGZ] Solana tx sent:',
+                            txid2
+                        );
+
+                        showToast(
+                            '✅ Solana 兑换交易已提交！哈希: ' +
+                            txid2,
+                            'success'
+                        );
+
+                        var amountEl2 =
+                            document.getElementById(
+                                'amountInput'
+                            );
+
+                        if (amountEl2) {
+                            amountEl2.value = '';
+                        }
+
+                        var dstEstimateEl2 =
+                            document.getElementById(
+                                'dstEstimateInput'
+                            );
+
+                        if (dstEstimateEl2) {
+
+                            dstEstimateEl2.value =
+                                '0';
+
+                            updateDstInputEmptyState();
+                        }
+
+                        state.lastQuoteData =
+                            null;
+
+                        setTimeout(
+                            function() {
+
+                                loadBalances();
+                                quote();
+
+                            },
+                            1200
+                        );
+
+                        return;
+                    }
+
+                    throw new Error(
+                        '当前 Solana 钱包不支持 signTransaction / signAndSendTransaction'
+                    );
+
+                } catch (simulationError) {
+
+                    lastError =
+                        simulationError;
+
+                    if (
+                        simulationError &&
+                        simulationError.solanaSimulation &&
+                        isSolanaSlippageError(
+                            simulationError.solanaSimulation
+                        )
+                    ) {
+
+                        console.warn(
+                            '[DOGZ][Solana] simulation 因滑点失败，尝试下一档滑点:',
+                            currentSlippage
+                        );
+
+                       
+                        break;
+
+                    }
+
+                   
+                    var simulation =
+                        simulationError &&
+                        simulationError.solanaSimulation;
+
+                    var logs =
+                        simulation &&
+                        simulation.value &&
+                        simulation.value.logs
+                            ? simulation.value.logs
+                            : [];
+
+                    console.error(
+                        '[DOGZ][Solana] 非滑点 simulation 失败:',
+                        simulationError
+                    );
+
+                    console.error(
+                        '[DOGZ][Solana] logs:',
+                        logs
+                    );
+
+                    var readable =
+                        logs.length
+                            ? logs.join('\n')
+                            : (
+                                simulationError.message ||
+                                'Solana simulation failed'
+                            );
+
+                    throw new Error(
+                        'Solana 交易模拟失败: ' +
+                        readable
+                    );
+                }
+
+            } catch (e) {
+
+                lastError =
+                    e;
+
+                if (
+                    e &&
+                    (
+                        e.solanaTxTooLarge ||
+                        (
+                            e.message &&
+                            e.message.indexOf(
+                                'SOLANA_TX_TOO_LARGE:'
+                            ) === 0
+                        )
+                    )
+                ) {
+
+                    var txSize =
+                        e.txSize ||
+                        (
+                            e.message
+                                ? e.message.split(':')[1]
+                                : '?'
+                        );
+
+                    console.warn(
+                        '[DOGZ][Solana] transaction too large:',
+                        txSize,
+                        'bytes, retry smaller route'
+                    );
+
+                    continue;
+                }
+
+                if (
+                    e &&
+                    e.solanaSimulation &&
+                    isSolanaSlippageError(
+                        e.solanaSimulation
+                    )
+                ) {
+
+                    break;
+                }
+
+                
+                if (
+                    e &&
+                    e.message ===
+                    'USER_REJECTED_TX'
+                ) {
+
+                    throw e;
+                }
+
+               
+                throw e;
+            }
+        }
+    }
+
+   
+    if (
+        lastError &&
+        lastError.solanaSimulation &&
+        isSolanaSlippageError(
+            lastError.solanaSimulation
+        )
+    ) {
+
+        throw new Error(
+            'Solana 当前行情波动较大，0.5%～5% 滑点均无法通过链上模拟，请稍后重新报价'
+        );
+    }
+
+    if (
+        lastError &&
+        lastError.solanaTxTooLarge
+    ) {
+
+        throw new Error(
+            'Solana 路由交易数据过大，即使压缩路由后仍超过 1232 bytes，请尝试更小兑换数量或稍后重新报价'
+        );
+    }
+
+    throw (
+        lastError ||
+        new Error(
+            'Solana 兑换失败'
+        )
+    );
+}
+
+             
+                async function executeTronSwap() {
 
     var chainId = Number(state.chainId);
 
@@ -6692,6 +8790,8 @@ console.log(
                     try {
                         if (state.isTron) {
                             await executeTronSwap();
+                        } else if (state.isSolana) {
+                            await executeSolanaSwap();
                         } else {
                             await executeEvmSwap();
                         }
@@ -6722,16 +8822,19 @@ console.log(
                     var chain = getChain(chainId);
                     var isNative = normalized === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' ||
                         normalized === 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' ||
-                        (chain.isTron && normalized === chain.native);
+                        normalized === '11111111111111111111111111111111' ||
+                        (chain.isTron && normalized === chain.native) ||
+                        (chain.isSolana && normalized === chain.native);
                     if (isNative) {
-                        var info = { symbol: chain.native, decimals: chain.isTron ? 6 : 18, icon: chain.iconUrl ||
-                                'https://via.placeholder.com/32' };
+                        var info = { symbol: chain.native, decimals: chain.isTron ? 6 : (chain.isSolana ? 9 : 18),
+                            icon: chain.iconUrl || 'https://via.placeholder.com/32' };
                         state.tokenCache[cacheKey] = info;
                         return info;
                     }
                     try {
                         var apiChainId = chainId;
                         if (isTronChain(chainId)) apiChainId = 195;
+                        else if (isSolanaChain(chainId)) apiChainId = 501;
                         if (isNaN(apiChainId)) apiChainId = 1;
                         var data = await marketProxyRequest('/token/search', { chains: String(apiChainId),
                             search: normalized, limit: '100' });
@@ -6762,7 +8865,7 @@ console.log(
                             state.tokenCache[cacheKey] = info3;
                             return info3;
                         }
-                        if (!state.isTron && state.provider) {
+                        if (!state.isTron && !state.isSolana && state.provider) {
                             var contract4 = new ethers.Contract(normalized, [
                                 'function name() view returns (string)',
                                 'function symbol() view returns (string)',
@@ -6787,6 +8890,7 @@ console.log(
                     if (!query) return [];
                     var apiChainId = chainId;
                     if (isTronChain(chainId)) apiChainId = 195;
+                    else if (isSolanaChain(chainId)) apiChainId = 501;
                     if (isNaN(apiChainId)) apiChainId = 1;
                     apiChainId = String(apiChainId);
                     var cacheKey2 = apiChainId + ':' + query.toLowerCase();
@@ -7035,52 +9139,31 @@ console.log(
                     var oldChainId = Number(state.chainId);
                     var oldWasConnected = !!state.isConnected;
                     var oldWasTron = !!state.isTron;
+                    var oldWasSolana = !!state.isSolana;
                     var targetChain = getChain(targetChainId);
                     var targetIsTron = !!(targetChain && targetChain.isTron);
+                    var targetIsSolana = !!(targetChain && targetChain.isSolana);
                     console.log('====================================');
                     console.log('[DOGZ] SWITCH CHAIN');
                     console.log('old:', oldChainId, getChain(oldChainId).short);
                     console.log('target:', targetChainId, targetChain.short);
                     console.log('connected:', oldWasConnected);
                     console.log('oldIsTron:', oldWasTron);
+                    console.log('oldIsSolana:', oldWasSolana);
                     console.log('targetIsTron:', targetIsTron);
+                    console.log('targetIsSolana:', targetIsSolana);
                     console.log('====================================');
                     try {
                         if (!oldWasConnected) {
                             state.chainId = targetChainId;
                             state.tronReadOnlyWeb = null;
                             state.tronWeb = null;
+                            state.solanaConnection = null;
+                            state.solanaProvider = null;
+                            state.solanaPublicKey = null;
                             autoSwitchTokens(targetChainId);
                             updateChainUI();
-                        } else if (!oldWasTron && !targetIsTron) {
-                            await switchEvmNetwork(targetChainId);
-                            state.chainId = targetChainId;
-                            autoSwitchTokens(targetChainId);
-                            state.provider = new ethers.BrowserProvider(window.ethereum);
-                            state.signer = await state.provider.getSigner();
-                            state.walletAddress = await state.signer.getAddress();
-                            state.isTron = false;
-                            state.isConnected = true;
-                            updateChainUI();
-                            updateWalletUI();
-                            await loadBalances();
-                            await quote();
-                            await updateGasPrice();
-                        } else if (!oldWasTron && targetIsTron) {
-                            await disconnectWallet();
-                            state.chainId = targetChainId;
-                            autoSwitchTokens(targetChainId);
-                            updateChainUI();
-                            var tronConnected = await connectWallet();
-                            if (!tronConnected) { throw new Error('TRON 钱包连接失败'); }
-                        } else if (oldWasTron && !targetIsTron) {
-                            await disconnectWallet();
-                            state.chainId = targetChainId;
-                            autoSwitchTokens(targetChainId);
-                            updateChainUI();
-                            var evmConnected = await connectWallet();
-                            if (!evmConnected) { throw new Error('EVM 钱包连接失败'); }
-                        } else {
+                        } else if (oldWasTron && targetIsTron) {
                           
                             state.chainId = targetChainId;
                             state.tronReadOnlyWeb = null;
@@ -7090,6 +9173,44 @@ console.log(
                             updateWalletUI();
                             await loadBalances();
                             await quote();
+                        } else if (oldWasSolana && targetIsSolana) {
+                        
+                            state.chainId = targetChainId;
+                            state.solanaConnection = null; 
+                            autoSwitchTokens(targetChainId);
+                            updateChainUI();
+                            updateWalletUI();
+                            await loadBalances();
+                            await quote();
+                        } else if (!oldWasTron && !oldWasSolana && !targetIsTron && !targetIsSolana) {
+                         
+                            await switchEvmNetwork(targetChainId);
+                            state.chainId = targetChainId;
+                            autoSwitchTokens(targetChainId);
+                            state.provider = new ethers.BrowserProvider(window.ethereum);
+                            state.signer = await state.provider.getSigner();
+                            state.walletAddress = await state.signer.getAddress();
+                            state.isTron = false;
+                            state.isSolana = false;
+                            state.isConnected = true;
+                            updateChainUI();
+                            updateWalletUI();
+                            await loadBalances();
+                            await quote();
+                            await updateGasPrice();
+                        } else {
+                        
+                            await disconnectWallet();
+                            state.chainId = targetChainId;
+                            state.tronReadOnlyWeb = null;
+                            state.tronWeb = null;
+                            state.solanaConnection = null;
+                            state.solanaProvider = null;
+                            state.solanaPublicKey = null;
+                            autoSwitchTokens(targetChainId);
+                            updateChainUI();
+                            var connected = await connectWallet();
+                            if (!connected) throw new Error('钱包连接失败');
                         }
                         if (fromModal) {
                             renderMainView();
@@ -7118,6 +9239,9 @@ console.log(
                         state.chainId = oldChainId;
                         state.tronReadOnlyWeb = null;
                         state.tronWeb = null;
+                        state.solanaConnection = null;
+                        state.solanaProvider = null;
+                        state.solanaPublicKey = null;
                         autoSwitchTokens(oldChainId);
                         updateChainUI();
                         if (oldWasConnected) {
@@ -7357,7 +9481,7 @@ console.log(
                         renderLocalTokenItem(container, item2.symbol, item2.info, currentSymbol2);
                     }
                     var isAddress2 = /^0x[a-fA-F0-9]{40}$/.test(searchVal2) || /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(
-                    searchVal2);
+                    searchVal2) || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(searchVal2); // Solana base58
                     if (container.children.length === 0) {
                         container.innerHTML =
                             '<div style="padding:20px;text-align:center;color:var(--text-muted);">搜索中...</div>';
@@ -7588,7 +9712,7 @@ console.log(
                     if (!isNaN(gasVal2) && gasVal2 >= 0.00001 && gasVal2 <= 4000) { state.gasGwei = gasVal2; }
                     closeSettingsModal();
                     showToast('设置已保存', 'success');
-                    if (!state.isTron) updateGasPrice();
+                    if (!state.isTron && !state.isSolana) updateGasPrice();
                 });
 
                 document.getElementById('settingsReset').addEventListener('click', function() {
@@ -7607,7 +9731,7 @@ console.log(
                     if (gasInput4) { gasInput4.value = '';
                         gasInput4.dataset.userEdited = 'false'; }
                     updateSlippageDisplay();
-                    if (!state.isTron) updateGasPrice();
+                    if (!state.isTron && !state.isSolana) updateGasPrice();
                     showToast('已重置为默认', 'info');
                 });
 
@@ -7653,14 +9777,14 @@ console.log(
                     document.body.removeChild(textarea);
                 }
 
-                // --- Start ---
+                
                 function startPriceRefresh() {
                     if (state.quoteTimer) clearInterval(state.quoteTimer);
                     state.quoteTimer = setInterval(function() {
                         var amountInput2 = document.getElementById('amountInput');
                         var amount2 = amountInput2 ? amountInput2.value.trim() : '';
                         if (amount2 && Number(amount2) > 0) { quote(); } else { clearCurrentQuote(); }
-                        if (!state.isTron && state.provider) updateGasPrice();
+                        if (!state.isTron && !state.isSolana && state.provider) updateGasPrice();
                         updateUsdPrices();
                     }, 5000);
                 }
@@ -7799,17 +9923,17 @@ console.log(
                                         }
                                         loadBalances();
                                         quote();
-                                        if (!state.isTron) updateGasPrice();
+                                        if (!state.isTron && !state.isSolana) updateGasPrice();
                                     }).catch(function() { loadBalances();
                                         quote(); });
                                 } else {
-                                    if (state.isConnected && !state.isTron) { disconnectWallet(); }
+                                    if (state.isConnected && !state.isTron && !state.isSolana) { disconnectWallet(); }
                                 }
                             });
                             window.ethereum.on('chainChanged', function(chainIdHex3) {
                                 var newChainId3 = parseInt(chainIdHex3, 16);
                                 if (newChainId3 !== state.chainId && state.isConnected && !state
-                                    .isTron) {
+                                    .isTron && !state.isSolana) {
                                     state.chainId = newChainId3;
                                     if (state.provider) {
                                         var provider2 = new ethers.BrowserProvider(window
@@ -7827,13 +9951,15 @@ console.log(
                             });
                         }
 
+                 
+
                         autoSwitchTokens(state.chainId);
                         updateChainUI();
                         updateTokenUI();
                         updateWalletUI();
                         updateSlippageDisplay();
                         startPriceRefresh();
-                        console.log('🐕 DOGZ DEX 已启动 (EVM + Tron 多链支持，手机端已优化)');
+                        console.log('🐕 DOGZ DEX 已启动 (EVM + Tron + Solana 多链支持，手机端已优化)');
 
                         setTimeout(quote, 500);
                     } catch (e) {
