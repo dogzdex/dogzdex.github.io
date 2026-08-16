@@ -1374,13 +1374,20 @@
         font-size: 12px;
         line-height: 1.25;
         flex-shrink: 0;
-        min-width: 78px;
-        max-width: 96px;
         margin-left: 8px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        overflow: hidden;
+    }
+    .modal-token-item .right .balance-col {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
         justify-content: center;
+        min-width: 70px;
+        max-width: 96px;
         overflow: hidden;
     }
     .modal-token-item .right .balance-amount {
@@ -1423,6 +1430,36 @@
         overflow: hidden;
         flex-shrink: 0;
     }
+    .star-btn {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        min-height: 28px;
+        padding: 0 !important;
+        margin-left: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        border-radius: 8px !important;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 18px;
+        line-height: 1;
+        color: var(--text-muted);
+        transition: color 0.25s ease, transform 0.25s ease;
+    }
+    .star-btn:hover {
+        background: var(--bg-hover);
+    }
+    .star-btn.starred {
+        color: #f5b700;
+    }
+    .star-btn.star-pop {
+        transform: scale(1.35);
+    }
     @media (max-width:480px) {
         .modal-token-item .left {
             gap: 7px;
@@ -1440,6 +1477,14 @@
             padding: 0 7px !important;
             font-size: 11px !important;
             border-radius: 9px !important;
+        }
+        .star-btn {
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
+            min-height: 26px;
+            font-size: 16px;
+            margin-left: 4px;
         }
     }
     .modal-network-view {
@@ -3277,6 +3322,7 @@
                     dstBalance: '0',
                     dstEstimate: '0',
                     customTokens: {},
+                    sessionTokens: {},
                     isProcessing: false,
                     modalMode: 'src',
                     lastQuoteData: null,
@@ -3927,7 +3973,7 @@ function getTronWalletSigningWeb(walletKey) {
                
                 function getChain(chainId) { return CHAINS[chainId] || CHAINS[1]; }
 
-                function getTokens(chainId) {
+                function getPersistedTokens(chainId) {
                     var base = TOKENS[chainId] || {};
                     var custom = state.customTokens[chainId] || {};
                     var result = {};
@@ -3936,9 +3982,103 @@ function getTronWalletSigningWeb(walletKey) {
                     return result;
                 }
 
+                function getTokens(chainId) {
+                    
+                    var result = getPersistedTokens(chainId);
+                    var session = state.sessionTokens[chainId] || {};
+                    for (var sk in session) {
+                        if (session.hasOwnProperty(sk) && !result.hasOwnProperty(sk)) result[sk] = session[sk];
+                    }
+                    return result;
+                }
+
                 function getTokenInfo(chainId, symbol) {
                     var tokens = getTokens(chainId);
                     return tokens[symbol] || { address: '0x', symbol: symbol, decimals: 18, icon: '' };
+                }
+
+                function isTokenStarred(chainId, key) {
+                    return !!(state.customTokens[chainId] && state.customTokens[chainId].hasOwnProperty(key));
+                }
+
+                
+                function animateStarPop(btn) {
+                    btn.classList.add('star-pop');
+                    setTimeout(function() { btn.classList.remove('star-pop'); }, 220);
+                }
+
+                
+                function computeTokenStoreKey(chainId, address, symbol) {
+                    var existingTokens = getPersistedTokens(chainId);
+                    var storeKey = symbol;
+                    var existingBySymbol = existingTokens[symbol];
+                    if (existingBySymbol && existingBySymbol.address &&
+                        String(existingBySymbol.address).toLowerCase() !== String(address).toLowerCase()) {
+                        
+                        storeKey = symbol + '#' + address;
+                    }
+                    return storeKey;
+                }
+
+                
+                function starToken(chainId, address, info) {
+                    if (!state.customTokens[chainId]) state.customTokens[chainId] = {};
+                    var symbol = info.symbol;
+                    var storeKey = computeTokenStoreKey(chainId, address, symbol);
+                    state.customTokens[chainId][storeKey] = {
+                        address: address,
+                        symbol: symbol,
+                        decimals: info.decimals || 18,
+                        icon: info.icon || 'https://via.placeholder.com/32'
+                    };
+                    if (state.sessionTokens[chainId]) { delete state.sessionTokens[chainId][storeKey]; }
+                    var starCacheKey = chainId + '_' + String(address).toLowerCase();
+                    delete state.tokenCache[starCacheKey];
+                    try { localStorage.setItem('dogz_custom_tokens', JSON.stringify(state.customTokens)); } catch (e) {}
+                    return storeKey;
+                }
+
+                
+                function unstarToken(chainId, key) {
+                    if (state.customTokens[chainId] && state.customTokens[chainId].hasOwnProperty(key)) {
+                        delete state.customTokens[chainId][key];
+                        try { localStorage.setItem('dogz_custom_tokens', JSON.stringify(state.customTokens)); } catch (e) {}
+                    }
+                    autoSwitchTokens(chainId);
+                }
+
+                
+                function selectToken(chainId, key, info) {
+                    if (!getTokens(chainId)[key]) {
+                        if (!state.sessionTokens[chainId]) state.sessionTokens[chainId] = {};
+                        state.sessionTokens[chainId][key] = {
+                            address: info.address,
+                            symbol: info.symbol,
+                            decimals: info.decimals || 18,
+                            icon: info.icon || 'https://via.placeholder.com/32'
+                        };
+                    }
+                    if (state.modalMode === 'src') {
+                        state.srcTokenSymbol = key;
+                        if (state.srcTokenSymbol === state.dstTokenSymbol) {
+                            var keysSel1 = Object.keys(getTokens(chainId));
+                            var otherSel1 = keysSel1.find(function(k) { return k !== key; });
+                            if (otherSel1) state.dstTokenSymbol = otherSel1;
+                        }
+                    } else if (state.modalMode === 'dst') {
+                        state.dstTokenSymbol = key;
+                        if (state.srcTokenSymbol === state.dstTokenSymbol) {
+                            var keysSel2 = Object.keys(getTokens(chainId));
+                            var otherSel2 = keysSel2.find(function(k) { return k !== key; });
+                            if (otherSel2) state.srcTokenSymbol = otherSel2;
+                        }
+                    }
+                    updateTokenUI();
+                    if (state.isConnected) { loadBalances();
+                        quote(); }
+                    document.getElementById('tokenSearchInput').value = '';
+                    hideTokenPreview();
+                    closeTokenModal();
                 }
 
                 function isTronChain(chainId) { var c = getChain(chainId); return c && c.isTron || false; }
@@ -8716,51 +8856,11 @@ console.log(
                 }
 
                 function addCustomToken(address, info) {
-                    var chainId = state.chainId;
-                    if (!state.customTokens[chainId]) state.customTokens[chainId] = {};
-                    var symbol = info.symbol;
                     
-                    var existingTokens = getTokens(chainId);
-                    var storeKey = symbol;
-                    var existingBySymbol = existingTokens[symbol];
-                    if (existingBySymbol && existingBySymbol.address &&
-                        String(existingBySymbol.address).toLowerCase() !== String(address).toLowerCase()) {
-                        
-                        storeKey = symbol + '#' + address;
-                    }
-                    state.customTokens[chainId][storeKey] = {
-                        address: address,
-                        symbol: symbol,
-                        decimals: info.decimals || 18,
-                        icon: info.icon || 'https://via.placeholder.com/32'
-                    };
-                    var cacheKey3 = chainId + '_' + address.toLowerCase();
-                    delete state.tokenCache[cacheKey3];
-                    try { localStorage.setItem('dogz_custom_tokens', JSON.stringify(state.customTokens)); } catch (e) {}
-                    if (state.modalMode === 'src') {
-                        state.srcTokenSymbol = storeKey;
-                        if (state.srcTokenSymbol === state.dstTokenSymbol) {
-                            var tokens2 = getTokens(chainId);
-                            var keys2 = Object.keys(tokens2);
-                            var other2 = keys2.find(function(k) { return k !== storeKey; });
-                            if (other2) state.dstTokenSymbol = other2;
-                        }
-                    } else if (state.modalMode === 'dst') {
-                        state.dstTokenSymbol = storeKey;
-                        if (state.srcTokenSymbol === state.dstTokenSymbol) {
-                            var tokens3 = getTokens(chainId);
-                            var keys3 = Object.keys(tokens3);
-                            var other3 = keys3.find(function(k) { return k !== storeKey; });
-                            if (other3) state.srcTokenSymbol = other3;
-                        }
-                    }
-                    updateTokenUI();
-                    if (state.isConnected) { loadBalances();
-                        quote(); }
-                    showToast('已添加并切换至 ' + symbol, 'success');
-                    document.getElementById('tokenSearchInput').value = '';
-                    hideTokenPreview();
-                    closeTokenModal();
+                    var chainId = state.chainId;
+                    var storeKey = starToken(chainId, address, info);
+                    selectToken(chainId, storeKey, info);
+                    showToast('已收藏并切换至 ' + info.symbol, 'success');
                 }
 
            
@@ -9172,6 +9272,8 @@ console.log(
                     item.appendChild(left);
                     var right = document.createElement('div');
                     right.className = 'right';
+                    var balanceCol = document.createElement('div');
+                    balanceCol.className = 'balance-col';
                     var balance = '0';
                     if (state.isConnected && (symbol === state.srcTokenSymbol || symbol === state.dstTokenSymbol)) {
                         var balEl2 = document.getElementById(symbol === state.srcTokenSymbol ? 'srcBalance' :
@@ -9182,7 +9284,7 @@ console.log(
                     balDiv2.className = 'balance-amount';
                     balDiv2.textContent = formatTokenBalance(balance);
                     balDiv2.title = String(balance);
-                    right.appendChild(balDiv2);
+                    balanceCol.appendChild(balDiv2);
                     var usdDiv2 = document.createElement('div');
                     usdDiv2.className = 'balance-value';
                     var numericBalance = parseFloat(String(balance).replace(/,/g, '')) || 0;
@@ -9204,12 +9306,34 @@ console.log(
                     }
                     var val2 = numericBalance * tokenUsdPrice2;
                     usdDiv2.textContent = '$' + val2.toFixed(2);
-                    right.appendChild(usdDiv2);
+                    balanceCol.appendChild(usdDiv2);
                     if (isSelected) {
                         var check = document.createElement('div');
                         check.style.cssText = 'color:var(--accent);font-size:11px;margin-top:1px;line-height:1;';
                         check.textContent = '✔️';
-                        right.appendChild(check);
+                        balanceCol.appendChild(check);
+                    }
+                    right.appendChild(balanceCol);
+                    
+                    if (isTokenStarred(state.chainId, symbol)) {
+                        var localStarBtn = document.createElement('button');
+                        localStarBtn.type = 'button';
+                        localStarBtn.className = 'star-btn starred';
+                        localStarBtn.textContent = '★';
+                        localStarBtn.title = '已添加到"默认"';
+                        localStarBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            localStarBtn.classList.remove('starred');
+                            localStarBtn.textContent = '☆';
+                            localStarBtn.title = '点亮收藏，永久保留在代币列表中';
+                            localStarBtn.classList.remove('star-pop');
+                            void localStarBtn.offsetWidth;
+                            localStarBtn.classList.add('star-pop');
+                            showToast('已取消关注', 'info');
+                            unstarToken(state.chainId, symbol);
+                            setTimeout(function() { renderTokenList(); }, 260);
+                        });
+                        right.appendChild(localStarBtn);
                     }
                     item.appendChild(right);
                     container.appendChild(item);
@@ -9240,7 +9364,7 @@ console.log(
                     var container = document.getElementById('modalTokenList');
                     if (!container) return;
                     var chainId3 = state.chainId;
-                    var tokens4 = getTokens(chainId3);
+                    var tokens4 = getPersistedTokens(chainId3);
                     var currentSymbol2 = state.modalMode === 'src' ? state.srcTokenSymbol : state.dstTokenSymbol;
                     var otherSymbol2 = state.modalMode === 'src' ? state.dstTokenSymbol : state.srcTokenSymbol;
                     var searchVal2 = document.getElementById('tokenSearchInput') ? document.getElementById(
@@ -9333,25 +9457,77 @@ console.log(
                         textDiv2.appendChild(subDiv2);
                         left2.appendChild(textDiv2);
                         addItem2.appendChild(left2);
+                        let remoteSymbol2 = token2.tokenSymbol || token2.tokenName || 'UNKNOWN';
+                        let remoteKey2 = computeTokenStoreKey(chainId3, address2, remoteSymbol2);
                         var right2 = document.createElement('div');
                         right2.className = 'right';
-                        var addBtn2 = document.createElement('button');
-                        addBtn2.className = 'add-btn';
-                        addBtn2.type = 'button';
-                        addBtn2.textContent = '添加';
-                        addBtn2.style.background = 'var(--accent)';
-                        addBtn2.style.color = 'white';
-                        addBtn2.style.border = 'none';
-                        addBtn2.style.cursor = 'pointer';
-                        right2.appendChild(addBtn2);
+                        var remoteBalanceCol2 = document.createElement('div');
+                        remoteBalanceCol2.className = 'balance-col';
+                        var remoteBalance2 = '0';
+                        if (state.isConnected && (remoteKey2 === state.srcTokenSymbol || remoteKey2 === state
+                                .dstTokenSymbol)) {
+                            var remoteBalEl2 = document.getElementById(remoteKey2 === state.srcTokenSymbol ?
+                                'srcBalance' : 'dstBalance');
+                            if (remoteBalEl2) remoteBalance2 = remoteBalEl2.textContent;
+                        }
+                        var remoteBalDiv2 = document.createElement('div');
+                        remoteBalDiv2.className = 'balance-amount';
+                        remoteBalDiv2.textContent = formatTokenBalance(remoteBalance2);
+                        remoteBalDiv2.title = String(remoteBalance2);
+                        remoteBalanceCol2.appendChild(remoteBalDiv2);
+                        var remoteUsdDiv2 = document.createElement('div');
+                        remoteUsdDiv2.className = 'balance-value';
+                        var remoteNumericBalance2 = parseFloat(String(remoteBalance2).replace(/,/g, '')) || 0;
+                        var remoteUsdPrice2 = parseFloat(token2.price) || 0;
+                        if (remoteKey2 === state.srcTokenSymbol) {
+                            var remoteSrcPrice2 = parseFloat(state.usdPriceSrc) || 0;
+                            if (remoteSrcPrice2 > 0) remoteUsdPrice2 = remoteSrcPrice2;
+                        }
+                        if (remoteKey2 === state.dstTokenSymbol) {
+                            var remoteDstPrice2 = parseFloat(state.usdPriceDst) || 0;
+                            if (remoteDstPrice2 > 0) remoteUsdPrice2 = remoteDstPrice2;
+                        }
+                        remoteUsdDiv2.textContent = '$' + (remoteNumericBalance2 * remoteUsdPrice2).toFixed(2);
+                        remoteBalanceCol2.appendChild(remoteUsdDiv2);
+                        right2.appendChild(remoteBalanceCol2);
+                        let starBtn2 = document.createElement('button');
+                        starBtn2.type = 'button';
+                        var remoteAlreadyStarred2 = isTokenStarred(chainId3, remoteKey2);
+                        starBtn2.className = 'star-btn' + (remoteAlreadyStarred2 ? ' starred' : '');
+                        starBtn2.textContent = remoteAlreadyStarred2 ? '★' : '☆';
+                        starBtn2.title = remoteAlreadyStarred2 ? '已添加到"默认"' : '点亮收藏，永久保留在代币列表中';
+                        right2.appendChild(starBtn2);
                         addItem2.appendChild(right2);
                         container.appendChild(addItem2);
-                        addBtn2.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            var info7 = { symbol: token2.tokenSymbol || token2.tokenName || 'UNKNOWN',
+                        
+                        addItem2.addEventListener('click', function() {
+                            var infoSelect = { address: address2, symbol: remoteSymbol2,
                                 decimals: parseInt(token2.decimals) || 18, icon: token2.tokenLogoUrl ||
                                     'https://via.placeholder.com/32' };
-                            addCustomToken(address2, info7);
+                            selectToken(state.chainId, remoteKey2, infoSelect);
+                        });
+                        
+                        starBtn2.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            var nowStarred2 = starBtn2.classList.contains('starred');
+                            if (nowStarred2) {
+                                unstarToken(state.chainId, remoteKey2);
+                                starBtn2.classList.remove('starred');
+                                starBtn2.textContent = '☆';
+                                animateStarPop(starBtn2);
+                                starBtn2.title = '点亮收藏，永久保留在代币列表中';
+                                showToast('已取消关注', 'info');
+                            } else {
+                                var infoStar = { symbol: remoteSymbol2,
+                                    decimals: parseInt(token2.decimals) || 18, icon: token2.tokenLogoUrl ||
+                                        'https://via.placeholder.com/32' };
+                                starToken(state.chainId, address2, infoStar);
+                                starBtn2.classList.add('starred');
+                                starBtn2.textContent = '★';
+                                animateStarPop(starBtn2);
+                                starBtn2.title = '已添加到"默认"';
+                                showToast('已添加到"默认"', 'success');
+                            }
                         });
                     }
                     if (localResults2.length === 0 && remoteCount2 === 0) {
