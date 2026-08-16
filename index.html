@@ -4279,7 +4279,8 @@ function getTronWalletSigningWeb(walletKey) {
                     var balEl = document.getElementById('srcBalance');
                     if (!btn) return;
                     var bal = parseFloat(balEl ? balEl.textContent : '0');
-                    var srcSymbol = state.srcTokenSymbol;
+                    var srcTokenForBtn = getTokenInfo(state.chainId, state.srcTokenSymbol);
+                    var srcSymbol = srcTokenForBtn.symbol || state.srcTokenSymbol;
                     if (!state.isConnected) {
                         btn.innerHTML = '<i class="fas fa-arrows-spin"></i> 连接钱包';
                         btn.disabled = true;
@@ -4346,7 +4347,7 @@ function getTronWalletSigningWeb(walletKey) {
                     } else if (state.nativePrice > 0) {
                         srcPrice = parseFloat(state.nativePrice) || 0;
                     } else {
-                        if (state.srcTokenSymbol === 'USDT' || state.srcTokenSymbol === 'USDC') srcPrice = 1;
+                        if (srcToken.symbol === 'USDT' || srcToken.symbol === 'USDC') srcPrice = 1;
                     }
                     state.usdPriceSrc = Number.isFinite(srcPrice) ? srcPrice : 0;
                     var srcUsd = amount * state.usdPriceSrc;
@@ -4358,7 +4359,7 @@ function getTronWalletSigningWeb(walletKey) {
                         var quoteDstPrice = parseFloat(state.lastQuoteData.toToken.tokenUnitPrice);
                         if (Number.isFinite(quoteDstPrice) && quoteDstPrice > 0) dstPrice = quoteDstPrice;
                     } else if (dstPrice <= 0) {
-                        if (state.dstTokenSymbol === 'USDT' || state.dstTokenSymbol === 'USDC') dstPrice = 1;
+                        if (dstToken.symbol === 'USDT' || dstToken.symbol === 'USDC') dstPrice = 1;
                     }
                     state.usdPriceDst = Number.isFinite(dstPrice) ? dstPrice : 0;
                     var dstUsd = dstEstimate * state.usdPriceDst;
@@ -8718,11 +8719,16 @@ console.log(
                     var chainId = state.chainId;
                     if (!state.customTokens[chainId]) state.customTokens[chainId] = {};
                     var symbol = info.symbol;
-                    if (state.customTokens[chainId][symbol]) {
-                        showToast('代币 ' + symbol + ' 已存在', 'warning');
-                        return;
+                    
+                    var existingTokens = getTokens(chainId);
+                    var storeKey = symbol;
+                    var existingBySymbol = existingTokens[symbol];
+                    if (existingBySymbol && existingBySymbol.address &&
+                        String(existingBySymbol.address).toLowerCase() !== String(address).toLowerCase()) {
+                        
+                        storeKey = symbol + '#' + address;
                     }
-                    state.customTokens[chainId][symbol] = {
+                    state.customTokens[chainId][storeKey] = {
                         address: address,
                         symbol: symbol,
                         decimals: info.decimals || 18,
@@ -8732,19 +8738,19 @@ console.log(
                     delete state.tokenCache[cacheKey3];
                     try { localStorage.setItem('dogz_custom_tokens', JSON.stringify(state.customTokens)); } catch (e) {}
                     if (state.modalMode === 'src') {
-                        state.srcTokenSymbol = symbol;
+                        state.srcTokenSymbol = storeKey;
                         if (state.srcTokenSymbol === state.dstTokenSymbol) {
                             var tokens2 = getTokens(chainId);
                             var keys2 = Object.keys(tokens2);
-                            var other2 = keys2.find(function(k) { return k !== symbol; });
+                            var other2 = keys2.find(function(k) { return k !== storeKey; });
                             if (other2) state.dstTokenSymbol = other2;
                         }
                     } else if (state.modalMode === 'dst') {
-                        state.dstTokenSymbol = symbol;
+                        state.dstTokenSymbol = storeKey;
                         if (state.srcTokenSymbol === state.dstTokenSymbol) {
                             var tokens3 = getTokens(chainId);
                             var keys3 = Object.keys(tokens3);
-                            var other3 = keys3.find(function(k) { return k !== symbol; });
+                            var other3 = keys3.find(function(k) { return k !== storeKey; });
                             if (other3) state.srcTokenSymbol = other3;
                         }
                     }
@@ -9145,15 +9151,16 @@ console.log(
                     var isSelected = symbol === currentSymbol;
                     var left = document.createElement('div');
                     left.className = 'left';
+                    var displaySymbol = info.symbol || symbol;
                     var img = document.createElement('img');
                     img.src = info.icon || 'https://via.placeholder.com/32';
-                    img.alt = symbol;
+                    img.alt = displaySymbol;
                     img.onerror = function() { this.src = 'https://via.placeholder.com/32'; };
                     left.appendChild(img);
                     var textDiv = document.createElement('div');
                     var nameDiv = document.createElement('div');
                     nameDiv.className = 'name';
-                    nameDiv.textContent = symbol;
+                    nameDiv.textContent = displaySymbol;
                     textDiv.appendChild(nameDiv);
                     var subDiv = document.createElement('div');
                     subDiv.className = 'sub';
@@ -9288,8 +9295,8 @@ console.log(
                     }
                     var remoteCount2 = 0;
                     for (var ri2 = 0; ri2 < results2.length; ri2++) {
-                        var token2 = results2[ri2];
-                        var address2 = token2.tokenContractAddress;
+                        let token2 = results2[ri2];
+                        let address2 = token2.tokenContractAddress;
                         if (!address2) continue;
                         if (existingAddresses2.has(address2.toLowerCase())) continue;
                         var alreadyRendered = container.querySelector('[data-address="' + CSS.escape(address2) +
