@@ -4555,28 +4555,36 @@ async function dogzSolanaRpcFetch(
 
 
 
+var DOGZ_SOLANA_ALT_CACHE = window.__DOGZ_SOLANA_ALT_CACHE || new Map();
+window.__DOGZ_SOLANA_ALT_CACHE = DOGZ_SOLANA_ALT_CACHE;
+var DOGZ_SOLANA_ALT_CACHE_TTL_MS = 5 * 60 * 1000;
+
 async function dogzLoadSolanaLookupTables(connection, addresses) {
     if (!Array.isArray(addresses) || addresses.length === 0) {
         return [];
     }
 
     var uniqueTables = Array.from(new Set(addresses.filter(Boolean)));
-    var result = [];
+    var now = Date.now();
 
-    for (var i = 0; i < uniqueTables.length; i++) {
-        var address = uniqueTables[i];
+    
+    var results = await Promise.all(uniqueTables.map(async function(address) {
+        var cached = DOGZ_SOLANA_ALT_CACHE.get(address);
+        if (cached && (now - cached.ts) < DOGZ_SOLANA_ALT_CACHE_TTL_MS) {
+            return cached.value;
+        }
+
         var pubkey;
-
         try {
             pubkey = new window.solanaWeb3.PublicKey(address);
         } catch (e) {
             console.warn('[DOGZ] 无效的 ALT 地址，跳过:', address);
-            continue;
+            return null;
         }
 
         var loaded = null;
-       
-        for (var retry = 0; retry < 3; retry++) {
+        
+        for (var retry = 0; retry < 2; retry++) {
             try {
                 var response = await connection.getAddressLookupTable(
                     pubkey,
@@ -4589,17 +4597,21 @@ async function dogzLoadSolanaLookupTables(connection, addresses) {
             } catch (e) {
                 console.warn('[DOGZ] ALT 加载失败 (尝试 %d): %s', retry + 1, address, e);
             }
-            await new Promise(function(resolve) { setTimeout(resolve, 500 * (retry + 1)); });
+            if (retry < 1) {
+                await new Promise(function(resolve) { setTimeout(resolve, 250); });
+            }
         }
 
         if (loaded) {
-            result.push(loaded);
+            DOGZ_SOLANA_ALT_CACHE.set(address, { value: loaded, ts: Date.now() });
         } else {
             console.warn('[DOGZ] ALT 最终加载失败，跳过该表:', address);
         }
-    }
+        return loaded;
+    }));
 
-    console.log('[DOGZ] Solana ALT 成功加载 %d / %d 个', result.length, uniqueTables.length);
+    var result = results.filter(Boolean);
+    console.log('[DOGZ] Solana ALT 成功加载 %d / %d 个（并行 + 缓存）', result.length, uniqueTables.length);
     return result;
 }
 
@@ -4696,17 +4708,21 @@ async function dogzBuildSolanaTransaction(
         });
 
  
-    var lookupTables =
-        await dogzLoadSolanaLookupTables(
+    var lookupTablesPromise =
+        dogzLoadSolanaLookupTables(
             connection,
             swapData.addressLookupTableAccount || []
         );
 
-
-    var latestBlockhash =
-        await connection.getLatestBlockhash(
+    var latestBlockhashPromise =
+        connection.getLatestBlockhash(
             'confirmed'
         );
+
+    
+    var parallelResults = await Promise.all([lookupTablesPromise, latestBlockhashPromise]);
+    var lookupTables = parallelResults[0];
+    var latestBlockhash = parallelResults[1];
 
  
 
@@ -7502,19 +7518,18 @@ async function executeSolanaSwap() {
             console.log('[DOGZ] Solana tx ready:', built.size, 'bytes');
 
             
-            try {
-                var simulation = await connection.simulateTransaction(
-                    built.transaction,
-                    { sigVerify: false, replaceRecentBlockhash: false }
-                );
+            connection.simulateTransaction(
+                built.transaction,
+                { sigVerify: false, replaceRecentBlockhash: false }
+            ).then(function(simulation) {
                 if (simulation && simulation.value && simulation.value.err) {
                     console.error('[DOGZ] Solana simulation error:', simulation.value.err);
                     console.error('[DOGZ] Solana simulation logs:', simulation.value.logs);
                 
                 }
-            } catch (simulationError) {
+            }).catch(function(simulationError) {
                 console.warn('[DOGZ] Solana simulation skipped:', simulationError.message);
-            }
+            });
 
       
             if (typeof provider.signAndSendTransaction === 'function') {
