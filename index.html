@@ -4592,18 +4592,49 @@ function getTronWalletSigningWeb(walletKey) {
                 }
 
            
+                function pickEvmProvider() {
+                    if (typeof window.ethereum === 'undefined') return null;
+                    
+                    if (Array.isArray(window.ethereum.providers) && window.ethereum.providers.length > 0) {
+                        var trustProvider = window.ethereum.providers.find(function(p) {
+                            return p && (p.isTrust || p.isTrustWallet);
+                        });
+                        if (trustProvider) return trustProvider;
+                        return window.ethereum.providers[0];
+                    }
+                    return window.ethereum;
+                }
+
+                
+                async function waitForEvmProvider() {
+                    var found = pickEvmProvider();
+                    if (found) return found;
+                    for (var i = 0; i < 25; i++) {
+                        await new Promise(function(resolve) { setTimeout(resolve, 200); });
+                        found = pickEvmProvider();
+                        if (found) {
+                            console.log('[DOGZ] EVM provider detected after wait');
+                            return found;
+                        }
+                    }
+                    return null;
+                }
+
+                
                 async function connectEvmWallet() {
-                    if (typeof window.ethereum === 'undefined') {
-                        showToast('请安装 MetaMask 等 EVM 钱包', 'warning');
+                    var ethereumProvider = await waitForEvmProvider();
+                    if (!ethereumProvider) {
+                        showToast('未检测到 EVM 钱包，请安装 MetaMask、Trust Wallet 等钱包，或在其 DApp 浏览器中打开本页面',
+                            'warning');
                         return null;
                     }
                     try {
-                        var chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+                        var chainIdHex = await ethereumProvider.request({ method: 'eth_chainId' });
                         var currentChainId = parseInt(chainIdHex, 16);
                         if (!CHAINS[currentChainId]) {
                             showToast('当前网络不支持，请切换到以太坊、BNB Chain等支持的网络', 'warning');
                             try {
-                                await window.ethereum.request({
+                                await ethereumProvider.request({
                                     method: 'wallet_switchEthereumChain',
                                     params: [{ chainId: '0x1' }],
                                 });
@@ -4611,11 +4642,11 @@ function getTronWalletSigningWeb(walletKey) {
                                 throw new Error('请手动切换到支持的网络');
                             }
                         }
-                        var accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        var accounts = await ethereumProvider.request({ method: 'eth_requestAccounts' });
                         if (!accounts || !accounts[0]) throw new Error('No accounts');
-                        var provider = new ethers.BrowserProvider(window.ethereum);
+                        var provider = new ethers.BrowserProvider(ethereumProvider);
                         var signer = await provider.getSigner();
-                        var finalChainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+                        var finalChainIdHex = await ethereumProvider.request({ method: 'eth_chainId' });
                         var finalChainId = parseInt(finalChainIdHex, 16);
                         return { provider: provider, signer: signer, address: accounts[0], chainId: finalChainId };
                     } catch (e) {
@@ -5137,21 +5168,39 @@ async function dogzBuildSolanaTransaction(
 
 
 
+    
+    try {
+        if (
+            window.trustWallet &&
+            window.trustWallet.solana
+        ) {
+            return {
+                provider: window.trustWallet.solana,
+                name: 'Trust Wallet'
+            };
+        }
+    } catch (e) {
+        console.warn(
+            '[DOGZ] Trust Wallet(capital) Solana detection error:',
+            e
+        );
+    }
+
+
+
     try {
         if (
             window.solana &&
-            typeof window.solana.connect === 'function' &&
-            (
-                window.solana.isPhantom ||
-                typeof window.solana.signTransaction === 'function'
-            )
+            typeof window.solana.connect === 'function'
         ) {
             return {
                 provider: window.solana,
                 name:
                     window.solana.isPhantom
                         ? 'Phantom'
-                        : 'Solana Wallet'
+                        : (window.solana.isTrust || window.solana.isTrustWallet)
+                            ? 'Trust Wallet'
+                            : 'Solana Wallet'
             };
         }
     } catch (e) {
@@ -5264,7 +5313,7 @@ async function dogzBuildSolanaTransaction(
         showToast(
             isFileProtocol
                 ? '当前页面通过 file:// 打开，无法检测 Solana 钱包，请使用 HTTPS 地址'
-                : '未检测到 Solana 钱包，请安装 Phantom、OKX Wallet、Solflare、Backpack、Trust Wallet 或在 TokenPocket DApp 浏览器中打开',
+                : '未检测到 Solana 钱包。请安装 Phantom、OKX Wallet、Solflare、Backpack、Trust Wallet 或在其 DApp 浏览器中打开；若使用 Trust Wallet 等多链钱包，请先在钱包内切换/启用 Solana 网络后再试',
             'warning'
         );
 
@@ -5293,6 +5342,12 @@ async function dogzBuildSolanaTransaction(
                     !!(
                         window.trustwallet &&
                         window.trustwallet.solana
+                    ),
+
+                trustWalletCapital:
+                    !!(
+                        window.trustWallet &&
+                        window.trustWallet.solana
                     ),
 
                 solana:
