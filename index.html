@@ -2585,6 +2585,23 @@
                 const REQUEST_TIMEOUT = 30000;
                 const MAX_RETRIES = 2;
 
+                
+                var dogzEip6963Providers = [];
+                window.addEventListener('eip6963:announceProvider', function(event) {
+                    try {
+                        var detail = event.detail;
+                        if (detail && detail.provider && !dogzEip6963Providers.some(function(p) {
+                                return p.provider === detail.provider;
+                            })) {
+                            dogzEip6963Providers.push(detail);
+                            console.log('[DOGZ] EIP-6963 provider announced:', detail.info && detail.info.name);
+                        }
+                    } catch (e) {
+                        console.warn('[DOGZ] EIP-6963 announce handling error:', e);
+                    }
+                });
+                window.dispatchEvent(new Event('eip6963:requestProvider'));
+
                 async function proxyRequest(endpoint, params, retryCount) {
                     retryCount = retryCount || 0;
                     var searchParams = new URLSearchParams();
@@ -4593,22 +4610,39 @@ function getTronWalletSigningWeb(walletKey) {
 
            
                 function pickEvmProvider() {
-                    if (typeof window.ethereum === 'undefined') return null;
                     
-                    if (Array.isArray(window.ethereum.providers) && window.ethereum.providers.length > 0) {
-                        var trustProvider = window.ethereum.providers.find(function(p) {
-                            return p && (p.isTrust || p.isTrustWallet);
+                    if (dogzEip6963Providers.length > 0) {
+                        var trustAnnounced = dogzEip6963Providers.find(function(p) {
+                            var info = p.info || {};
+                            var name = String(info.name || '').toLowerCase();
+                            var rdns = String(info.rdns || '').toLowerCase();
+                            return name.indexOf('trust') !== -1 || rdns.indexOf('trust') !== -1;
                         });
-                        if (trustProvider) return trustProvider;
-                        return window.ethereum.providers[0];
+                        if (trustAnnounced) return trustAnnounced.provider;
                     }
-                    return window.ethereum;
+                    
+                    if (typeof window.ethereum !== 'undefined') {
+                        if (Array.isArray(window.ethereum.providers) && window.ethereum.providers.length > 0) {
+                            var trustProvider = window.ethereum.providers.find(function(p) {
+                                return p && (p.isTrust || p.isTrustWallet);
+                            });
+                            if (trustProvider) return trustProvider;
+                            return window.ethereum.providers[0];
+                        }
+                        return window.ethereum;
+                    }
+                    
+                    if (dogzEip6963Providers.length > 0) {
+                        return dogzEip6963Providers[0].provider;
+                    }
+                    return null;
                 }
 
                 
                 async function waitForEvmProvider() {
                     var found = pickEvmProvider();
                     if (found) return found;
+                    window.dispatchEvent(new Event('eip6963:requestProvider'));
                     for (var i = 0; i < 25; i++) {
                         await new Promise(function(resolve) { setTimeout(resolve, 200); });
                         found = pickEvmProvider();
@@ -4629,7 +4663,14 @@ function getTronWalletSigningWeb(walletKey) {
                         return null;
                     }
                     try {
-                        var chainIdHex = await ethereumProvider.request({ method: 'eth_chainId' });
+                        var chainIdHex;
+                        try {
+                            chainIdHex = await ethereumProvider.request({ method: 'eth_chainId' });
+                        } catch (bridgeErr) {
+                            console.warn('[DOGZ] eth_chainId 首次请求失败，重试一次:', bridgeErr);
+                            await new Promise(function(resolve) { setTimeout(resolve, 400); });
+                            chainIdHex = await ethereumProvider.request({ method: 'eth_chainId' });
+                        }
                         var currentChainId = parseInt(chainIdHex, 16);
                         if (!CHAINS[currentChainId]) {
                             showToast('当前网络不支持，请切换到以太坊、BNB Chain等支持的网络', 'warning');
