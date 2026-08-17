@@ -5120,6 +5120,25 @@ async function dogzBuildSolanaTransaction(
 
     try {
         if (
+            window.trustwallet &&
+            window.trustwallet.solana
+        ) {
+            return {
+                provider: window.trustwallet.solana,
+                name: 'Trust Wallet'
+            };
+        }
+    } catch (e) {
+        console.warn(
+            '[DOGZ] Trust Wallet Solana detection error:',
+            e
+        );
+    }
+
+
+
+    try {
+        if (
             window.solana &&
             typeof window.solana.connect === 'function' &&
             (
@@ -5245,7 +5264,7 @@ async function dogzBuildSolanaTransaction(
         showToast(
             isFileProtocol
                 ? '当前页面通过 file:// 打开，无法检测 Solana 钱包，请使用 HTTPS 地址'
-                : '未检测到 Solana 钱包，请安装 Phantom、OKX Wallet、Solflare、Backpack 或在 TokenPocket DApp 浏览器中打开',
+                : '未检测到 Solana 钱包，请安装 Phantom、OKX Wallet、Solflare、Backpack、Trust Wallet 或在 TokenPocket DApp 浏览器中打开',
             'warning'
         );
 
@@ -5268,6 +5287,12 @@ async function dogzBuildSolanaTransaction(
                     !!(
                         window.okxwallet &&
                         window.okxwallet.solana
+                    ),
+
+                trustwallet:
+                    !!(
+                        window.trustwallet &&
+                        window.trustwallet.solana
                     ),
 
                 solana:
