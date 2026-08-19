@@ -6862,7 +6862,7 @@ if (isSolanaChain(chainId)) {
                                 if (allowance < requiredAmount) {
                                     try {
                                         showToast('正在授权...', 'info');
-                                        var approveTx = await tokenContract.approve(spender, ethers.MaxUint256);
+                                        var approveTx = await tokenContract.approve(spender, requiredAmount);
                                         await approveTx.wait();
                                     } catch (e) {
                                         if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes(
