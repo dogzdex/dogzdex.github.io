@@ -35,29 +35,29 @@
     <link rel="icon" href="https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350" />
     <script src="https://cdn.tailwindcss.com"></script>
 
-   
-<link
+    <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     integrity="sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B"
     crossorigin="anonymous"
-/>
+    />
 
-
-<link
+    <link
     href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
     rel="stylesheet"
-/>
+    />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js">
+</script>
 
 <script
     src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"
     integrity="sha384-gpR0Q6Hx/O+uevlbpbANbS0LWjbejPV1sqD/8w422l/fW8whGY0EPmKw3uG7ACYP"
     crossorigin="anonymous">
 </script>
-
 
 <script
     src="https://cdn.jsdelivr.net/npm/tronweb@5.1.0/dist/TronWeb.js"
@@ -66,12 +66,12 @@
 </script>
 
 
+
 <script
     src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js"
     integrity="sha384-xo1g+ODR6i1cxIVZeALc/apXFHeaJHO1j1whMO3dhtdBChWeaihnDs7UnXs9ch78"
     crossorigin="anonymous">
 </script>
-
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer>
 </script>
@@ -2589,6 +2589,13 @@
             function runSplashAnimation() {
                 var splash = document.getElementById('splash-screen');
                 if (!splash) return;
+                
+                try {
+                    if (window.sessionStorage && window.sessionStorage.getItem('dogzSplashShown') === '1') {
+                        releaseSplash(true);
+                        return;
+                    }
+                } catch (e) { }
                 var logo = document.getElementById('splashLogo');
                 var title = document.getElementById('splashTitle');
                 var subtitle = document.getElementById('splashSubtitle');
@@ -2607,6 +2614,7 @@
                 }, 1400);
                 setTimeout(function() {
                     releaseSplash(false);
+                    try { if (window.sessionStorage) window.sessionStorage.setItem('dogzSplashShown', '1'); } catch (e) { /* ignore */ }
                 }, 2500);
             }
 
@@ -2645,7 +2653,7 @@
             try {
 
              
-       
+               
                 const PROXY_URL = 'https://api.dogz.dpdns.org';
                 const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator';
                 const OKX_MARKET_API_BASE = 'https://web3.okx.com/api/v6/dex/market';
@@ -2655,8 +2663,24 @@
                 const REQUEST_TIMEOUT = 30000;
                 const MAX_RETRIES = 2;
 
-             
+               
                 const WORKER_AUTH_TOKEN = '6d6caaf66cf23f60beee62d6cb58fa6b6342a923b29c0f3f7d2e1d3d0ec1f528';
+
+               
+                var __dogzBoundProviderRegistry = (typeof WeakSet !== 'undefined') ? new WeakSet() : null;
+                function __dogzShouldBindEvents(provider) {
+                    if (!provider) return false;
+                    if (__dogzBoundProviderRegistry) {
+                        if (__dogzBoundProviderRegistry.has(provider)) return false;
+                        __dogzBoundProviderRegistry.add(provider);
+                        return true;
+                    }
+                    try {
+                        if (provider.__dogzEventsBound) return false;
+                        provider.__dogzEventsBound = true;
+                    } catch (e) {}
+                    return true;
+                }
 
                 function buildProxyHeaders(extra) {
                     var headers = { 'Content-Type': 'application/json' };
@@ -2669,12 +2693,12 @@
                     return headers;
                 }
 
-       
+              
                 async function parseProxyErrorResponse(response) {
                     var rawText = '';
-                    try { rawText = await response.text(); } catch (e) { }
+                    try { rawText = await response.text(); } catch (e) {}
                     var parsedJson = null;
-                    try { parsedJson = JSON.parse(rawText); } catch (e) { }
+                    try { parsedJson = JSON.parse(rawText); } catch (e) {}
 
                     if (parsedJson && typeof parsedJson === 'object' && parsedJson.msg) {
                         var err = new Error('HTTP ' + response.status + ': ' + parsedJson.msg);
@@ -2733,7 +2757,7 @@
                 function getFreshTurnstileToken() {
                     return new Promise(function(resolve) {
                         if (!__dogzEnsureTurnstileWidget()) {
-                           
+                            
                             resolve(null);
                             return;
                         }
@@ -2827,7 +2851,7 @@
                         }
                         for (var k = 0; k < addr.length && addr[k] === '1'; k++) bytes.push(0);
                         bytes.reverse();
-                       
+                        
                         if (bytes.length !== 25) return null;
                         var hash20 = bytes.slice(1, 21);
                         return '0x' + hash20.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
@@ -2892,7 +2916,7 @@
                             }
                         }
                     } else if (opts.expectedUserWallet && txInfo.from && typeof txInfo.from === 'string') {
-                        
+                       
                         if (txInfo.from.toLowerCase() !== opts.expectedUserWallet.toLowerCase()) {
                             throw new Error('安全校验失败：交易发起地址与当前钱包不一致，已阻止签名（' + decoded.name + '）');
                         }
@@ -2940,7 +2964,7 @@
                     var queryString = searchParams.toString();
                     var fullUrl = OKX_API_BASE + endpoint + (queryString ? '?' + queryString : '');
                     var payload = { url: fullUrl };
-                   
+                    
                     if (TURNSTILE_REQUIRED_ENDPOINTS.indexOf(endpoint) !== -1) {
                         try {
                             var __ts = await getFreshTurnstileToken();
@@ -4636,9 +4660,9 @@ function getTronWalletSigningWeb(walletKey) {
                     updateFeeDetailDisplay();
                 }
 
-               
-                var DOGZ_TOKEN_ADDRESS = '0x82a77710495a35549d2add797412b4a4497d33ef';
                 
+                var DOGZ_TOKEN_ADDRESS = '0x82a77710495a35549d2add797412b4a4497d33ef';
+               
                 var FEE_WHITELIST_DISPLAY = [
                     '0x6f46c3267dbee08bc31e68efaca6626892255105',
                     'twpfwxgyjwdq4zk8dj9ezt9kmcpt5nf1yp',
@@ -5875,13 +5899,9 @@ async function dogzBuildSolanaTransaction(
      
 
         if (
-            !provider.__dogzEventsBound &&
+            __dogzShouldBindEvents(provider) &&
             typeof provider.on === 'function'
         ) {
-
-            provider.__dogzEventsBound =
-                true;
-
 
             provider.on(
                 'accountChanged',
@@ -6054,7 +6074,7 @@ async function dogzBuildSolanaTransaction(
                         var balance = await connection.getBalance(publicKey);
                         return formatBalance(BigInt(balance), decimals);
                     } else {
-                        
+                       
                         var parsedAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
                             mint: new window.solanaWeb3.PublicKey(token.address)
                         });
@@ -6668,8 +6688,7 @@ if (
 
                 function bindTronAdapterEvents(adapter) {
                     if (!adapter) return;
-                    if (adapter.__dogzEventsBound) return;
-                    adapter.__dogzEventsBound = true;
+                    if (!__dogzShouldBindEvents(adapter)) return;
                     try {
                         adapter.on('connect', async function(address) {
                             try {
@@ -6747,8 +6766,7 @@ if (
 
                 function bindTronProviderEvents(provider) {
                     if (!provider) return;
-                    if (provider.__dogzEventsBound) return;
-                    provider.__dogzEventsBound = true;
+                    if (!__dogzShouldBindEvents(provider)) return;
                     if (typeof provider.on !== 'function') return;
                     try {
                         provider.on('accountsChanged', async function(accounts) {
@@ -7009,11 +7027,37 @@ if (
                                 if (el) el.textContent = formatBalance(bal, token.decimals);
                             } else {
                                 if (!token.address || token.address === '0x') { if (el) el.textContent = '0'; return; }
-                                var contract = await tronWeb.contract().at(token.address);
-                               
-                                var callOptions = state.walletAddress ? { from: state.walletAddress } : {};
-                                var bal2 = await contract.balanceOf(state.walletAddress).call(
-                                    callOptions);
+                                
+                                var balanceCheckWeb = (state.tronWalletWeb && state.tronWalletWeb.transactionBuilder &&
+                                    typeof state.tronWalletWeb.transactionBuilder.triggerConstantContract === 'function')
+                                    ? state.tronWalletWeb : tronWeb;
+                                var balResult;
+                                try {
+                                    balResult = await balanceCheckWeb.transactionBuilder.triggerConstantContract(
+                                        token.address,
+                                        'balanceOf(address)',
+                                        {},
+                                        [{ type: 'address', value: state.walletAddress }],
+                                        state.walletAddress
+                                    );
+                                } catch (balErr) {
+                                    if (balanceCheckWeb === state.tronWalletWeb) {
+                                        console.warn('[DOGZ] 用钱包自身 tronWeb 查询余额失败，改用只读节点重试:', balErr);
+                                        balResult = await tronWeb.transactionBuilder.triggerConstantContract(
+                                            token.address,
+                                            'balanceOf(address)',
+                                            {},
+                                            [{ type: 'address', value: state.walletAddress }],
+                                            state.walletAddress
+                                        );
+                                    } else {
+                                        throw balErr;
+                                    }
+                                }
+                                var bal2 = 0n;
+                                if (balResult && balResult.constant_result && balResult.constant_result[0]) {
+                                    bal2 = BigInt('0x' + balResult.constant_result[0]);
+                                }
                                 if (el) el.textContent = formatBalance(bal2, token.decimals);
                             }
                         } else if (state.isSolana) {
@@ -7273,7 +7317,7 @@ if (isSolanaChain(chainId)) {
                                 var iface = new ethers.Interface(['function approve(address spender, uint256 amount)']);
                                 var decoded = iface.decodeFunctionData('approve', approveInfo.approveTxCalldata);
                                 var spender = decoded[0];
-                                
+                               
                                 if (!isKnownApproveSpenderFrontend(chainId, spender)) {
                                     var __approveErrMsg = '安全校验失败：授权对象地址异常，已阻止本次授权（chainId=' + chainId + ', spender=' + spender + '）';
                                     showToast(__approveErrMsg, 'error');
@@ -7307,7 +7351,8 @@ if (isSolanaChain(chainId)) {
                     try {
                         verifyTxBeforeSign(txInfo, {
                             expectedToToken: dstToken.address,
-                            expectedRecipient: '',                                                  
+                            expectedRecipient: '', 
+                                                   
                             expectedUserWallet: state.walletAddress,
                             expectedFromAmount: amountWei,
                         });
@@ -7417,7 +7462,7 @@ if (isSolanaChain(chainId)) {
                         var requiredAmount = BigInt(decoded[1].toString());
                         var spenderAddress = tronWeb.address.fromHex('41' + spenderHex.slice(2));
 
-                        
+                       
                         var TRON_KNOWN_APPROVE_SPENDER = 'THRAE2VhGNAcvPKtT96AqyXtSQwhiU1XL8';
                         if (spenderAddress !== TRON_KNOWN_APPROVE_SPENDER) {
                             var __tronApproveErrMsg = '安全校验失败：TRON 授权对象地址异常，已阻止本次授权（spender=' + spenderAddress + '）';
@@ -7432,17 +7477,41 @@ if (isSolanaChain(chainId)) {
                         });
 
                 
-                        var allowanceResult = await tronWeb.transactionBuilder
-                            .triggerConstantContract(
-                                approveContractAddr,
-                                'allowance(address,address)',
-                                {},
-                                [
-                                    { type: 'address', value: ownerAddress },
-                                    { type: 'address', value: spenderAddress }
-                                ],
-                                ownerAddress
-                            );
+                       
+                        var allowanceCheckWeb = (walletWeb && walletWeb.transactionBuilder &&
+                            typeof walletWeb.transactionBuilder.triggerConstantContract === 'function')
+                            ? walletWeb : tronWeb;
+                        var allowanceResult;
+                        try {
+                            allowanceResult = await allowanceCheckWeb.transactionBuilder
+                                .triggerConstantContract(
+                                    approveContractAddr,
+                                    'allowance(address,address)',
+                                    {},
+                                    [
+                                        { type: 'address', value: ownerAddress },
+                                        { type: 'address', value: spenderAddress }
+                                    ],
+                                    ownerAddress
+                                );
+                        } catch (allowanceErr) {
+                            if (allowanceCheckWeb === walletWeb) {
+                                console.warn('[DOGZ] 用钱包自身 tronWeb 查询授权额度失败，改用只读节点重试:', allowanceErr);
+                                allowanceResult = await tronWeb.transactionBuilder
+                                    .triggerConstantContract(
+                                        approveContractAddr,
+                                        'allowance(address,address)',
+                                        {},
+                                        [
+                                            { type: 'address', value: ownerAddress },
+                                            { type: 'address', value: spenderAddress }
+                                        ],
+                                        ownerAddress
+                                    );
+                            } else {
+                                throw allowanceErr;
+                            }
+                        }
 
                         var allowanceBig = 0n;
                         if (allowanceResult && allowanceResult.constant_result && allowanceResult
@@ -9976,7 +10045,7 @@ console.log(
                         renderLocalTokenItem(container, item2.symbol, item2.info, currentSymbol2);
                     }
                     var isAddress2 = /^0x[a-fA-F0-9]{40}$/.test(searchVal2) || /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(
-                    searchVal2) || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(searchVal2); // Solana base58
+                    searchVal2) || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(searchVal2); 
                     if (container.children.length === 0) {
                         container.innerHTML =
                             '<div style="padding:20px;text-align:center;color:var(--text-muted);">搜索中...</div>';
@@ -10367,7 +10436,7 @@ console.log(
                 }
 
               
-                document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', async function() {
                     try {
                         setTheme('auto');
                         try {
@@ -10499,6 +10568,22 @@ console.log(
                         }
 
                  
+
+                      
+                        try {
+                            if (window.ethereum && typeof window.ethereum.request === 'function') {
+                                var __initialChainIdHex = await Promise.race([
+                                    window.ethereum.request({ method: 'eth_chainId' }),
+                                    new Promise(function(_, reject) { setTimeout(function() { reject(new Error('timeout')); }, 1500); })
+                                ]);
+                                var __initialChainId = parseInt(__initialChainIdHex, 16);
+                                if (!isNaN(__initialChainId) && CHAINS[__initialChainId]) {
+                                    state.chainId = __initialChainId;
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('[DOGZ] 启动时读取钱包当前链失败，使用默认链:', e);
+                        }
 
                         autoSwitchTokens(state.chainId);
                         updateChainUI();
