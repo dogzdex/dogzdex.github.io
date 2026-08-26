@@ -23,7 +23,36 @@
               https://api.shasta.trongrid.io
               https://nile.trongrid.io
               https://challenges.cloudflare.com
-              https://cdn.tailwindcss.com;
+              https://cdn.tailwindcss.com
+              https://cdn.jsdelivr.net
+              https://cdnjs.cloudflare.com
+              https://1rpc.io
+              https://api.avax.network
+              https://api.mainnet-beta.solana.com
+              https://arb1.arbitrum.io
+              https://binance.nodereal.io
+              https://blast-rpc.publicnode.com
+              https://conflux-espace-public.unifra.io
+              https://eth.llamarpc.com
+              https://infra.originstake.com
+              https://ink.drpc.org
+              https://mainnet.base.org
+              https://mainnet.era.zksync.io
+              https://mainnet.optimism.io
+              https://mantle-rpc.publicnode.com
+              https://metis-rpc.publicnode.com
+              https://pacific-rpc.manta.network
+              https://plasma.drpc.org
+              https://polygon-rpc.com
+              https://robinhood.rpc.blxrbdn.com
+              https://rpc.hypurrscan.io
+              https://rpc.linea.build
+              https://rpc.merlinchain.io
+              https://rpc.pharos.xyz
+              https://scroll-rpc.publicnode.com
+              https://sonic.api.pocket.network
+              https://unichain-rpc.publicnode.com
+              https://xlayer.drpc.org;
           font-src
               https://cdnjs.cloudflare.com
               https://fonts.gstatic.com;
@@ -2453,7 +2482,7 @@
                     </div>
                 </div>
 
-                <!-- Swap Action Button -->
+              
                 <button class="btn-primary" id="swapActionBtn"><i class="fas fa-arrows-spin"></i> 兑换</button>
             </div>
         </div>
@@ -2595,7 +2624,7 @@
                         releaseSplash(true);
                         return;
                     }
-                } catch (e) { }
+                } catch (e) {}
                 var logo = document.getElementById('splashLogo');
                 var title = document.getElementById('splashTitle');
                 var subtitle = document.getElementById('splashSubtitle');
@@ -2614,7 +2643,7 @@
                 }, 1400);
                 setTimeout(function() {
                     releaseSplash(false);
-                    try { if (window.sessionStorage) window.sessionStorage.setItem('dogzSplashShown', '1'); } catch (e) { /* ignore */ }
+                    try { if (window.sessionStorage) window.sessionStorage.setItem('dogzSplashShown', '1'); } catch (e) {}
                 }, 2500);
             }
 
@@ -2653,7 +2682,7 @@
             try {
 
              
-               
+              
                 const PROXY_URL = 'https://api.dogz.dpdns.org';
                 const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator';
                 const OKX_MARKET_API_BASE = 'https://web3.okx.com/api/v6/dex/market';
@@ -2693,7 +2722,7 @@
                     return headers;
                 }
 
-              
+               
                 async function parseProxyErrorResponse(response) {
                     var rawText = '';
                     try { rawText = await response.text(); } catch (e) {}
@@ -2709,8 +2738,9 @@
 
                     var looksLikeEdgeBlock = response.status === 429 || response.status === 403 || response.status === 503;
                     if (looksLikeEdgeBlock) {
+                       
                         var friendly = response.status === 429
-                            ? '请求被限流，请求过于频繁。如果你在本地/内网环境测试，可能是 Cloudflare 对共享域名 workers.dev 的平台级限流触发了（不是业务限流），换个网络环境或稍等片刻再试。'
+                            ? '请求被限流（不是我们自己 Worker 代码返回的，是在到达 Worker 之前就被拦了）。建议去 Cloudflare 后台安全性 → 事件日志，筛一下刚才这个时间点的请求，看看具体是哪条规则拦的；如果已经配置过跳过规则但还在拦，说明还有另一层防护没覆盖到，需要单独排查。'
                             : '请求被安全网关拦截（HTTP ' + response.status + '）。如果最近改过 Turnstile 或 Worker 配置，检查一下站点密钥的允许域名是否包含当前测试域名。';
                         var err2 = new Error(friendly);
                         err2.httpStatus = response.status;
@@ -2757,7 +2787,7 @@
                 function getFreshTurnstileToken() {
                     return new Promise(function(resolve) {
                         if (!__dogzEnsureTurnstileWidget()) {
-                            
+                           
                             resolve(null);
                             return;
                         }
@@ -2778,7 +2808,6 @@
 
                 var TURNSTILE_REQUIRED_ENDPOINTS = ['/swap', '/swap-instruction', '/approve-transaction'];
 
-               
                 var ROUTER_CALL_SIGNATURES = {
                     'f2c42696': { name: 'dagSwapByOrderId', toTokenWord: 2, receiverWord: null },
                     '0c307f76': { name: 'dagSwapTo', toTokenWord: 3, receiverWord: 1 },
@@ -2851,7 +2880,7 @@
                         }
                         for (var k = 0; k < addr.length && addr[k] === '1'; k++) bytes.push(0);
                         bytes.reverse();
-                        
+                       
                         if (bytes.length !== 25) return null;
                         var hash20 = bytes.slice(1, 21);
                         return '0x' + hash20.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
@@ -2897,7 +2926,7 @@
                     return result;
                 }
 
-               
+              
                 function verifyTxBeforeSign(txInfo, opts) {
                     opts = opts || {};
                     var decoded = decodeRouterCallFrontend(txInfo.data);
@@ -2916,7 +2945,7 @@
                             }
                         }
                     } else if (opts.expectedUserWallet && txInfo.from && typeof txInfo.from === 'string') {
-                       
+                        
                         if (txInfo.from.toLowerCase() !== opts.expectedUserWallet.toLowerCase()) {
                             throw new Error('安全校验失败：交易发起地址与当前钱包不一致，已阻止签名（' + decoded.name + '）');
                         }
@@ -3013,7 +3042,7 @@
                     var queryString = searchParams.toString();
                     var fullUrl = OKX_MARKET_API_BASE + endpoint + (queryString ? '?' + queryString : '');
                     var payload = { url: fullUrl };
-                    
+                   
                     var controller = new AbortController();
                     var timeoutId = setTimeout(function() { controller.abort(); }, REQUEST_TIMEOUT);
                     try {
@@ -3727,6 +3756,23 @@
                     state.tronReadOnlyWeb = tronWeb;
                     state.tronWeb = tronWeb;
                     return tronWeb;
+                }
+
+               
+                var __dogzEvmFallbackProviders = {};
+                function getEvmFallbackProvider(chainId) {
+                    var id = Number(chainId);
+                    if (__dogzEvmFallbackProviders[id]) return __dogzEvmFallbackProviders[id];
+                    var chain = CHAINS[id];
+                    if (!chain || !chain.rpc) return null;
+                    try {
+                        var provider = new ethers.JsonRpcProvider(chain.rpc, id, { staticNetwork: true });
+                        __dogzEvmFallbackProviders[id] = provider;
+                        return provider;
+                    } catch (e) {
+                        console.warn('[DOGZ] 创建 EVM 公共节点 fallback provider 失败:', e);
+                        return null;
+                    }
                 }
 
                 function getInjectedTronWallet(preferredKey) {
@@ -4597,7 +4643,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                 function updateTokenUI() {
                     var chainId = state.chainId;
-                    
+                   
                     if (typeof __dogzLastGoodBalance !== 'undefined') {
                         __dogzLastGoodBalance.src = null;
                         __dogzLastGoodBalance.dst = null;
@@ -4660,7 +4706,7 @@ function getTronWalletSigningWeb(walletKey) {
                     updateFeeDetailDisplay();
                 }
 
-                
+               
                 var DOGZ_TOKEN_ADDRESS = '0x82a77710495a35549d2add797412b4a4497d33ef';
                
                 var FEE_WHITELIST_DISPLAY = [
@@ -4985,7 +5031,15 @@ function getTronWalletSigningWeb(walletKey) {
                 async function updateGasPrice() {
                     if (state.isTron || state.isSolana || !state.provider) return;
                     try {
-                        var feeData = await state.provider.getFeeData();
+                        var feeData;
+                        try {
+                            feeData = await state.provider.getFeeData();
+                        } catch (feeErr) {
+                            var fallbackProvider = getEvmFallbackProvider(state.chainId);
+                            if (!fallbackProvider) throw feeErr;
+                            console.warn('[DOGZ] 钱包自身 RPC 获取 gas 价格失败，改用公共节点重试:', feeErr);
+                            feeData = await fallbackProvider.getFeeData();
+                        }
                         var gasPrice = feeData.gasPrice || feeData.maxFeePerGas;
                         if (!gasPrice) return;
                         var gwei = parseFloat(ethers.formatUnits(gasPrice, 9));
@@ -7065,20 +7119,37 @@ if (
                             if (el) el.textContent = balSol;
                             __dogzLastGoodBalance[type] = balSol;
                         } else {
-                            if (token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
-                                var bal3 = await state.provider.getBalance(state.walletAddress);
-                                if (el) el.textContent = formatBalance(bal3, token.decimals);
-                            } else {
-                                var contract2 = new ethers.Contract(token.address,
-                                    ['function balanceOf(address) view returns (uint256)'], state.provider);
-                                var bal4 = await contract2.balanceOf(state.walletAddress);
-                                if (el) el.textContent = formatBalance(bal4, token.decimals);
+                           
+                            var evmBalanceProvider = state.provider;
+                            try {
+                                if (token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
+                                    var bal3 = await evmBalanceProvider.getBalance(state.walletAddress);
+                                    if (el) el.textContent = formatBalance(bal3, token.decimals);
+                                } else {
+                                    var contract2 = new ethers.Contract(token.address,
+                                        ['function balanceOf(address) view returns (uint256)'], evmBalanceProvider);
+                                    var bal4 = await contract2.balanceOf(state.walletAddress);
+                                    if (el) el.textContent = formatBalance(bal4, token.decimals);
+                                }
+                            } catch (evmBalErr) {
+                                var fallbackProvider = getEvmFallbackProvider(state.chainId);
+                                if (!fallbackProvider) throw evmBalErr;
+                                console.warn('[DOGZ] 钱包自身 RPC 查询 EVM 余额失败，改用公共节点重试:', evmBalErr);
+                                if (token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
+                                    var bal3b = await fallbackProvider.getBalance(state.walletAddress);
+                                    if (el) el.textContent = formatBalance(bal3b, token.decimals);
+                                } else {
+                                    var contract2b = new ethers.Contract(token.address,
+                                        ['function balanceOf(address) view returns (uint256)'], fallbackProvider);
+                                    var bal4b = await contract2b.balanceOf(state.walletAddress);
+                                    if (el) el.textContent = formatBalance(bal4b, token.decimals);
+                                }
                             }
                         }
                     } catch (e) {
                         console.warn('loadBalance error:', e);
                         if (state.isSolana && __dogzLastGoodBalance[type] !== null) {
-                            
+                           
                             if (el) el.textContent = __dogzLastGoodBalance[type];
                         } else {
                             if (el) el.textContent = '0';
@@ -7352,7 +7423,7 @@ if (isSolanaChain(chainId)) {
                         verifyTxBeforeSign(txInfo, {
                             expectedToToken: dstToken.address,
                             expectedRecipient: '', 
-                                                   
+                                                    
                             expectedUserWallet: state.walletAddress,
                             expectedFromAmount: amountWei,
                         });
@@ -8936,18 +9007,40 @@ try {
 } catch (e) {
 
     console.error(
-        '[DOGZ] TRON wallet transactionBuilder error:',
+        '[DOGZ] TRON wallet transactionBuilder error（钱包自身节点构建失败，改用只读节点重试）:',
         e
     );
 
-    throw new Error(
-        '构造 TRON Swap 交易失败: ' +
-        (
-            e && e.message
-                ? e.message
-                : String(e)
-        )
-    );
+   
+    try {
+        transactionWrapper =
+            await tronWeb
+                .transactionBuilder
+                .triggerSmartContract(
+                    contractAddress,
+                    '',
+                    {
+                        feeLimit: feeLimit,
+                        callValue: callValue,
+                        rawParameter: rawData
+                    },
+                    [],
+                    ownerAddress
+                );
+    } catch (fallbackErr) {
+        console.error(
+            '[DOGZ] TRON 只读节点构建交易也失败:',
+            fallbackErr
+        );
+        throw new Error(
+            '构造 TRON Swap 交易失败: ' +
+            (
+                fallbackErr && fallbackErr.message
+                    ? fallbackErr.message
+                    : String(fallbackErr)
+            )
+        );
+    }
 }
 
 
@@ -10045,7 +10138,7 @@ console.log(
                         renderLocalTokenItem(container, item2.symbol, item2.info, currentSymbol2);
                     }
                     var isAddress2 = /^0x[a-fA-F0-9]{40}$/.test(searchVal2) || /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(
-                    searchVal2) || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(searchVal2); 
+                    searchVal2) || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(searchVal2); // Solana base58
                     if (container.children.length === 0) {
                         container.innerHTML =
                             '<div style="padding:20px;text-align:center;color:var(--text-muted);">搜索中...</div>';
@@ -10569,7 +10662,7 @@ console.log(
 
                  
 
-                      
+                       
                         try {
                             if (window.ethereum && typeof window.ethereum.request === 'function') {
                                 var __initialChainIdHex = await Promise.race([
