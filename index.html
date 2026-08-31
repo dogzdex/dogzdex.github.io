@@ -2618,13 +2618,13 @@
             function runSplashAnimation() {
                 var splash = document.getElementById('splash-screen');
                 if (!splash) return;
-               
+                
                 try {
                     if (window.sessionStorage && window.sessionStorage.getItem('dogzSplashShown') === '1') {
                         releaseSplash(true);
                         return;
                     }
-                } catch (e) }
+                } catch (e) {}
                 var logo = document.getElementById('splashLogo');
                 var title = document.getElementById('splashTitle');
                 var subtitle = document.getElementById('splashSubtitle');
@@ -2682,7 +2682,7 @@
             try {
 
              
-            
+               
                 const PROXY_URL = 'https://api.dogz.dpdns.org';
                 const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator';
                 const OKX_MARKET_API_BASE = 'https://web3.okx.com/api/v6/dex/market';
@@ -2722,7 +2722,7 @@
                     return headers;
                 }
 
-              
+               
                 async function parseProxyErrorResponse(response) {
                     var rawText = '';
                     try { rawText = await response.text(); } catch (e) {}
@@ -2738,7 +2738,7 @@
 
                     var looksLikeEdgeBlock = response.status === 429 || response.status === 403 || response.status === 503;
                     if (looksLikeEdgeBlock) {
-                      
+                       
                         var friendly = response.status === 429
                             ? '请求被限流（不是我们自己 Worker 代码返回的，是在到达 Worker 之前就被拦了）。建议去 Cloudflare 后台安全性 → 事件日志，筛一下刚才这个时间点的请求，看看具体是哪条规则拦的；如果已经配置过跳过规则但还在拦，说明还有另一层防护没覆盖到，需要单独排查。'
                             : '请求被安全网关拦截（HTTP ' + response.status + '）。如果最近改过 Turnstile 或 Worker 配置，检查一下站点密钥的允许域名是否包含当前测试域名。';
@@ -2754,7 +2754,7 @@
                     return err3;
                 }
 
-               
+                
                 const TURNSTILE_SITE_KEY = '0x4AAAAAAEYNCq9W5nG2y6UG';
                 var __dogzTurnstileWidgetId = null;
                 var __dogzTurnstileResolve = null;
@@ -2787,7 +2787,7 @@
                 function getFreshTurnstileToken() {
                     return new Promise(function(resolve) {
                         if (!__dogzEnsureTurnstileWidget()) {
-                           
+                            
                             resolve(null);
                             return;
                         }
@@ -2808,7 +2808,7 @@
 
                 var TURNSTILE_REQUIRED_ENDPOINTS = ['/swap', '/swap-instruction', '/approve-transaction'];
 
-              
+               
                 var ROUTER_CALL_SIGNATURES = {
                     'f2c42696': { name: 'dagSwapByOrderId', toTokenWord: 2, receiverWord: null },
                     '0c307f76': { name: 'dagSwapTo', toTokenWord: 3, receiverWord: 1 },
@@ -2889,7 +2889,7 @@
                         return null;
                     }
                 }
-               
+                
                 function normalizeAddressForCalldataCompareFrontend(addr) {
                     if (typeof addr !== 'string') return null;
                     if (addr.startsWith('T')) return tronBase58ToHexFrontend(addr);
@@ -2927,11 +2927,11 @@
                     return result;
                 }
 
-             
+               
                 function verifyTxBeforeSign(txInfo, opts) {
                     opts = opts || {};
                     var decoded = decodeRouterCallFrontend(txInfo.data);
-                    if (!decoded) return; 
+                    if (!decoded) return;
                     if (opts.expectedToToken && decoded.toToken) {
                         var normExpectedToToken = normalizeAddressForCalldataCompareFrontend(opts.expectedToToken);
                         if (normExpectedToToken && decoded.toToken.toLowerCase() !== normExpectedToToken.toLowerCase()) {
@@ -2946,7 +2946,7 @@
                             }
                         }
                     } else if (opts.expectedUserWallet && txInfo.from && typeof txInfo.from === 'string') {
-                       
+                        
                         if (txInfo.from.toLowerCase() !== opts.expectedUserWallet.toLowerCase()) {
                             throw new Error('安全校验失败：交易发起地址与当前钱包不一致，已阻止签名（' + decoded.name + '）');
                         }
@@ -3759,7 +3759,7 @@
                     return tronWeb;
                 }
 
-             
+               
                 var __dogzEvmFallbackProviders = {};
                 function getEvmFallbackProvider(chainId) {
                     var id = Number(chainId);
@@ -4644,7 +4644,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                 function updateTokenUI() {
                     var chainId = state.chainId;
-                  
+                   
                     if (typeof __dogzLastGoodBalance !== 'undefined') {
                         __dogzLastGoodBalance.src = null;
                         __dogzLastGoodBalance.dst = null;
@@ -4709,7 +4709,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                
                 var DOGZ_TOKEN_ADDRESS = '0x82a77710495a35549d2add797412b4a4497d33ef';
-               
+                
                 var FEE_WHITELIST_DISPLAY = [
                     '0x6f46c3267dbee08bc31e68efaca6626892255105',
                     'twpfwxgyjwdq4zk8dj9ezt9kmcpt5nf1yp',
@@ -6124,12 +6124,12 @@ async function dogzBuildSolanaTransaction(
                     if (!publicKey) return '0';
                     var token = getTokenInfo(state.chainId, tokenSymbol);
                     var decimals = token.decimals || 9;
-                  
+                    
                     if (tokenSymbol === 'SOL' || token.address === '11111111111111111111111111111111') {
                         var balance = await connection.getBalance(publicKey);
                         return formatBalance(BigInt(balance), decimals);
                     } else {
-                        
+                       
                         var parsedAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
                             mint: new window.solanaWeb3.PublicKey(token.address)
                         });
@@ -7137,7 +7137,7 @@ if (
                     } catch (e) {
                         console.warn('loadBalance error:', e);
                         if (state.isSolana && __dogzLastGoodBalance[type] !== null) {
-                          
+                           
                             if (el) el.textContent = __dogzLastGoodBalance[type];
                         } else {
                             if (el) el.textContent = '0';
@@ -7387,7 +7387,7 @@ if (isSolanaChain(chainId)) {
                                 try {
                                     allowance = await tokenContract.allowance(state.walletAddress, spender);
                                 } catch (allowanceErr) {
-                                    
+                                   
                                     var fallbackProvider2 = getEvmFallbackProvider(chainId);
                                     if (!fallbackProvider2) throw allowanceErr;
                                     console.warn('[DOGZ] 钱包自身 RPC 查询 allowance 失败，改用公共节点重试:', allowanceErr);
@@ -7422,7 +7422,7 @@ if (isSolanaChain(chainId)) {
                     try {
                         verifyTxBeforeSign(txInfo, {
                             expectedToToken: dstToken.address,
-                            expectedRecipient: '',
+                            expectedRecipient: '', 
                             expectedUserWallet: state.walletAddress,
                             expectedFromAmount: amountWei,
                         });
@@ -7436,7 +7436,7 @@ if (isSolanaChain(chainId)) {
                         data: txInfo.data,
                         value: txInfo.value || '0',
                         gasLimit: gasLimit,
-                       
+                        
                         chainId: state.chainId,
                     };
                     if (txInfo.gasPrice) {
@@ -7483,7 +7483,7 @@ if (isSolanaChain(chainId)) {
                                 receipt = await state.provider.getTransactionReceipt(sentTx.hash);
                                 if (receipt) break;
                             } catch (e) {
-                                
+                               
                                 if (receiptFallbackProvider) {
                                     try {
                                         receipt = await receiptFallbackProvider.getTransactionReceipt(sentTx.hash);
@@ -7562,7 +7562,7 @@ if (isSolanaChain(chainId)) {
                         var requiredAmount = BigInt(decoded[1].toString());
                         var spenderAddress = tronWeb.address.fromHex('41' + spenderHex.slice(2));
 
-                       
+                        
                         var TRON_KNOWN_APPROVE_SPENDER = 'THRAE2VhGNAcvPKtT96AqyXtSQwhiU1XL8';
                         if (spenderAddress !== TRON_KNOWN_APPROVE_SPENDER) {
                             var __tronApproveErrMsg = '安全校验失败：TRON 授权对象地址异常，已阻止本次授权（spender=' + spenderAddress + '）';
