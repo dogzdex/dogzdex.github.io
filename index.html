@@ -407,8 +407,6 @@
 
         })();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
-<script>new VConsole();</script>
 </head>
 <style>
     * {
@@ -2620,7 +2618,7 @@
             function runSplashAnimation() {
                 var splash = document.getElementById('splash-screen');
                 if (!splash) return;
-               
+                
                 try {
                     if (window.sessionStorage && window.sessionStorage.getItem('dogzSplashShown') === '1') {
                         releaseSplash(true);
@@ -2684,7 +2682,7 @@
             try {
 
              
-                
+               
                 const PROXY_URL = 'https://api.dogz.dpdns.org';
                 const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator';
                 const OKX_MARKET_API_BASE = 'https://web3.okx.com/api/v6/dex/market';
@@ -2695,7 +2693,7 @@
                 const MAX_RETRIES = 2;
 
                
-                const WORKER_AUTH_TOKEN = '6d6caaf66cf23f60beee62d6cb58fa6b6342a923b29c0f3f7d2e1d3d0ec1f528';
+                const WORKER_AUTH_TOKEN = '';
 
                
                 var __dogzBoundProviderRegistry = (typeof WeakSet !== 'undefined') ? new WeakSet() : null;
@@ -2724,7 +2722,7 @@
                     return headers;
                 }
 
-               
+              
                 async function parseProxyErrorResponse(response) {
                     var rawText = '';
                     try { rawText = await response.text(); } catch (e) {}
@@ -2740,7 +2738,7 @@
 
                     var looksLikeEdgeBlock = response.status === 429 || response.status === 403 || response.status === 503;
                     if (looksLikeEdgeBlock) {
-                       
+                        
                         var friendly = response.status === 429
                             ? '请求被限流（不是我们自己 Worker 代码返回的，是在到达 Worker 之前就被拦了）。建议去 Cloudflare 后台安全性 → 事件日志，筛一下刚才这个时间点的请求，看看具体是哪条规则拦的；如果已经配置过跳过规则但还在拦，说明还有另一层防护没覆盖到，需要单独排查。'
                             : '请求被安全网关拦截（HTTP ' + response.status + '）。如果最近改过 Turnstile 或 Worker 配置，检查一下站点密钥的允许域名是否包含当前测试域名。';
@@ -2883,7 +2881,7 @@
                         }
                         for (var k = 0; k < addr.length && addr[k] === '1'; k++) bytes.push(0);
                         bytes.reverse();
-                        
+                       
                         if (bytes.length !== 25) return null;
                         var hash20 = bytes.slice(1, 21);
                         return '0x' + hash20.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
@@ -2996,7 +2994,7 @@
                     var queryString = searchParams.toString();
                     var fullUrl = OKX_API_BASE + endpoint + (queryString ? '?' + queryString : '');
                     var payload = { url: fullUrl };
-                   
+                    
                     if (TURNSTILE_REQUIRED_ENDPOINTS.indexOf(endpoint) !== -1) {
                         try {
                             var __ts = await getFreshTurnstileToken();
@@ -3045,7 +3043,7 @@
                     var queryString = searchParams.toString();
                     var fullUrl = OKX_MARKET_API_BASE + endpoint + (queryString ? '?' + queryString : '');
                     var payload = { url: fullUrl };
-                    
+                   
                     var controller = new AbortController();
                     var timeoutId = setTimeout(function() { controller.abort(); }, REQUEST_TIMEOUT);
                     try {
@@ -3761,7 +3759,7 @@
                     return tronWeb;
                 }
 
-              
+               
                 var __dogzEvmFallbackProviders = {};
                 function getEvmFallbackProvider(chainId) {
                     var id = Number(chainId);
@@ -4646,7 +4644,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                 function updateTokenUI() {
                     var chainId = state.chainId;
-                  
+                   
                     if (typeof __dogzLastGoodBalance !== 'undefined') {
                         __dogzLastGoodBalance.src = null;
                         __dogzLastGoodBalance.dst = null;
@@ -6126,7 +6124,7 @@ async function dogzBuildSolanaTransaction(
                     if (!publicKey) return '0';
                     var token = getTokenInfo(state.chainId, tokenSymbol);
                     var decimals = token.decimals || 9;
-                   
+                    
                     if (tokenSymbol === 'SOL' || token.address === '11111111111111111111111111111111') {
                         var balance = await connection.getBalance(publicKey);
                         return formatBalance(BigInt(balance), decimals);
@@ -6722,7 +6720,7 @@ if (
                             }
                         }
                        
-                       
+                      
                         return false;
                     } catch (e) {
                         console.warn('[DOGZ] ensureTronWalletNetwork error:', e);
@@ -7109,7 +7107,7 @@ if (
                             if (el) el.textContent = balSol;
                             __dogzLastGoodBalance[type] = balSol;
                         } else {
-                            
+                           
                             var evmBalanceProvider = state.provider;
                             try {
                                 if (token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
@@ -7420,7 +7418,7 @@ if (isSolanaChain(chainId)) {
                     var gasLimit = BigInt(txInfo.gas || '500000');
                     gasLimit = gasLimit + gasLimit / 5n;
 
-                    
+                   
                     try {
                         verifyTxBeforeSign(txInfo, {
                             expectedToToken: dstToken.address,
@@ -7438,7 +7436,28 @@ if (isSolanaChain(chainId)) {
                         data: txInfo.data,
                         value: txInfo.value || '0',
                         gasLimit: gasLimit,
+                       
+                        chainId: state.chainId,
                     };
+                    if (txInfo.gasPrice) {
+                        try {
+                            tx.gasPrice = BigInt(txInfo.gasPrice);
+                        } catch (e) {}
+                    }
+                    try {
+                        var nonce;
+                        try {
+                            nonce = await state.provider.getTransactionCount(state.walletAddress, 'pending');
+                        } catch (nonceErr) {
+                            var nonceFallbackProvider = getEvmFallbackProvider(state.chainId);
+                            if (!nonceFallbackProvider) throw nonceErr;
+                            console.warn('[DOGZ] 钱包自身 RPC 查询 nonce 失败，改用公共节点重试:', nonceErr);
+                            nonce = await nonceFallbackProvider.getTransactionCount(state.walletAddress, 'pending');
+                        }
+                        tx.nonce = nonce;
+                    } catch (e) {
+                        console.warn('[DOGZ] nonce 查询完全失败（钱包节点和公共节点都不行），交给钱包自己在签名时处理:', e);
+                    }
                     var sentTx;
                     try {
                         sentTx = await state.signer.sendTransaction(tx);
@@ -7455,6 +7474,7 @@ if (isSolanaChain(chainId)) {
                         receipt = await sentTx.wait();
                     } catch (waitError) {
                         console.warn('wait() error, polling receipt:', waitError);
+                        var receiptFallbackProvider = getEvmFallbackProvider(state.chainId);
                         var attempts = 0;
                         var maxAttempts = 10;
                         while (attempts < maxAttempts) {
@@ -7462,7 +7482,15 @@ if (isSolanaChain(chainId)) {
                             try {
                                 receipt = await state.provider.getTransactionReceipt(sentTx.hash);
                                 if (receipt) break;
-                            } catch (e) {}
+                            } catch (e) {
+                               
+                                if (receiptFallbackProvider) {
+                                    try {
+                                        receipt = await receiptFallbackProvider.getTransactionReceipt(sentTx.hash);
+                                        if (receipt) break;
+                                    } catch (e2) {}
+                                }
+                            }
                             attempts++;
                         }
                         if (!receipt) {
@@ -7534,7 +7562,7 @@ if (isSolanaChain(chainId)) {
                         var requiredAmount = BigInt(decoded[1].toString());
                         var spenderAddress = tronWeb.address.fromHex('41' + spenderHex.slice(2));
 
-                        
+                       
                         var TRON_KNOWN_APPROVE_SPENDER = 'THRAE2VhGNAcvPKtT96AqyXtSQwhiU1XL8';
                         if (spenderAddress !== TRON_KNOWN_APPROVE_SPENDER) {
                             var __tronApproveErrMsg = '安全校验失败：TRON 授权对象地址异常，已阻止本次授权（spender=' + spenderAddress + '）';
@@ -10516,11 +10544,11 @@ console.log(
                     if (effective === 'dark') {
                         if (logo) logo.src =
                             'https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350';
-                        if (footer) footer.src = 'https://web3.okx.com/cdn/assets/imgs/259/2B3A8EAD021B254A.png?x-oss-process=image/format,webp/resize,w_176,h_28,type_6/ignore-error,1';
+                        if (footer) footer.src = 'https://i.hd-r.cn/07cce604-676b-400d-9d73-0ff20dea760a.png';
                     } else {
                         if (logo) logo.src =
                             'https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350';
-                        if (footer) footer.src = 'https://web3.okx.com/cdn/assets/imgs/259/E9A05D2BB0B40383.png?x-oss-process=image/format,webp/resize,w_176,h_28,type_6/ignore-error,1';
+                        if (footer) footer.src = 'https://i.hd-r.cn/bcc7df42-30d6-45b0-b58b-dde6176a3a6f.png';
                     }
                     var themeBtn = document.getElementById('themeToggleBtn');
                     if (themeBtn) {
