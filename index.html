@@ -2759,8 +2759,8 @@
                     if (looksLikeEdgeBlock) {
                         
                         var friendly = response.status === 429
-                            ? '请求被限流（不是我们自己 Worker 代码返回的，是在到达 Worker 之前就被拦了）。建议去 Cloudflare 后台安全性 → 事件日志，筛一下刚才这个时间点的请求，看看具体是哪条规则拦的；如果已经配置过跳过规则但还在拦，说明还有另一层防护没覆盖到，需要单独排查。'
-                            : '请求被安全网关拦截（HTTP ' + response.status + '）。如果最近改过 Turnstile 或 Worker 配置，检查一下站点密钥的允许域名是否包含当前测试域名。';
+                            ? '请求被限流'
+                            : '请求被安全网关拦截（HTTP ' + response.status + '）';
                         var err2 = new Error(friendly);
                         err2.httpStatus = response.status;
                         err2.isEdgeBlock = true;
