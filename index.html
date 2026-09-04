@@ -426,6 +426,104 @@
 
         })();
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
+<script>new VConsole();</script>
+<script>
+(function() {
+  
+    var __LOGS = [];
+    var MAX_LOGS = 3000; 
+
+   
+    var origLog = console.log;
+    var origWarn = console.warn;
+    var origError = console.error;
+    var origInfo = console.info;
+
+    function pushLog(type, args) {
+        try {
+            var msg = Array.from(args).map(function(a) {
+                if (typeof a === 'object') {
+                    try { return JSON.stringify(a, null, 2); } catch(e) { return String(a); }
+                }
+                return String(a);
+            }).join(' ');
+            __LOGS.push({ type: type, msg: msg, time: new Date().toLocaleTimeString() });
+            if (__LOGS.length > MAX_LOGS) __LOGS.shift();
+        } catch(e) {}
+    }
+
+    
+    console.log = function() { pushLog('LOG', arguments); return origLog.apply(console, arguments); };
+    console.warn = function() { pushLog('WARN', arguments); return origWarn.apply(console, arguments); };
+    console.error = function() { pushLog('ERROR', arguments); return origError.apply(console, arguments); };
+    console.info = function() { pushLog('INFO', arguments); return origInfo.apply(console, arguments); };
+
+   
+    window.getLogs = function() {
+        return __LOGS.map(function(l) { return '[' + l.time + '] [' + l.type + '] ' + l.msg; }).join('\n');
+    };
+
+    
+    setTimeout(function() {
+        var btn = document.createElement('div');
+        btn.innerHTML = '📋 复制日志';
+        btn.style.cssText = 'position:fixed;bottom:80px;right:10px;z-index:99999;background:#1a1a2e;color:#fff;padding:6px 12px;border-radius:20px;font-size:13px;font-family:sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.4);cursor:pointer;opacity:0.85;border:1px solid #6366f1;';
+        
+        btn.onclick = function() {
+            var text = window.getLogs();
+           
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:999999;display:flex;align-items:center;justify-content:center;';
+            
+            var box = document.createElement('div');
+            box.style.cssText = 'background:#fff;color:#000;width:90%;max-height:80%;border-radius:12px;padding:16px;display:flex;flex-direction:column;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
+            
+            var title = document.createElement('div');
+            title.textContent = '📄 全部日志 (' + __LOGS.length + ' 条)';
+            title.style.cssText = 'font-weight:bold;font-size:16px;margin-bottom:8px;color:#333;';
+            box.appendChild(title);
+            
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'flex:1;width:100%;min-height:200px;border:1px solid #ccc;border-radius:8px;padding:8px;font-size:12px;font-family:monospace;background:#f9f9f9;color:#000;resize:vertical;';
+            box.appendChild(ta);
+            
+            var btnRow = document.createElement('div');
+            btnRow.style.cssText = 'display:flex;gap:10px;margin-top:12px;justify-content:flex-end;';
+            
+            var copyBtn = document.createElement('button');
+            copyBtn.textContent = '✅ 复制到剪贴板';
+            copyBtn.style.cssText = 'background:#4f46e5;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;';
+            copyBtn.onclick = function() {
+                ta.select();
+                try {
+                    document.execCommand('copy');
+                    alert('✅ 已复制 ' + __LOGS.length + ' 条日志到剪贴板！');
+                } catch(e) {
+                    alert('复制失败，请手动长按文本框全选复制');
+                }
+            };
+            btnRow.appendChild(copyBtn);
+            
+            var closeBtn = document.createElement('button');
+            closeBtn.textContent = '关闭';
+            closeBtn.style.cssText = 'background:#ef4444;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;';
+            closeBtn.onclick = function() { document.body.removeChild(overlay); };
+            btnRow.appendChild(closeBtn);
+            
+            box.appendChild(btnRow);
+            overlay.appendChild(box);
+            document.body.appendChild(overlay);
+            
+           
+            ta.select();
+        };
+        
+        document.body.appendChild(btn);
+    }, 1500); 
+})();
+</script>
 </head>
 <style>
     * {
@@ -2759,7 +2857,7 @@
                     if (looksLikeEdgeBlock) {
                         
                         var friendly = response.status === 429
-                            ? '请求被限流'
+                            ? '请求被限流（'
                             : '请求被安全网关拦截（HTTP ' + response.status + '）';
                         var err2 = new Error(friendly);
                         err2.httpStatus = response.status;
@@ -3158,7 +3256,7 @@
                 };
                 var CHAIN_LIST = Object.keys(CHAINS).map(function(k) { return CHAINS[k]; });
 
-              
+               
                 var RPC_FALLBACKS = {
                     1: [
                         'https://ethereum-rpc.publicnode.com',
@@ -3868,10 +3966,10 @@
 
                
                 var __dogzEvmFallbackProviders = {};
-                var __dogzRpcHealth = {}; // chainId -> { url: { ok: bool, lastCheck: timestamp, failCount: number } }
-                var __dogzRpcCurrentIndex = {}; // chainId -> current fallback index
+                var __dogzRpcHealth = {}; 
+                var __dogzRpcCurrentIndex = {}; 
 
-                
+               
                 function withTimeout(promise, ms, label) {
                     return new Promise(function(resolve, reject) {
                         var timer = setTimeout(function() {
@@ -3882,7 +3980,7 @@
                     });
                 }
 
-                
+               
                 function markRpcHealth(chainId, url, ok) {
                     var id = Number(chainId);
                     if (!__dogzRpcHealth[id]) __dogzRpcHealth[id] = {};
@@ -3898,7 +3996,7 @@
                     var id = Number(chainId);
                     var urls = getRpcFallbacks(id);
                     if (urls.length === 0) return null;
-                    
+                   
                     var bestUrl = null;
                     var bestScore = Infinity;
                     for (var i = 0; i < urls.length; i++) {
@@ -3908,7 +4006,7 @@
                         if (health) {
                             if (!health.ok) score += 1000;
                             score += health.failCount * 10;
-                           
+                            
                             if (Date.now() - health.lastCheck < 30000 && !health.ok) score += 500;
                         }
                         score += i; 
@@ -3930,7 +4028,7 @@
                     }
                 }
 
-               
+                
                 async function evmCallWithFallback(chainId, fn, label) {
                     var id = Number(chainId);
                     var urls = getRpcFallbacks(id);
@@ -6877,12 +6975,14 @@ if (
                     return '0x' + id.toString(16).toLowerCase();
                 }
 
+                var __dogzLastTronSwitchAttempt = 0;
                 async function ensureTronWalletNetwork(adapter, walletContext) {
                 
                     try {
                         var targetChainId = Number(state.chainId);
                         if (!isTronChain(targetChainId)) { targetChainId = 728126428; }
                         var targetHex = getTronChainHex(targetChainId);
+                        
                         if (adapter && typeof adapter.network === 'function') {
                             var network = await adapter.network();
                             console.log('[DOGZ] Current TRON wallet network:', network);
@@ -6893,10 +6993,60 @@ if (
                                 return true;
                             }
                             if (adapter && typeof adapter.switchChain === 'function') {
+                                
+                                var now = Date.now();
+                                if (now - __dogzLastTronSwitchAttempt < 10000) {
+                                    console.warn('[DOGZ] TRON switch attempt throttled, skipping');
+                                    return false;
+                                }
+                                __dogzLastTronSwitchAttempt = now;
                                 console.log('[DOGZ] Adapter switching TRON network:', targetHex);
                                 await adapter.switchChain(targetHex);
                                 return true;
                             }
+                        }
+                        
+                        var ctxTronWeb = walletContext && (walletContext.tronWeb || (walletContext.provider && walletContext.provider.tronWeb));
+                        if (ctxTronWeb && ctxTronWeb.fullNode && ctxTronWeb.fullNode.host) {
+                            var currentHost = String(ctxTronWeb.fullNode.host).toLowerCase();
+                            var isMainnet = (currentHost.indexOf('api.trongrid.io') !== -1 ||
+                                currentHost.indexOf('trongrid.io') !== -1) &&
+                                currentHost.indexOf('shasta') === -1 &&
+                                currentHost.indexOf('nile') === -1;
+                            var isShasta = currentHost.indexOf('shasta') !== -1;
+                            var isNile = currentHost.indexOf('nile') !== -1;
+                            console.log('[DOGZ] TRON wallet current node host:', currentHost,
+                                'mainnet:', isMainnet, 'shasta:', isShasta, 'nile:', isNile);
+                            if (isMainnet && targetChainId === 728126428) {
+                                return true; 
+                            }
+                           
+                            if ((isShasta || isNile) && targetChainId === 728126428) {
+                                var now2 = Date.now();
+                                if (now2 - __dogzLastTronSwitchAttempt < 10000) {
+                                    console.warn('[DOGZ] TRON switch attempt throttled, skipping');
+                                    return false;
+                                }
+                                __dogzLastTronSwitchAttempt = now2;
+                                var ctxProvider = walletContext && walletContext.provider;
+                                if (ctxProvider && typeof ctxProvider.request === 'function') {
+                                    try {
+                                        console.log('[DOGZ] TRON wallet on testnet, requesting switch to mainnet via provider.request');
+                                        await ctxProvider.request({
+                                            method: 'tron_switchChain',
+                                            params: [{ chainId: targetHex }]
+                                        });
+                                        return true;
+                                    } catch (switchErr) {
+                                        console.warn('[DOGZ] tron_switchChain failed:', switchErr);
+                                    }
+                                }
+                               
+                                showToast('检测到钱包当前在 TRON 测试网，请在钱包设置中切换至 TRON 主网后重试', 'warning');
+                                return false;
+                            }
+                           
+                            return true;
                         }
                        
                       
@@ -7435,7 +7585,23 @@ if (isSolanaChain(chainId)) {
                     updateMetaBlockVisibility(false);
                 }
 
+                var __dogzQuoteInFlight = false;
+                var __dogzConsecutive429 = 0;
+                var __dogzLastQuoteTime = 0;
                 async function quote() {
+                    // 并发控制：防止同时发出多个quote请求导致限流
+                    if (__dogzQuoteInFlight) {
+                        console.log('[DOGZ] Quote already in flight, skipping');
+                        return;
+                    }
+                    // 最小请求间隔：300ms，避免快速操作时频繁请求
+                    var nowMs = Date.now();
+                    if (nowMs - __dogzLastQuoteTime < 300) {
+                        console.log('[DOGZ] Quote too frequent, skipping');
+                        return;
+                    }
+                    __dogzQuoteInFlight = true;
+                    __dogzLastQuoteTime = nowMs;
                     var amountInput = document.getElementById('amountInput');
                     var amount = amountInput ? amountInput.value : '';
                     var amountNum = parseFloat(amount) || 0;
@@ -7453,6 +7619,7 @@ if (isSolanaChain(chainId)) {
                             badge.className = 'change-badge neutral'; }
                         updateSwapButton(amountNum);
                         updateUsdPrices();
+                        __dogzQuoteInFlight = false;
                         return;
                     }
                     var chainId = state.chainId;
@@ -7464,6 +7631,7 @@ if (isSolanaChain(chainId)) {
                             updateDstInputEmptyState(); }
                         updateSwapButton(amountNum);
                         updateUsdPrices();
+                        __dogzQuoteInFlight = false;
                         return;
                     }
                     try {
@@ -7504,16 +7672,32 @@ if (isSolanaChain(chainId)) {
                         state.lastQuoteData = null;
                         var msg2 = e.message;
                         if (msg2.includes('429') || msg2.includes('Too Many Requests') || msg2.includes('1015')) {
+                            __dogzConsecutive429++;
                             msg2 = '请求过于频繁，请稍候再试 (429)';
-                            setTimeout(function() { if (document.getElementById('amountInput').value) quote(); }, 5000);
-                        } else if (msg2.includes('Failed to fetch') || msg2.includes('NetworkError') || msg2.includes(
-                            'AbortError') || msg2.includes('signal is aborted')) {
-                            msg2 = '网络请求超时，请检查网络或稍后重试';
+                            
+                            if (__dogzConsecutive429 <= 3) {
+                                var retryDelay = __dogzConsecutive429 === 1 ? 5000 :
+                                    __dogzConsecutive429 === 2 ? 15000 : 30000;
+                                console.log('[DOGZ] 429 rate limited, retrying in', retryDelay, 'ms (attempt', __dogzConsecutive429, ')');
+                                setTimeout(function() {
+                                    if (document.getElementById('amountInput').value) { quote(); }
+                                }, retryDelay);
+                            } else {
+                                console.warn('[DOGZ] 429 rate limited too many times, stopped auto-retry');
+                                showToast('报价服务暂时不可用，请稍后手动刷新', 'warning');
+                            }
+                        } else {
+                            __dogzConsecutive429 = 0;
+                            if (msg2.includes('Failed to fetch') || msg2.includes('NetworkError') || msg2.includes(
+                                'AbortError') || msg2.includes('signal is aborted')) {
+                                msg2 = '网络请求超时，请检查网络或稍后重试';
+                            }
                         }
                         showToast('获取报价失败: ' + msg2, 'error');
                         updateUsdPrices();
                     } finally {
                         updateSwapButton(amountNum);
+                        __dogzQuoteInFlight = false;
                     }
                 }
 
@@ -7584,7 +7768,7 @@ if (isSolanaChain(chainId)) {
                                         'allowance via wallet RPC'
                                     );
                                 } catch (allowanceErr) {
-                                    
+                                   
                                     console.warn('[DOGZ] 钱包自身 RPC 查询 allowance 失败，改用多节点 fallback:', allowanceErr.message);
                                     allowance = await evmCallWithFallback(chainId, function(provider) {
                                         var roContract = new ethers.Contract(srcToken.address, [
@@ -7663,6 +7847,17 @@ if (isSolanaChain(chainId)) {
                     } catch (e) {
                         console.warn('[DOGZ] nonce 查询完全失败（钱包节点和公共节点都不行），交给钱包自己在签名时处理:', e);
                     }
+                   
+                    try {
+                        var __walletRpcTest = await withTimeout(
+                            state.provider.getBlockNumber(),
+                            5000,
+                            'pre-send wallet RPC check'
+                        );
+                    } catch (__rpcCheckErr) {
+                        console.warn('[DOGZ] 交易前钱包RPC检测失败，仍尝试发送（钱包可能使用其他节点）:', __rpcCheckErr.message);
+                        showToast('检测到钱包节点网络不稳定，正在尝试交易...', 'warning');
+                    }
                     var sentTx;
                     try {
                         sentTx = await state.signer.sendTransaction(tx);
@@ -7672,7 +7867,7 @@ if (isSolanaChain(chainId)) {
                             showToast('用户取消交易', 'warning');
                             throw new Error('USER_REJECTED_TX');
                         }
-                        
+                       
                         var errMsg = e.message || String(e);
                         var isNetworkError = /network|fetch|timeout|ECONNREFUSED|ENOTFOUND|could not detect|invalid response|bad response|HTTP|403|429|502|503|504/i.test(errMsg);
                         if (isNetworkError) {
@@ -9961,7 +10156,7 @@ console.log(
 
             
                 async function switchEvmNetwork(targetChainId) {
-                    
+                   
                     var rawProvider = state.evmRawProvider || window.ethereum;
                     if (!rawProvider) { throw new Error('未检测到 EVM 钱包'); }
                     var chain = getChain(targetChainId);
@@ -9978,7 +10173,9 @@ console.log(
                             var explorer = chain.explorer || '';
                             explorer = String(explorer).replace(/\/tx\/?$/, '');
                             
-                            var rpcUrls = getRpcFallbacks(targetChainId);
+                            var allRpcUrls = getRpcFallbacks(targetChainId);
+                            var rpcUrls = allRpcUrls.slice(0, 2);
+                            if (rpcUrls.length === 0) rpcUrls = [chain.rpc];
                             await rawProvider.request({
                                 method: 'wallet_addEthereumChain',
                                 params: [{
@@ -10060,7 +10257,7 @@ console.log(
                             await switchEvmNetwork(targetChainId);
                             state.chainId = targetChainId;
                             autoSwitchTokens(targetChainId);
-                            
+                           
                             var __switchRawProvider = state.evmRawProvider || window.ethereum;
                             state.provider = new ethers.BrowserProvider(__switchRawProvider);
                             state.signer = await state.provider.getSigner();
@@ -10860,7 +11057,7 @@ console.log(
                             openSettingsModal();
                         });
 
-                       
+                        
                         function getActiveEvmRawProvider() {
                             return state.evmRawProvider || window.ethereum;
                         }
