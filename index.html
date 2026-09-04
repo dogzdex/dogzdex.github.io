@@ -430,7 +430,7 @@
 <script>new VConsole();</script>
 <script>
 (function() {
-  
+   
     var __LOGS = [];
     var MAX_LOGS = 3000; 
 
@@ -453,18 +453,18 @@
         } catch(e) {}
     }
 
-    
+  
     console.log = function() { pushLog('LOG', arguments); return origLog.apply(console, arguments); };
     console.warn = function() { pushLog('WARN', arguments); return origWarn.apply(console, arguments); };
     console.error = function() { pushLog('ERROR', arguments); return origError.apply(console, arguments); };
     console.info = function() { pushLog('INFO', arguments); return origInfo.apply(console, arguments); };
 
-   
+    
     window.getLogs = function() {
         return __LOGS.map(function(l) { return '[' + l.time + '] [' + l.type + '] ' + l.msg; }).join('\n');
     };
 
-    
+   
     setTimeout(function() {
         var btn = document.createElement('div');
         btn.innerHTML = '📋 复制日志';
@@ -516,7 +516,7 @@
             overlay.appendChild(box);
             document.body.appendChild(overlay);
             
-           
+      
             ta.select();
         };
         
@@ -2599,7 +2599,7 @@
                     </div>
                 </div>
 
-                <!-- Swap Action Button -->
+               
                 <button class="btn-primary" id="swapActionBtn"><i class="fas fa-arrows-spin"></i> 兑换</button>
             </div>
         </div>
@@ -2857,7 +2857,7 @@
                     if (looksLikeEdgeBlock) {
                         
                         var friendly = response.status === 429
-                            ? '请求被限流（'
+                            ? '请求被限流'
                             : '请求被安全网关拦截（HTTP ' + response.status + '）';
                         var err2 = new Error(friendly);
                         err2.httpStatus = response.status;
@@ -3256,7 +3256,9 @@
                 };
                 var CHAIN_LIST = Object.keys(CHAINS).map(function(k) { return CHAINS[k]; });
 
-               
+                // 多 RPC 节点 fallback 表：每条链配置多个独立 RPC 端点，
+                // 当钱包内置节点或主节点超时时自动轮询切换。
+                // 端点选择原则：优先公共节点(publicnode/ankr)，避免单一服务商故障导致整链不可用。
                 var RPC_FALLBACKS = {
                     1: [
                         'https://ethereum-rpc.publicnode.com',
@@ -3332,7 +3334,7 @@
                         'https://scroll-rpc.publicnode.com'
                     ]
                 };
-                
+               
                 function getRpcFallbacks(chainId) {
                     var id = Number(chainId);
                     var list = RPC_FALLBACKS[id] ? RPC_FALLBACKS[id].slice() : [];
@@ -3967,9 +3969,9 @@
                
                 var __dogzEvmFallbackProviders = {};
                 var __dogzRpcHealth = {}; 
-                var __dogzRpcCurrentIndex = {}; 
+                var __dogzRpcCurrentIndex = {};
 
-               
+                
                 function withTimeout(promise, ms, label) {
                     return new Promise(function(resolve, reject) {
                         var timer = setTimeout(function() {
@@ -3991,7 +3993,7 @@
                     else __dogzRpcHealth[id][url].failCount = 0;
                 }
 
-               
+                
                 function getEvmFallbackProvider(chainId) {
                     var id = Number(chainId);
                     var urls = getRpcFallbacks(id);
@@ -4028,7 +4030,7 @@
                     }
                 }
 
-                
+               
                 async function evmCallWithFallback(chainId, fn, label) {
                     var id = Number(chainId);
                     var urls = getRpcFallbacks(id);
@@ -5366,6 +5368,7 @@ function getTronWalletSigningWeb(walletKey) {
            
                 function pickEvmProvider() {
                     
+                    
                     if (dogzEip6963Providers.length > 0) {
                         var trustAnnounced = dogzEip6963Providers.find(function(p) {
                             var info = p.info || {};
@@ -5376,14 +5379,29 @@ function getTronWalletSigningWeb(walletKey) {
                         if (trustAnnounced) return trustAnnounced.provider;
                     }
                     
+                    
+                    if (window.trustwallet && window.trustwallet.ethereum) {
+                        return window.trustwallet.ethereum;
+                    }
+                    
+                   
                     if (typeof window.ethereum !== 'undefined') {
                         if (Array.isArray(window.ethereum.providers) && window.ethereum.providers.length > 0) {
                             var trustProvider = window.ethereum.providers.find(function(p) {
-                                return p && (p.isTrust || p.isTrustWallet);
+                                return p && (p.isTrust || p.isTrustWallet ||
+                                    (p.providerName && String(p.providerName).toLowerCase().indexOf('trust') !== -1));
                             });
                             if (trustProvider) return trustProvider;
                             return window.ethereum.providers[0];
                         }
+                        if (window.ethereum.isTrust || window.ethereum.isTrustWallet) {
+                            return window.ethereum;
+                        }
+                        return window.ethereum;
+                    }
+                    
+                   
+                    if (window.isTrust && window.ethereum) {
                         return window.ethereum;
                     }
                     
@@ -5398,7 +5416,8 @@ function getTronWalletSigningWeb(walletKey) {
                     var found = pickEvmProvider();
                     if (found) return found;
                     window.dispatchEvent(new Event('eip6963:requestProvider'));
-                    for (var i = 0; i < 25; i++) {
+                   
+                    for (var i = 0; i < 50; i++) {
                         await new Promise(function(resolve) { setTimeout(resolve, 200); });
                         found = pickEvmProvider();
                         if (found) {
@@ -5413,7 +5432,7 @@ function getTronWalletSigningWeb(walletKey) {
                 async function connectEvmWallet() {
                     var ethereumProvider = await waitForEvmProvider();
                     if (!ethereumProvider) {
-                        showToast('未检测到 EVM 钱包，请安装 MetaMask、Trust Wallet 等钱包，或在其 DApp 浏览器中打开本页面',
+                        showToast('未检测到 EVM 钱包',
                             'warning');
                         return null;
                     }
@@ -5428,7 +5447,7 @@ function getTronWalletSigningWeb(walletKey) {
                         }
                         var currentChainId = parseInt(chainIdHex, 16);
                         if (!CHAINS[currentChainId]) {
-                            showToast('当前网络不支持，请切换到以太坊、BNB Chain等支持的网络', 'warning');
+                            showToast('当前网络不支持', 'warning');
                             try {
                                 await ethereumProvider.request({
                                     method: 'wallet_switchEthereumChain',
@@ -5444,6 +5463,36 @@ function getTronWalletSigningWeb(walletKey) {
                         var signer = await provider.getSigner();
                         var finalChainIdHex = await ethereumProvider.request({ method: 'eth_chainId' });
                         var finalChainId = parseInt(finalChainIdHex, 16);
+                        
+                        try {
+                            var __testProvider = new ethers.BrowserProvider(ethereumProvider);
+                            await withTimeout(__testProvider.getBlockNumber(), 5000, 'post-connect RPC check');
+                            console.log('[DOGZ] 钱包RPC健康检测通过');
+                        } catch (__rpcErr) {
+                            console.warn('[DOGZ] 钱包RPC健康检测失败，尝试通过 wallet_addEthereumChain 切换到稳定节点:', __rpcErr.message);
+                            try {
+                                var __chain = CHAINS[finalChainId];
+                                if (__chain) {
+                                    var __stableRpcs = getRpcFallbacks(finalChainId).slice(0, 2);
+                                    var __explorer = __chain.explorer ? String(__chain.explorer).replace(/\/tx\/?$/, '') : '';
+                                    await ethereumProvider.request({
+                                        method: 'wallet_addEthereumChain',
+                                        params: [{
+                                            chainId: '0x' + Number(finalChainId).toString(16),
+                                            chainName: __chain.name,
+                                            nativeCurrency: { name: __chain.native, symbol: __chain.native, decimals: 18 },
+                                            rpcUrls: __stableRpcs,
+                                            blockExplorerUrls: __explorer ? [__explorer] : undefined
+                                        }]
+                                    });
+                                    console.log('[DOGZ] 已通过 wallet_addEthereumChain 更新钱包RPC节点');
+                                    showToast('已为钱包切换到稳定RPC节点，请重试交易', 'info');
+                                }
+                            } catch (__addErr) {
+                                console.warn('[DOGZ] wallet_addEthereumChain 失败:', __addErr);
+                                showToast('检测到钱包RPC节点不稳定，建议在钱包设置中手动切换RPC', 'warning');
+                            }
+                        }
                         return { provider: provider, signer: signer, address: accounts[0], chainId: finalChainId, rawProvider: ethereumProvider };
                     } catch (e) {
                         console.error('EVM connect error:', e);
@@ -6113,7 +6162,7 @@ async function dogzBuildSolanaTransaction(
         showToast(
             isFileProtocol
                 ? '当前页面通过 file:// 打开，无法检测 Solana 钱包，请使用 HTTPS 地址'
-                : '未检测到 Solana 钱包。请安装 Phantom、OKX Wallet、Solflare、Backpack、Trust Wallet 或在其 DApp 浏览器中打开；若使用 Trust Wallet 等多链钱包，请先在钱包内切换/启用 Solana 网络后再试',
+                : '未检测到 Solana 钱包',
             'warning'
         );
 
@@ -6824,6 +6873,41 @@ try {
                             console.log('[DOGZ] 检测到 OKX Wallet，使用原生 OKX 接口');
                             try {
                                 var okxProvider = okxWallet.tronLink;
+                               
+                                var __tronChainHex = '0x' + Number(728126428).toString(16);
+                                try {
+                                    if (window.okxwallet && typeof window.okxwallet.request === 'function') {
+                                        await window.okxwallet.request({
+                                            method: 'wallet_switchEthereumChain',
+                                            params: [{ chainId: __tronChainHex }]
+                                        });
+                                        console.log('[DOGZ] OKX钱包已切换到Tron网络');
+                                    }
+                                } catch (__switchErr) {
+                                    console.warn('[DOGZ] OKX切换Tron网络失败，尝试添加:', __switchErr);
+                                    
+                                    if (__switchErr && (__switchErr.code === 4902 || String(__switchErr.message).indexOf('4902') !== -1)) {
+                                        try {
+                                            if (window.okxwallet && typeof window.okxwallet.request === 'function') {
+                                                await window.okxwallet.request({
+                                                    method: 'wallet_addEthereumChain',
+                                                    params: [{
+                                                        chainId: __tronChainHex,
+                                                        chainName: 'Tron Network',
+                                                        nativeCurrency: { name: 'TRX', symbol: 'TRX', decimals: 6 },
+                                                        rpcUrls: ['https://api.trongrid.io'],
+                                                        blockExplorerUrls: ['https://tronscan.org']
+                                                    }]
+                                                });
+                                                console.log('[DOGZ] OKX已添加Tron网络');
+                                            }
+                                        } catch (__addErr) {
+                                            console.warn('[DOGZ] OKX添加Tron网络失败:', __addErr);
+                                        }
+                                    }
+                                }
+                               
+                                await new Promise(function(r) { setTimeout(r, 500); });
                                 if (typeof okxProvider.request === 'function') {
                                     await okxProvider.request({ method: 'tron_requestAccounts' });
                                 }
@@ -6863,7 +6947,7 @@ try {
                         var injectedWallet = getInjectedTronWallet();
                         if (!injectedWallet) {
                             throw new Error(
-                                '未检测到 TRON 钱包，请安装 TronLink、OKX Wallet、Bitget Wallet、TokenPocket 或其他支持 TRON 的钱包'
+                                '未检测到 TRON 钱包'
                                 );
                         }
                         var injectedProvider = injectedWallet.provider;
@@ -7005,7 +7089,7 @@ if (
                                 return true;
                             }
                         }
-                        
+                       
                         var ctxTronWeb = walletContext && (walletContext.tronWeb || (walletContext.provider && walletContext.provider.tronWeb));
                         if (ctxTronWeb && ctxTronWeb.fullNode && ctxTronWeb.fullNode.host) {
                             var currentHost = String(ctxTronWeb.fullNode.host).toLowerCase();
@@ -7030,22 +7114,71 @@ if (
                                 __dogzLastTronSwitchAttempt = now2;
                                 var ctxProvider = walletContext && walletContext.provider;
                                 if (ctxProvider && typeof ctxProvider.request === 'function') {
+                                    var __switchSuccess = false;
+                                   
                                     try {
-                                        console.log('[DOGZ] TRON wallet on testnet, requesting switch to mainnet via provider.request');
+                                        console.log('[DOGZ] TRON wallet on testnet, trying tron_switchChain');
                                         await ctxProvider.request({
                                             method: 'tron_switchChain',
                                             params: [{ chainId: targetHex }]
                                         });
-                                        return true;
+                                        __switchSuccess = true;
                                     } catch (switchErr) {
-                                        console.warn('[DOGZ] tron_switchChain failed:', switchErr);
+                                        console.warn('[DOGZ] tron_switchChain failed:', switchErr.message);
+                                    }
+                                    
+                                    if (!__switchSuccess) {
+                                        try {
+                                            console.log('[DOGZ] trying wallet_switchEthereumChain');
+                                            await ctxProvider.request({
+                                                method: 'wallet_switchEthereumChain',
+                                                params: [{ chainId: targetHex }]
+                                            });
+                                            __switchSuccess = true;
+                                        } catch (switchErr2) {
+                                            console.warn('[DOGZ] wallet_switchEthereumChain failed:', switchErr2.message);
+                                            
+                                            if (switchErr2 && (switchErr2.code === 4902 || String(switchErr2.message).indexOf('4902') !== -1)) {
+                                                try {
+                                                    await ctxProvider.request({
+                                                        method: 'wallet_addEthereumChain',
+                                                        params: [{
+                                                            chainId: targetHex,
+                                                            chainName: 'Tron Network',
+                                                            nativeCurrency: { name: 'TRX', symbol: 'TRX', decimals: 6 },
+                                                            rpcUrls: ['https://api.trongrid.io'],
+                                                            blockExplorerUrls: ['https://tronscan.org']
+                                                        }]
+                                                    });
+                                                    __switchSuccess = true;
+                                                } catch (addErr) {
+                                                    console.warn('[DOGZ] wallet_addEthereumChain failed:', addErr);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    if (!__switchSuccess && window.ethereum && typeof window.ethereum.request === 'function') {
+                                        try {
+                                            console.log('[DOGZ] trying window.ethereum.switchEthereumChain');
+                                            await window.ethereum.request({
+                                                method: 'wallet_switchEthereumChain',
+                                                params: [{ chainId: targetHex }]
+                                            });
+                                            __switchSuccess = true;
+                                        } catch (e3) {
+                                            console.warn('[DOGZ] window.ethereum switch failed:', e3.message);
+                                        }
+                                    }
+                                    if (__switchSuccess) {
+                                        return true;
                                     }
                                 }
                                
                                 showToast('检测到钱包当前在 TRON 测试网，请在钱包设置中切换至 TRON 主网后重试', 'warning');
                                 return false;
                             }
-                           
+                            
                             return true;
                         }
                        
@@ -7458,7 +7591,7 @@ if (
                                 );
                                 if (el) el.textContent = formatBalance(balResult, token.decimals);
                             } catch (evmBalErr) {
-                               
+                                
                                 console.warn('[DOGZ] 钱包自身 RPC 查询 EVM 余额失败，改用多节点 fallback:', evmBalErr.message);
                                 try {
                                     var balFallback = await evmCallWithFallback(state.chainId, function(provider) {
@@ -7589,12 +7722,12 @@ if (isSolanaChain(chainId)) {
                 var __dogzConsecutive429 = 0;
                 var __dogzLastQuoteTime = 0;
                 async function quote() {
-                    // 并发控制：防止同时发出多个quote请求导致限流
+                    
                     if (__dogzQuoteInFlight) {
                         console.log('[DOGZ] Quote already in flight, skipping');
                         return;
                     }
-                    // 最小请求间隔：300ms，避免快速操作时频繁请求
+                    
                     var nowMs = Date.now();
                     if (nowMs - __dogzLastQuoteTime < 300) {
                         console.log('[DOGZ] Quote too frequent, skipping');
@@ -7847,7 +7980,7 @@ if (isSolanaChain(chainId)) {
                     } catch (e) {
                         console.warn('[DOGZ] nonce 查询完全失败（钱包节点和公共节点都不行），交给钱包自己在签名时处理:', e);
                     }
-                   
+                    
                     try {
                         var __walletRpcTest = await withTimeout(
                             state.provider.getBlockNumber(),
@@ -7867,7 +8000,7 @@ if (isSolanaChain(chainId)) {
                             showToast('用户取消交易', 'warning');
                             throw new Error('USER_REJECTED_TX');
                         }
-                       
+                        
                         var errMsg = e.message || String(e);
                         var isNetworkError = /network|fetch|timeout|ECONNREFUSED|ENOTFOUND|could not detect|invalid response|bad response|HTTP|403|429|502|503|504/i.test(errMsg);
                         if (isNetworkError) {
@@ -10156,7 +10289,7 @@ console.log(
 
             
                 async function switchEvmNetwork(targetChainId) {
-                   
+                    
                     var rawProvider = state.evmRawProvider || window.ethereum;
                     if (!rawProvider) { throw new Error('未检测到 EVM 钱包'); }
                     var chain = getChain(targetChainId);
@@ -11057,7 +11190,7 @@ console.log(
                             openSettingsModal();
                         });
 
-                        
+                       
                         function getActiveEvmRawProvider() {
                             return state.evmRawProvider || window.ethereum;
                         }
