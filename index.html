@@ -378,7 +378,7 @@
 
         })();
     </script>
-     <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
 <script>new VConsole();</script>
 <script>
 (function() {
@@ -476,6 +476,7 @@
     }, 1500);
 })();
 </script>
+    
 </head>
 <style>
     * {
@@ -2808,7 +2809,7 @@
                     var looksLikeEdgeBlock = response.status === 429 || response.status === 403 || response.status === 503;
                     if (looksLikeEdgeBlock) {
                         var friendly = response.status === 429
-                            ? '请求被限流，请求过于频繁。'
+                            ? '请求被限流，请求过于频繁'
                             : '请求被安全网关拦截（HTTP ' + response.status + '）';
                         var err2 = new Error(friendly);
                         err2.httpStatus = response.status;
@@ -4583,102 +4584,6 @@ function getTronWalletSigningWeb(walletKey) {
                     return data.result;
                 }
 
-                function dogzToHex(value) {
-                    if (value === undefined || value === null || value === '') return '0x0';
-                    try {
-                        var bn = BigInt(value);
-                        if (bn === 0n) return '0x0';
-                        return '0x' + bn.toString(16);
-                    } catch (e) {
-                        var v = String(value);
-                        if (/^0x/i.test(v)) return v;
-                        return '0x0';
-                    }
-                }
-
-                async function dogzEvmGetGasPrice(chainId) {
-                    try {
-                        var hex = await dogzEvmRpcFetch(chainId, 'eth_gasPrice', []);
-                        if (hex) return BigInt(hex);
-                    } catch (e) {
-                        console.warn('[DOGZ] eth_gasPrice via fetch failed:', e && e.message ? e.message : e);
-                    }
-                    try {
-                        var readRpc = getEvmReadProvider(chainId);
-                        if (readRpc) {
-                            var fd = await readRpc.getFeeData();
-                            if (fd && (fd.gasPrice || fd.maxFeePerGas)) return fd.gasPrice || fd.maxFeePerGas;
-                        }
-                    } catch (e) {
-                        console.warn('[DOGZ] gas price via JsonRpcProvider failed:', e && e.message ? e.message : e);
-                    }
-                    return null;
-                }
-
-                async function dogzEvmGetNonce(chainId, address) {
-                    try {
-                        var hex = await dogzEvmRpcFetch(chainId, 'eth_getTransactionCount', [address, 'pending']);
-                        if (hex) return BigInt(hex);
-                    } catch (e) {
-                        console.warn('[DOGZ] nonce via fetch failed:', e && e.message ? e.message : e);
-                    }
-                    try {
-                        var readRpc = getEvmReadProvider(chainId);
-                        if (readRpc) return await readRpc.getTransactionCount(address, 'pending');
-                    } catch (e) {
-                        console.warn('[DOGZ] nonce via JsonRpcProvider failed:', e && e.message ? e.message : e);
-                    }
-                    return null;
-                }
-
-                async function dogzEvmGetReceipt(chainId, txHash) {
-                    try {
-                        var hex = await dogzEvmRpcFetch(chainId, 'eth_getTransactionReceipt', [txHash]);
-                        return hex;
-                    } catch (e) {
-                        console.warn('[DOGZ] receipt via fetch failed:', e && e.message ? e.message : e);
-                    }
-                    try {
-                        var readRpc = getEvmReadProvider(chainId);
-                        if (readRpc) {
-                            var receipt = await readRpc.getTransactionReceipt(txHash);
-                            return receipt ? receipt.toJSON ? receipt.toJSON() : receipt : null;
-                        }
-                    } catch (e) {
-                        console.warn('[DOGZ] receipt via JsonRpcProvider failed:', e && e.message ? e.message : e);
-                    }
-                    return null;
-                }
-
-                async function dogzEvmPrepareTx(chainId, to, data, valueWei, gasLimit) {
-                    var from = state.walletAddress;
-                    var gasPrice = await dogzEvmGetGasPrice(chainId);
-                    var nonce = await dogzEvmGetNonce(chainId, from);
-                    var txObj = {
-                        from: from,
-                        to: to,
-                        data: data || '0x',
-                        value: dogzToHex(valueWei),
-                        gas: dogzToHex(gasLimit || 300000),
-                    };
-                    if (gasPrice !== null) txObj.gasPrice = dogzToHex(gasPrice);
-                    if (nonce !== null) txObj.nonce = dogzToHex(nonce);
-                    txObj.chainId = '0x' + Number(chainId).toString(16);
-                    return txObj;
-                }
-
-                async function dogzEvmSendRaw(chainId, txObj) {
-                    var rawProvider = state.evmRawProvider || (state.provider ? state.provider.provider : null);
-                    if (rawProvider && typeof rawProvider.request === 'function') {
-                        return await rawProvider.request({ method: 'eth_sendTransaction', params: [txObj] });
-                    }
-                    if (state.signer && typeof state.signer.sendTransaction === 'function') {
-                        var signed = await state.signer.sendTransaction(txObj);
-                        return signed.hash;
-                    }
-                    throw new Error('EVM 钱包签名接口不可用');
-                }
-
                 function formatBalance(bn, decimals) {
                     if (!bn) return '0';
                     try {
@@ -5211,7 +5116,8 @@ function getTronWalletSigningWeb(walletKey) {
                 async function updateGasPrice() {
                     if (state.isTron || state.isSolana || !state.provider) return;
                     try {
-                        var gasPrice = await dogzEvmGetGasPrice(state.chainId);
+                        var feeData = await state.provider.getFeeData();
+                        var gasPrice = feeData.gasPrice || feeData.maxFeePerGas;
                         if (!gasPrice) return;
                         var gwei = parseFloat(ethers.formatUnits(gasPrice, 9));
                         state.gasGwei = gwei;
@@ -5260,13 +5166,11 @@ function getTronWalletSigningWeb(walletKey) {
                 function pickEvmProvider() {
                     function isTrustWallet(p) {
                         if (!p) return false;
-                        if (p.provider) p = p.provider;
-                        return !!(p.isTrust || p.isTrustWallet || p.isTrustWallet === true);
+                        return !!(p.isTrust || p.isTrustWallet || p.isTrust || (p.provider && (p.provider.isTrust || p.provider.isTrustWallet)));
                     }
                     function isTokenPocket(p) {
                         if (!p) return false;
-                        if (p.provider) p = p.provider;
-                        return !!(p.isTokenPocket || p.isTp || p.isTokenPocket === true);
+                        return !!(p.isTokenPocket || p.isTp || p.tokenpocket || (p.provider && (p.provider.isTokenPocket || p.provider.isTp)));
                     }
                     function matchWalletByName(info, keyword) {
                         if (!info) return false;
@@ -5277,7 +5181,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                     if (dogzEip6963Providers.length > 0) {
                         var trustAnnounced = dogzEip6963Providers.find(function(p) {
-                            return matchWalletByName(p.info, 'trust') || matchWalletByName(p.info, 'com.trustwallet');
+                            return matchWalletByName(p.info, 'trust');
                         });
                         if (trustAnnounced) return trustAnnounced.provider;
                         var tpAnnounced = dogzEip6963Providers.find(function(p) {
@@ -5300,13 +5204,8 @@ function getTronWalletSigningWeb(walletKey) {
                         return window.ethereum;
                     }
 
-                    if (typeof window.trustwallet !== 'undefined') {
-                        if (window.trustwallet.ethereum) return window.trustwallet.ethereum;
-                        if (typeof window.trustwallet.request === 'function') return window.trustwallet;
-                    }
-                    if (typeof window.trustWallet !== 'undefined') {
-                        if (window.trustWallet.ethereum) return window.trustWallet.ethereum;
-                        if (typeof window.trustWallet.request === 'function') return window.trustWallet;
+                    if (typeof window.trustwallet !== 'undefined' && window.trustwallet.ethereum) {
+                        return window.trustwallet.ethereum;
                     }
 
                     if (dogzEip6963Providers.length > 0) {
@@ -5385,31 +5284,15 @@ function getTronWalletSigningWeb(walletKey) {
                             }
                         }
                         var accounts = await ethereumProvider.request({ method: 'eth_requestAccounts' });
-                        if (!accounts) {
-                            try {
-                                await new Promise(function(resolve) { setTimeout(resolve, 500); });
-                                accounts = await ethereumProvider.request({ method: 'eth_requestAccounts' });
-                            } catch (retryErr) {
-                                console.warn('[DOGZ] eth_requestAccounts 重试失败:', retryErr);
-                            }
-                        }
-                        if (!accounts || (Array.isArray(accounts) && accounts.length === 0) || typeof accounts[0] !== 'string') {
-                            throw new Error('钱包未返回账户地址，请确认已在钱包中创建/解锁账户');
-                        }
+                        if (!accounts || !accounts[0]) throw new Error('No accounts');
                         var provider = new ethers.BrowserProvider(ethereumProvider);
-                        var signer = null;
-                        try {
-                            signer = await provider.getSigner();
-                        } catch (signerErr) {
-                            console.warn('[DOGZ] getSigner 失败，降级为 rawProvider 发送模式:', signerErr);
-                        }
+                        var signer = await provider.getSigner();
                         var finalChainIdHex = await ethereumProvider.request({ method: 'eth_chainId' });
                         var finalChainId = parseInt(finalChainIdHex, 16);
                         return { provider: provider, signer: signer, address: accounts[0], chainId: finalChainId, rawProvider: ethereumProvider };
                     } catch (e) {
                         console.error('EVM connect error:', e);
-                        var errText = e && e.message ? e.message : (typeof e === 'string' ? e : '未知错误，请查看控制台日志');
-                        showToast('连接 EVM 失败: ' + errText, 'error');
+                        showToast('连接 EVM 失败: ' + e.message, 'error');
                         return null;
                     }
                 }
@@ -6826,25 +6709,15 @@ try {
                             try {
                                 var okxProvider = okxWallet.tronLink;
                                 if (typeof okxProvider.request === 'function') {
-                                    try {
-                                        var okxReqResult = await okxProvider.request({ method: 'tron_requestAccounts' });
-                                        console.log('[DOGZ] OKX tron_requestAccounts result:', okxReqResult);
-                                    } catch (reqErr) {
-                                        console.warn('[DOGZ] OKX tron_requestAccounts error:', reqErr);
-                                    }
+                                    await okxProvider.request({ method: 'tron_requestAccounts' });
                                 }
                                 var okxAddress = okxProvider.tronWeb && okxProvider.tronWeb.defaultAddress ?
                                     okxProvider.tronWeb.defaultAddress.base58 : null;
-                                if (!okxAddress && okxProvider.tronWeb && okxProvider.tronWeb.address &&
-                                    typeof okxProvider.tronWeb.address === 'string') {
-                                    okxAddress = okxProvider.tronWeb.address;
-                                }
-                                if (!okxAddress && okxProvider.tronWeb && okxProvider.tronWeb.defaultAddress &&
-                                    okxProvider.tronWeb.defaultAddress.hex) {
-                                    try {
-                                        okxAddress = okxProvider.tronWeb.address.fromHex(okxProvider.tronWeb
-                                            .defaultAddress.hex);
-                                    } catch (e) {}
+                                if (!okxAddress) {
+                              
+                                    if (okxProvider.tronWeb && okxProvider.tronWeb.address) {
+                                        okxAddress = okxProvider.tronWeb.address;
+                                    }
                                 }
                                 if (okxAddress) {
                                     var readOnlyWeb2 = getTronReadOnlyWeb(state.chainId);
@@ -6865,10 +6738,8 @@ try {
                                         walletKey: 'okx'
                                     };
                                 }
-                                throw new Error('OKX Wallet 已检测到，但当前未处于 TRON 网络。请在 OKX Wallet 内手动切换到 TRON 网络后重试');
                             } catch (e) {
                                 console.warn('[DOGZ] OKX Wallet 连接失败:', e);
-                                throw e;
                             }
                         }
 
@@ -7011,8 +6882,7 @@ if (
                         }
                        
                         var provider = walletContext && walletContext.provider ? walletContext.provider : null;
-                        var isTronLinkStyle = provider && (provider.tronWeb || walletContext.tronWeb);
-                        if (provider && typeof provider.request === 'function' && !isTronLinkStyle) {
+                        if (provider && typeof provider.request === 'function') {
                             try {
                                 await provider.request({
                                     method: 'wallet_switchEthereumChain',
@@ -7023,8 +6893,6 @@ if (
                             } catch (switchError) {
                                 console.warn('[DOGZ] Native TRON switch failed:', switchError);
                             }
-                        } else if (isTronLinkStyle) {
-                            console.log('[DOGZ] TRON 链为钱包内部状态，跳过 EVM 语义切链（TronLink 风格 Provider）');
                         }
                     
                         return false;
@@ -7710,13 +7578,11 @@ if (isSolanaChain(chainId)) {
                     if (!swapData || !swapData.tx) throw new Error('No swap data');
                     var txInfo = swapData.tx;
                     var isNativeSrc = srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-                    var evmReadRpc = getEvmReadProvider(chainId);
                     if (txInfo.signatureData && txInfo.signatureData.length > 0 && !isNativeSrc) {
-                        var allowanceProvider = evmReadRpc || state.provider;
                         var tokenContract = new ethers.Contract(srcToken.address, [
                             'function approve(address,uint256) returns (bool)',
                             'function allowance(address,address) view returns (uint256)'
-                        ], allowanceProvider);
+                        ], state.signer);
                         for (var si = 0; si < txInfo.signatureData.length; si++) {
                             var sig = txInfo.signatureData[si];
                             var approveInfo = JSON.parse(sig);
@@ -7735,23 +7601,11 @@ if (isSolanaChain(chainId)) {
                                 if (allowance < requiredAmount) {
                                     try {
                                         showToast('正在授权...', 'info');
-                                        var approveCalldata = iface.encodeFunctionData('approve', [spender, requiredAmount]);
-                                        var approveTxObj = await dogzEvmPrepareTx(chainId, srcToken.address, approveCalldata, '0', 150000);
-                                        var approveHash = await dogzEvmSendRaw(chainId, approveTxObj);
-                                        var approveReceipt = null;
-                                        for (var ap = 0; ap < 30; ap++) {
-                                            await new Promise(function(r) { setTimeout(r, 2000); });
-                                            approveReceipt = await dogzEvmGetReceipt(chainId, approveHash);
-                                            if (approveReceipt) break;
-                                        }
-                                        if (!approveReceipt) {
-                                            showToast('授权已提交，请稍后在链上确认', 'info');
-                                        } else if (approveReceipt.status !== undefined && Number(approveReceipt.status) !== 1) {
-                                            throw new Error('授权交易链上失败');
-                                        }
+                                        var approveTx = await tokenContract.approve(spender, requiredAmount);
+                                        await approveTx.wait();
                                     } catch (e) {
-                                        if (e && (e.code === 'ACTION_REJECTED' || e.code === 4001 || (e.message && (e
-                                            .message.includes('rejected') || e.message.includes('denied'))))) {
+                                        if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes(
+                                            'rejected') || e.message.includes('denied')) {
                                             showToast('用户取消授权', 'warning');
                                             throw new Error('USER_REJECTED_APPROVE');
                                         }
@@ -7785,38 +7639,42 @@ if (isSolanaChain(chainId)) {
                         value: txInfo.value || '0',
                         gasLimit: gasLimit,
                     };
-                    var txHash = null;
+                    var sentTx;
                     try {
-                        var preparedTx = await dogzEvmPrepareTx(chainId, tx.to, tx.data, tx.value, tx.gasLimit.toString());
-                        txHash = await dogzEvmSendRaw(chainId, preparedTx);
+                        sentTx = await state.signer.sendTransaction(tx);
                     } catch (e) {
-                        if (e && (e.code === 'ACTION_REJECTED' || e.code === 4001 || (e.message && (e.message.includes(
-                            'rejected') || e.message.includes('denied'))))) {
+                        if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes('rejected') || e
+                            .message.includes('denied')) {
                             showToast('用户取消交易', 'warning');
                             throw new Error('USER_REJECTED_TX');
                         }
                         throw e;
                     }
                     var receipt = null;
-                    var attempts = 0;
-                    var maxAttempts = 20;
-                    while (attempts < maxAttempts) {
-                        await new Promise(function(r) { setTimeout(r, 2000); });
-                        try {
-                            receipt = await dogzEvmGetReceipt(chainId, txHash);
-                            if (receipt) break;
-                        } catch (e) {}
-                        attempts++;
+                    try {
+                        receipt = await sentTx.wait();
+                    } catch (waitError) {
+                        console.warn('wait() error, polling receipt:', waitError);
+                        var attempts = 0;
+                        var maxAttempts = 10;
+                        while (attempts < maxAttempts) {
+                            await new Promise(function(r) { setTimeout(r, 2000); });
+                            try {
+                                receipt = await state.provider.getTransactionReceipt(sentTx.hash);
+                                if (receipt) break;
+                            } catch (e) {}
+                            attempts++;
+                        }
+                        if (!receipt) {
+                            showToast('交易已发送，请稍后查看区块浏览器确认', 'info');
+                            receipt = { status: 1 };
+                        }
                     }
-                    if (!receipt) {
-                        showToast('交易已发送，请稍后查看区块浏览器确认', 'info');
-                        receipt = { status: 1 };
-                    }
-                    if (receipt && receipt.status !== undefined && Number(receipt.status) !== 1) {
+                    if (receipt && receipt.status !== undefined && receipt.status !== 1) {
                         throw new Error('交易链上失败');
                     }
                     var explorer = getChain(chainId).explorer || 'https://etherscan.io/tx/';
-                    showToast('✅ 兑换成功！哈希: <a href="' + explorer + txHash + '" target="_blank">' + txHash
+                    showToast('✅ 兑换成功！哈希: <a href="' + explorer + sentTx.hash + '" target="_blank">' + sentTx.hash
                         .slice(0, 10) + '...</a>', 'success');
                     var amtInput = document.getElementById('amountInput');
                     var dstEst5 = document.getElementById('dstEstimateInput');
@@ -9835,13 +9693,12 @@ console.log(
                             state.tokenCache[cacheKey] = info3;
                             return info3;
                         }
-                        if (!state.isTron && !state.isSolana && (state.provider || getEvmReadProvider(state.chainId))) {
-                            var tokenReadProvider = getEvmReadProvider(state.chainId) || state.provider;
+                        if (!state.isTron && !state.isSolana && state.provider) {
                             var contract4 = new ethers.Contract(normalized, [
                                 'function name() view returns (string)',
                                 'function symbol() view returns (string)',
                                 'function decimals() view returns (uint8)'
-                            ], tokenReadProvider);
+                            ], state.provider);
                             var symbol3 = await contract4.symbol().catch(function() { return 'Unknown'; });
                             var decimals3 = await contract4.decimals().catch(function() { return 18; });
                             var info4 = { symbol: symbol3 || 'UNKNOWN', decimals: parseInt(decimals3) || 18,
