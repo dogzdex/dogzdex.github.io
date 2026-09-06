@@ -23,55 +23,7 @@
               https://api.shasta.trongrid.io
               https://nile.trongrid.io
               https://challenges.cloudflare.com
-              https://cdn.tailwindcss.com
-              https://cdn.jsdelivr.net
-              https://cdnjs.cloudflare.com
-              https://1rpc.io
-              https://api.avax.network
-              https://api.mainnet-beta.solana.com
-              https://arb1.arbitrum.io
-              https://binance.nodereal.io
-              https://blast-rpc.publicnode.com
-              https://conflux-espace-public.unifra.io
-              https://eth.llamarpc.com
-              https://infra.originstake.com
-              https://ink.drpc.org
-              https://mainnet.base.org
-              https://mainnet.era.zksync.io
-              https://mainnet.optimism.io
-              https://mantle-rpc.publicnode.com
-              https://metis-rpc.publicnode.com
-              https://pacific-rpc.manta.network
-              https://plasma.drpc.org
-              https://polygon-rpc.com
-              https://robinhood.rpc.blxrbdn.com
-              https://rpc.hypurrscan.io
-              https://rpc.linea.build
-              https://rpc.merlinchain.io
-              https://rpc.pharos.xyz
-              https://scroll-rpc.publicnode.com
-              https://sonic.api.pocket.network
-              https://unichain-rpc.publicnode.com
-              https://xlayer.drpc.org
-              https://rpc.ankr.com
-              https://ethereum-rpc.publicnode.com
-              https://bsc-rpc.publicnode.com
-              https://polygon-bor-rpc.publicnode.com
-              https://arbitrum-one-rpc.publicnode.com
-              https://optimism-rpc.publicnode.com
-              https://base-rpc.publicnode.com
-              https://avalanche-c-chain-rpc.publicnode.com
-              https://zksync-era-rpc.publicnode.com
-              https://linea-rpc.publicnode.com
-              https://cronos-rpc.publicnode.com
-              https://fantom-rpc.publicnode.com
-              https://metis-andromeda-rpc.publicnode.com
-              https://ethereum.publicnode.com
-              https://eth.drpc.org
-              https://bsc-dataseed.binance.org
-              https://bsc-dataseed1.defibit.io
-              https://bsc-dataseed1.ninicoin.io
-              https://1rpc.io;
+              https://cdn.tailwindcss.com;
           font-src
               https://cdnjs.cloudflare.com
               https://fonts.gstatic.com;
@@ -83,29 +35,29 @@
     <link rel="icon" href="https://i2c.seadn.io/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/c5baafdbaf18d60cb14596e26b8675/19c5baafdbaf18d60cb14596e26b8675.png?w=350" />
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <link
+   
+<link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     integrity="sha384-/o6I2CkkWC//PSjvWC/eYN7l3xM3tJm8ZzVkCOfp//W05QcE3mlGskpoHB6XqI+B"
     crossorigin="anonymous"
-    />
+/>
 
-    <link
+
+<link
     href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
     rel="stylesheet"
-    />
+/>
 
-  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js">
-</script>
 
 <script
     src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"
     integrity="sha384-gpR0Q6Hx/O+uevlbpbANbS0LWjbejPV1sqD/8w422l/fW8whGY0EPmKw3uG7ACYP"
     crossorigin="anonymous">
 </script>
+
 
 <script
     src="https://cdn.jsdelivr.net/npm/tronweb@5.1.0/dist/TronWeb.js"
@@ -114,12 +66,12 @@
 </script>
 
 
-
 <script
     src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js"
     integrity="sha384-xo1g+ODR6i1cxIVZeALc/apXFHeaJHO1j1whMO3dhtdBChWeaihnDs7UnXs9ch78"
     crossorigin="anonymous">
 </script>
+
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer>
 </script>
@@ -426,7 +378,7 @@
 
         })();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
 <script>new VConsole();</script>
 <script>
 (function() {
@@ -2735,13 +2687,6 @@
             function runSplashAnimation() {
                 var splash = document.getElementById('splash-screen');
                 if (!splash) return;
-                
-                try {
-                    if (window.sessionStorage && window.sessionStorage.getItem('dogzSplashShown') === '1') {
-                        releaseSplash(true);
-                        return;
-                    }
-                } catch (e) {}
                 var logo = document.getElementById('splashLogo');
                 var title = document.getElementById('splashTitle');
                 var subtitle = document.getElementById('splashSubtitle');
@@ -2760,14 +2705,37 @@
                 }, 1400);
                 setTimeout(function() {
                     releaseSplash(false);
-                    try { if (window.sessionStorage) window.sessionStorage.setItem('dogzSplashShown', '1'); } catch (e) { /* ignore */ }
                 }, 2500);
             }
 
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', runSplashAnimation, { once: true });
+                document.addEventListener('DOMContentLoaded', function() {
+                    var isReload = false;
+                    try {
+                        if (sessionStorage.getItem('dogz_splash_shown') === '1') {
+                            isReload = true;
+                        }
+                        sessionStorage.setItem('dogz_splash_shown', '1');
+                    } catch (e) {}
+                    if (isReload) {
+                        releaseSplash(true);
+                    } else {
+                        runSplashAnimation();
+                    }
+                }, { once: true });
             } else {
-                runSplashAnimation();
+                var isReload2 = false;
+                try {
+                    if (sessionStorage.getItem('dogz_splash_shown') === '1') {
+                        isReload2 = true;
+                    }
+                    sessionStorage.setItem('dogz_splash_shown', '1');
+                } catch (e) {}
+                if (isReload2) {
+                    releaseSplash(true);
+                } else {
+                    runSplashAnimation();
+                }
             }
 
             setTimeout(function() {
@@ -2799,7 +2767,7 @@
             try {
 
              
-               
+       
                 const PROXY_URL = 'https://api.dogz.dpdns.org';
                 const OKX_API_BASE = 'https://web3.okx.com/api/v6/dex/aggregator';
                 const OKX_MARKET_API_BASE = 'https://web3.okx.com/api/v6/dex/market';
@@ -2809,24 +2777,8 @@
                 const REQUEST_TIMEOUT = 30000;
                 const MAX_RETRIES = 2;
 
-               
+             
                 const WORKER_AUTH_TOKEN = '6d6caaf66cf23f60beee62d6cb58fa6b6342a923b29c0f3f7d2e1d3d0ec1f528';
-
-               
-                var __dogzBoundProviderRegistry = (typeof WeakSet !== 'undefined') ? new WeakSet() : null;
-                function __dogzShouldBindEvents(provider) {
-                    if (!provider) return false;
-                    if (__dogzBoundProviderRegistry) {
-                        if (__dogzBoundProviderRegistry.has(provider)) return false;
-                        __dogzBoundProviderRegistry.add(provider);
-                        return true;
-                    }
-                    try {
-                        if (provider.__dogzEventsBound) return false;
-                        provider.__dogzEventsBound = true;
-                    } catch (e) {}
-                    return true;
-                }
 
                 function buildProxyHeaders(extra) {
                     var headers = { 'Content-Type': 'application/json' };
@@ -2839,12 +2791,12 @@
                     return headers;
                 }
 
-              
+       
                 async function parseProxyErrorResponse(response) {
                     var rawText = '';
-                    try { rawText = await response.text(); } catch (e) {}
+                    try { rawText = await response.text(); } catch (e) { }
                     var parsedJson = null;
-                    try { parsedJson = JSON.parse(rawText); } catch (e) {}
+                    try { parsedJson = JSON.parse(rawText); } catch (e) { }
 
                     if (parsedJson && typeof parsedJson === 'object' && parsedJson.msg) {
                         var err = new Error('HTTP ' + response.status + ': ' + parsedJson.msg);
@@ -2855,9 +2807,8 @@
 
                     var looksLikeEdgeBlock = response.status === 429 || response.status === 403 || response.status === 503;
                     if (looksLikeEdgeBlock) {
-                        
                         var friendly = response.status === 429
-                            ? '请求被限流'
+                            ? '请求被限流，请求过于频繁。'
                             : '请求被安全网关拦截（HTTP ' + response.status + '）';
                         var err2 = new Error(friendly);
                         err2.httpStatus = response.status;
@@ -2925,7 +2876,7 @@
 
                 var TURNSTILE_REQUIRED_ENDPOINTS = ['/swap', '/swap-instruction', '/approve-transaction'];
 
-              
+               
                 var ROUTER_CALL_SIGNATURES = {
                     'f2c42696': { name: 'dagSwapByOrderId', toTokenWord: 2, receiverWord: null },
                     '0c307f76': { name: 'dagSwapTo', toTokenWord: 3, receiverWord: 1 },
@@ -3006,7 +2957,7 @@
                         return null;
                     }
                 }
-               
+                
                 function normalizeAddressForCalldataCompareFrontend(addr) {
                     if (typeof addr !== 'string') return null;
                     if (addr.startsWith('T')) return tronBase58ToHexFrontend(addr);
@@ -3063,7 +3014,7 @@
                             }
                         }
                     } else if (opts.expectedUserWallet && txInfo.from && typeof txInfo.from === 'string') {
-                       
+                        
                         if (txInfo.from.toLowerCase() !== opts.expectedUserWallet.toLowerCase()) {
                             throw new Error('安全校验失败：交易发起地址与当前钱包不一致，已阻止签名（' + decoded.name + '）');
                         }
@@ -3111,7 +3062,7 @@
                     var queryString = searchParams.toString();
                     var fullUrl = OKX_API_BASE + endpoint + (queryString ? '?' + queryString : '');
                     var payload = { url: fullUrl };
-                    
+                   
                     if (TURNSTILE_REQUIRED_ENDPOINTS.indexOf(endpoint) !== -1) {
                         try {
                             var __ts = await getFreshTurnstileToken();
@@ -3160,7 +3111,7 @@
                     var queryString = searchParams.toString();
                     var fullUrl = OKX_MARKET_API_BASE + endpoint + (queryString ? '?' + queryString : '');
                     var payload = { url: fullUrl };
-                   
+                    
                     var controller = new AbortController();
                     var timeoutId = setTimeout(function() { controller.abort(); }, REQUEST_TIMEOUT);
                     try {
@@ -3192,7 +3143,7 @@
              
                 var CHAINS = {
                     1: { chainId: 1, name: 'Ethereum', short: 'Ethereum', icon: '⟠', iconUrl: 'https://images.blockscan.com/chain-logos/eth.svg', native: 'ETH',
-                        rpc: 'https://ethereum-rpc.publicnode.com', explorer: 'https://etherscan.io/tx/', id: '1' },
+                        rpc: 'https://eth.llamarpc.com', explorer: 'https://etherscan.io/tx/', id: '1' },
                     56: { chainId: 56, name: 'BNB Chain', short: 'BNB Chain', icon: '🟡', iconUrl: 'https://images.blockscan.com/chain-logos/bsc.svg',
                         native: 'BNB', rpc: 'https://binance.nodereal.io', explorer: 'https://bscscan.com/tx/', id: '56' },
                     137: { chainId: 137, name: 'Polygon', short: 'Polygon', icon: '🟣', iconUrl: 'https://amoy.polygonscan.com/assets/poly/images/svg/logos/token-dark.svg?v=26.7.2.1',
@@ -3255,93 +3206,6 @@
                         rpc: 'https://api.mainnet-beta.solana.com', explorer: 'https://solscan.io/tx/', id: 'solana', isSolana: true }
                 };
                 var CHAIN_LIST = Object.keys(CHAINS).map(function(k) { return CHAINS[k]; });
-
-               
-                var RPC_FALLBACKS = {
-                    1: [
-                        'https://ethereum-rpc.publicnode.com',
-                        'https://rpc.ankr.com/eth',
-                        'https://ethereum.publicnode.com',
-                        'https://eth.drpc.org'
-                    ],
-                    56: [
-                        'https://bsc-rpc.publicnode.com',
-                        'https://bsc-dataseed.binance.org',
-                        'https://bsc-dataseed1.defibit.io',
-                        'https://bsc-dataseed1.ninicoin.io',
-                        'https://binance.nodereal.io'
-                    ],
-                    137: [
-                        'https://polygon-bor-rpc.publicnode.com',
-                        'https://polygon-rpc.com',
-                        'https://rpc.ankr.com/polygon'
-                    ],
-                    42161: [
-                        'https://arbitrum-one-rpc.publicnode.com',
-                        'https://arb1.arbitrum.io/rpc',
-                        'https://rpc.ankr.com/arbitrum'
-                    ],
-                    10: [
-                        'https://optimism-rpc.publicnode.com',
-                        'https://mainnet.optimism.io',
-                        'https://rpc.ankr.com/optimism'
-                    ],
-                    8453: [
-                        'https://base-rpc.publicnode.com',
-                        'https://mainnet.base.org',
-                        'https://rpc.ankr.com/base'
-                    ],
-                    43114: [
-                        'https://avalanche-c-chain-rpc.publicnode.com',
-                        'https://api.avax.network/ext/bc/C/rpc',
-                        'https://rpc.ankr.com/avalanche'
-                    ],
-                    324: [
-                        'https://zksync-era-rpc.publicnode.com',
-                        'https://mainnet.era.zksync.io',
-                        'https://era.zksync.network'
-                    ],
-                    59144: [
-                        'https://linea-rpc.publicnode.com',
-                        'https://rpc.linea.build'
-                    ],
-                    5000: [
-                        'https://mantle-rpc.publicnode.com'
-                    ],
-                    81457: [
-                        'https://blast-rpc.publicnode.com',
-                        'https://blast-rpc.publicnode.com',
-                        'https://rpc.blast.io'
-                    ],
-                    25: [
-                        'https://cronos-rpc.publicnode.com',
-                        'https://1rpc.io/cro'
-                    ],
-                    250: [
-                        'https://fantom-rpc.publicnode.com',
-                        'https://1rpc.io/ftm'
-                    ],
-                    1088: [
-                        'https://metis-andromeda-rpc.publicnode.com',
-                        'https://metis-rpc.publicnode.com'
-                    ],
-                    130: [
-                        'https://unichain-rpc.publicnode.com'
-                    ],
-                    534352: [
-                        'https://scroll-rpc.publicnode.com'
-                    ]
-                };
-                
-                function getRpcFallbacks(chainId) {
-                    var id = Number(chainId);
-                    var list = RPC_FALLBACKS[id] ? RPC_FALLBACKS[id].slice() : [];
-                    var chain = CHAINS[id];
-                    if (chain && chain.rpc && list.indexOf(chain.rpc) === -1) {
-                        list.unshift(chain.rpc);
-                    }
-                    return list;
-                }
 
               
                 var TOKENS = {
@@ -3962,95 +3826,6 @@
                     state.tronReadOnlyWeb = tronWeb;
                     state.tronWeb = tronWeb;
                     return tronWeb;
-                }
-
-               
-                var __dogzEvmFallbackProviders = {};
-                var __dogzRpcHealth = {};
-                var __dogzRpcCurrentIndex = {};
-
-               
-                function withTimeout(promise, ms, label) {
-                    return new Promise(function(resolve, reject) {
-                        var timer = setTimeout(function() {
-                            reject(new Error('RPC timeout after ' + ms + 'ms' + (label ? ' (' + label + ')' : '')));
-                        }, ms);
-                        promise.then(function(v) { clearTimeout(timer); resolve(v); },
-                            function(e) { clearTimeout(timer); reject(e); });
-                    });
-                }
-
-              
-                function markRpcHealth(chainId, url, ok) {
-                    var id = Number(chainId);
-                    if (!__dogzRpcHealth[id]) __dogzRpcHealth[id] = {};
-                    if (!__dogzRpcHealth[id][url]) __dogzRpcHealth[id][url] = { ok: true, lastCheck: 0, failCount: 0 };
-                    __dogzRpcHealth[id][url].ok = ok;
-                    __dogzRpcHealth[id][url].lastCheck = Date.now();
-                    if (!ok) __dogzRpcHealth[id][url].failCount++;
-                    else __dogzRpcHealth[id][url].failCount = 0;
-                }
-
-               
-                function getEvmFallbackProvider(chainId) {
-                    var id = Number(chainId);
-                    var urls = getRpcFallbacks(id);
-                    if (urls.length === 0) return null;
-                   
-                    var bestUrl = null;
-                    var bestScore = Infinity;
-                    for (var i = 0; i < urls.length; i++) {
-                        var url = urls[i];
-                        var health = __dogzRpcHealth[id] && __dogzRpcHealth[id][url];
-                        var score = 0;
-                        if (health) {
-                            if (!health.ok) score += 1000;
-                            score += health.failCount * 10;
-                          
-                            if (Date.now() - health.lastCheck < 30000 && !health.ok) score += 500;
-                        }
-                        score += i; 
-                        if (score < bestScore) { bestScore = score; bestUrl = url; }
-                    }
-                    if (!bestUrl) bestUrl = urls[0];
-                    var cacheKey = id + ':' + bestUrl;
-                    if (__dogzEvmFallbackProviders[cacheKey]) return __dogzEvmFallbackProviders[cacheKey];
-                    try {
-                        var provider = new ethers.JsonRpcProvider(bestUrl, id, { staticNetwork: true });
-                        __dogzEvmFallbackProviders[cacheKey] = provider;
-                        provider.__dogzRpcUrl = bestUrl;
-                        provider.__dogzChainId = id;
-                        return provider;
-                    } catch (e) {
-                        console.warn('[DOGZ] 创建 EVM fallback provider 失败 (' + bestUrl + '):', e);
-                        markRpcHealth(id, bestUrl, false);
-                        return null;
-                    }
-                }
-
-               
-                async function evmCallWithFallback(chainId, fn, label) {
-                    var id = Number(chainId);
-                    var urls = getRpcFallbacks(id);
-                    var lastError = null;
-                    for (var attempt = 0; attempt < Math.min(urls.length, 3); attempt++) {
-                        var provider = getEvmFallbackProvider(id);
-                        if (!provider) break;
-                        var url = provider.__dogzRpcUrl || 'unknown';
-                        try {
-                            var result = await withTimeout(fn(provider), 15000, label + ' @ ' + url);
-                            markRpcHealth(id, url, true);
-                            return result;
-                        } catch (e) {
-                            lastError = e;
-                            console.warn('[DOGZ] EVM call failed (' + label + ' @ ' + url + '):', e.message);
-                            markRpcHealth(id, url, false);
-                            
-                            var cacheKey = id + ':' + url;
-                            delete __dogzEvmFallbackProviders[cacheKey];
-                        }
-                    }
-                    throw lastError || new Error('All EVM RPC endpoints failed');
                 }
 
                 function getInjectedTronWallet(preferredKey) {
@@ -4777,6 +4552,133 @@ function getTronWalletSigningWeb(walletKey) {
 
                 function isSolanaChain(chainId) { var c = getChain(chainId); return c && c.isSolana || false; }
 
+                var __dogzEvmReadProviderCache = {};
+                function getEvmReadProvider(chainId) {
+                    var chain = getChain(chainId);
+                    if (!chain || chain.isTron || chain.isSolana || !chain.rpc) return null;
+                    var rpcUrl = chain.rpc;
+                    if (__dogzEvmReadProviderCache[rpcUrl]) return __dogzEvmReadProviderCache[rpcUrl];
+                    try {
+                        var p = new ethers.JsonRpcProvider(rpcUrl);
+                        __dogzEvmReadProviderCache[rpcUrl] = p;
+                        return p;
+                    } catch (e) {
+                        console.warn('[DOGZ] Failed to create EVM read provider:', e);
+                        return null;
+                    }
+                }
+
+                async function dogzEvmRpcFetch(chainId, method, params) {
+                    var chain = getChain(chainId);
+                    if (!chain || !chain.rpc) throw new Error('No RPC for chain ' + chainId);
+                    var body = JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params || [] });
+                    var resp = await fetch(chain.rpc, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: body
+                    });
+                    if (!resp.ok) throw new Error('RPC HTTP ' + resp.status);
+                    var data = await resp.json();
+                    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+                    return data.result;
+                }
+
+                function dogzToHex(value) {
+                    if (value === undefined || value === null || value === '') return '0x0';
+                    try {
+                        var bn = BigInt(value);
+                        if (bn === 0n) return '0x0';
+                        return '0x' + bn.toString(16);
+                    } catch (e) {
+                        var v = String(value);
+                        if (/^0x/i.test(v)) return v;
+                        return '0x0';
+                    }
+                }
+
+                async function dogzEvmGetGasPrice(chainId) {
+                    try {
+                        var hex = await dogzEvmRpcFetch(chainId, 'eth_gasPrice', []);
+                        if (hex) return BigInt(hex);
+                    } catch (e) {
+                        console.warn('[DOGZ] eth_gasPrice via fetch failed:', e && e.message ? e.message : e);
+                    }
+                    try {
+                        var readRpc = getEvmReadProvider(chainId);
+                        if (readRpc) {
+                            var fd = await readRpc.getFeeData();
+                            if (fd && (fd.gasPrice || fd.maxFeePerGas)) return fd.gasPrice || fd.maxFeePerGas;
+                        }
+                    } catch (e) {
+                        console.warn('[DOGZ] gas price via JsonRpcProvider failed:', e && e.message ? e.message : e);
+                    }
+                    return null;
+                }
+
+                async function dogzEvmGetNonce(chainId, address) {
+                    try {
+                        var hex = await dogzEvmRpcFetch(chainId, 'eth_getTransactionCount', [address, 'pending']);
+                        if (hex) return BigInt(hex);
+                    } catch (e) {
+                        console.warn('[DOGZ] nonce via fetch failed:', e && e.message ? e.message : e);
+                    }
+                    try {
+                        var readRpc = getEvmReadProvider(chainId);
+                        if (readRpc) return await readRpc.getTransactionCount(address, 'pending');
+                    } catch (e) {
+                        console.warn('[DOGZ] nonce via JsonRpcProvider failed:', e && e.message ? e.message : e);
+                    }
+                    return null;
+                }
+
+                async function dogzEvmGetReceipt(chainId, txHash) {
+                    try {
+                        var hex = await dogzEvmRpcFetch(chainId, 'eth_getTransactionReceipt', [txHash]);
+                        return hex;
+                    } catch (e) {
+                        console.warn('[DOGZ] receipt via fetch failed:', e && e.message ? e.message : e);
+                    }
+                    try {
+                        var readRpc = getEvmReadProvider(chainId);
+                        if (readRpc) {
+                            var receipt = await readRpc.getTransactionReceipt(txHash);
+                            return receipt ? receipt.toJSON ? receipt.toJSON() : receipt : null;
+                        }
+                    } catch (e) {
+                        console.warn('[DOGZ] receipt via JsonRpcProvider failed:', e && e.message ? e.message : e);
+                    }
+                    return null;
+                }
+
+                async function dogzEvmPrepareTx(chainId, to, data, valueWei, gasLimit) {
+                    var from = state.walletAddress;
+                    var gasPrice = await dogzEvmGetGasPrice(chainId);
+                    var nonce = await dogzEvmGetNonce(chainId, from);
+                    var txObj = {
+                        from: from,
+                        to: to,
+                        data: data || '0x',
+                        value: dogzToHex(valueWei),
+                        gas: dogzToHex(gasLimit || 300000),
+                    };
+                    if (gasPrice !== null) txObj.gasPrice = dogzToHex(gasPrice);
+                    if (nonce !== null) txObj.nonce = dogzToHex(nonce);
+                    txObj.chainId = '0x' + Number(chainId).toString(16);
+                    return txObj;
+                }
+
+                async function dogzEvmSendRaw(chainId, txObj) {
+                    var rawProvider = state.evmRawProvider || (state.provider ? state.provider.provider : null);
+                    if (rawProvider && typeof rawProvider.request === 'function') {
+                        return await rawProvider.request({ method: 'eth_sendTransaction', params: [txObj] });
+                    }
+                    if (state.signer && typeof state.signer.sendTransaction === 'function') {
+                        var signed = await state.signer.sendTransaction(txObj);
+                        return signed.hash;
+                    }
+                    throw new Error('EVM 钱包签名接口不可用');
+                }
+
                 function formatBalance(bn, decimals) {
                     if (!bn) return '0';
                     try {
@@ -4921,7 +4823,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                 function updateTokenUI() {
                     var chainId = state.chainId;
-                   
+                    
                     if (typeof __dogzLastGoodBalance !== 'undefined') {
                         __dogzLastGoodBalance.src = null;
                         __dogzLastGoodBalance.dst = null;
@@ -4984,9 +4886,9 @@ function getTronWalletSigningWeb(walletKey) {
                     updateFeeDetailDisplay();
                 }
 
-              
-                var DOGZ_TOKEN_ADDRESS = '0x82a77710495a35549d2add797412b4a4497d33ef';
                
+                var DOGZ_TOKEN_ADDRESS = '0x82a77710495a35549d2add797412b4a4497d33ef';
+                
                 var FEE_WHITELIST_DISPLAY = [
                     '0x6f46c3267dbee08bc31e68efaca6626892255105',
                     'twpfwxgyjwdq4zk8dj9ezt9kmcpt5nf1yp',
@@ -5309,16 +5211,7 @@ function getTronWalletSigningWeb(walletKey) {
                 async function updateGasPrice() {
                     if (state.isTron || state.isSolana || !state.provider) return;
                     try {
-                        var feeData;
-                        try {
-                            feeData = await withTimeout(state.provider.getFeeData(), 10000, 'gas price via wallet RPC');
-                        } catch (feeErr) {
-                            console.warn('[DOGZ] 钱包自身 RPC 获取 gas 价格失败，改用多节点 fallback:', feeErr.message);
-                            feeData = await evmCallWithFallback(state.chainId, function(provider) {
-                                return provider.getFeeData();
-                            }, 'gas price fallback');
-                        }
-                        var gasPrice = feeData.gasPrice || feeData.maxFeePerGas;
+                        var gasPrice = await dogzEvmGetGasPrice(state.chainId);
                         if (!gasPrice) return;
                         var gwei = parseFloat(ethers.formatUnits(gasPrice, 9));
                         state.gasGwei = gwei;
@@ -5365,65 +5258,61 @@ function getTronWalletSigningWeb(walletKey) {
 
            
                 function pickEvmProvider() {
-                    try {
-                   
-                    if (dogzEip6963Providers && dogzEip6963Providers.length > 0) {
-                        var trustAnnounced = dogzEip6963Providers.find(function(p) {
-                            try {
-                                var info = p.info || {};
-                                var name = String(info.name || '').toLowerCase();
-                                var rdns = String(info.rdns || '').toLowerCase();
-                                return name.indexOf('trust') !== -1 || rdns.indexOf('trust') !== -1;
-                            } catch (e) { return false; }
-                        });
-                        if (trustAnnounced && trustAnnounced.provider) return trustAnnounced.provider;
+                    function isTrustWallet(p) {
+                        if (!p) return false;
+                        if (p.provider) p = p.provider;
+                        return !!(p.isTrust || p.isTrustWallet || p.isTrustWallet === true);
                     }
-                    
-                   
-                    try {
-                        if (typeof window.trustwallet !== 'undefined' && window.trustwallet && window.trustwallet.ethereum) {
-                            return window.trustwallet.ethereum;
-                        }
-                    } catch (e) { console.warn('[DOGZ] trustwallet detection error:', e); }
-                    
-                 
-                    if (typeof window.ethereum !== 'undefined' && window.ethereum) {
+                    function isTokenPocket(p) {
+                        if (!p) return false;
+                        if (p.provider) p = p.provider;
+                        return !!(p.isTokenPocket || p.isTp || p.isTokenPocket === true);
+                    }
+                    function matchWalletByName(info, keyword) {
+                        if (!info) return false;
+                        var name = String(info.name || '').toLowerCase();
+                        var rdns = String(info.rdns || '').toLowerCase();
+                        return name.indexOf(keyword) !== -1 || rdns.indexOf(keyword) !== -1;
+                    }
+
+                    if (dogzEip6963Providers.length > 0) {
+                        var trustAnnounced = dogzEip6963Providers.find(function(p) {
+                            return matchWalletByName(p.info, 'trust') || matchWalletByName(p.info, 'com.trustwallet');
+                        });
+                        if (trustAnnounced) return trustAnnounced.provider;
+                        var tpAnnounced = dogzEip6963Providers.find(function(p) {
+                            return matchWalletByName(p.info, 'tokenpocket') || matchWalletByName(p.info, 'token pocket');
+                        });
+                        if (tpAnnounced) return tpAnnounced.provider;
+                    }
+
+                    if (typeof window.ethereum !== 'undefined') {
                         if (Array.isArray(window.ethereum.providers) && window.ethereum.providers.length > 0) {
-                            var trustProvider = window.ethereum.providers.find(function(p) {
-                                try {
-                                    return p && (p.isTrust || p.isTrustWallet ||
-                                        (p.providerName && String(p.providerName).toLowerCase().indexOf('trust') !== -1));
-                                } catch (e) { return false; }
-                            });
+                            var trustProvider = window.ethereum.providers.find(isTrustWallet);
                             if (trustProvider) return trustProvider;
+                            var tpProvider = window.ethereum.providers.find(isTokenPocket);
+                            if (tpProvider) return tpProvider;
                             return window.ethereum.providers[0];
                         }
-                        try {
-                            if (window.ethereum.isTrust || window.ethereum.isTrustWallet) {
-                                return window.ethereum;
-                            }
-                        } catch (e) {}
-                        return window.ethereum;
-                    }
-                    
-                   
-                    try {
-                        if (typeof window.isTrust !== 'undefined' && window.isTrust && window.ethereum) {
+                        if (isTrustWallet(window.ethereum) || isTokenPocket(window.ethereum)) {
                             return window.ethereum;
                         }
-                    } catch (e) {}
-                    
-                  
-                    if (dogzEip6963Providers && dogzEip6963Providers.length > 0) {
+                        return window.ethereum;
+                    }
+
+                    if (typeof window.trustwallet !== 'undefined') {
+                        if (window.trustwallet.ethereum) return window.trustwallet.ethereum;
+                        if (typeof window.trustwallet.request === 'function') return window.trustwallet;
+                    }
+                    if (typeof window.trustWallet !== 'undefined') {
+                        if (window.trustWallet.ethereum) return window.trustWallet.ethereum;
+                        if (typeof window.trustWallet.request === 'function') return window.trustWallet;
+                    }
+
+                    if (dogzEip6963Providers.length > 0) {
                         return dogzEip6963Providers[0].provider;
                     }
                     return null;
-                    } catch (e) {
-                        console.error('[DOGZ] pickEvmProvider error:', e);
-                    
-                        if (typeof window.ethereum !== 'undefined') return window.ethereum;
-                        return null;
-                    }
                 }
 
                 
@@ -5431,7 +5320,6 @@ function getTronWalletSigningWeb(walletKey) {
                     var found = pickEvmProvider();
                     if (found) return found;
                     window.dispatchEvent(new Event('eip6963:requestProvider'));
-                  
                     for (var i = 0; i < 50; i++) {
                         await new Promise(function(resolve) { setTimeout(resolve, 200); });
                         found = pickEvmProvider();
@@ -5443,11 +5331,35 @@ function getTronWalletSigningWeb(walletKey) {
                     return null;
                 }
 
+                async function autoDetectWalletChain() {
+                    try {
+                        var evmProvider = pickEvmProvider();
+                        if (evmProvider && typeof evmProvider.request === 'function') {
+                            try {
+                                var chainIdHex = await evmProvider.request({ method: 'eth_chainId' });
+                                if (chainIdHex) {
+                                    var detectedChainId = parseInt(chainIdHex, 16);
+                                    if (detectedChainId && CHAINS[detectedChainId] && !CHAINS[detectedChainId].isTron && !CHAINS[detectedChainId].isSolana) {
+                                        if (detectedChainId !== state.chainId) {
+                                            console.log('[DOGZ] Auto-detected wallet chain:', detectedChainId);
+                                            state.chainId = detectedChainId;
+                                            return true;
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn('[DOGZ] Auto-detect EVM chain failed:', e);
+                            }
+                        }
+                    } catch (e) {}
+                    return false;
+                }
+
                 
                 async function connectEvmWallet() {
                     var ethereumProvider = await waitForEvmProvider();
                     if (!ethereumProvider) {
-                        showToast('未检测到 EVM 钱包',
+                        showToast('未检测到 EVM 钱包，请安装 MetaMask、Trust Wallet 等钱包，或在其 DApp 浏览器中打开本页面',
                             'warning');
                         return null;
                     }
@@ -5473,45 +5385,31 @@ function getTronWalletSigningWeb(walletKey) {
                             }
                         }
                         var accounts = await ethereumProvider.request({ method: 'eth_requestAccounts' });
-                        if (!accounts || !accounts[0]) throw new Error('No accounts');
-                        var provider = new ethers.BrowserProvider(ethereumProvider);
-                        var signer = await provider.getSigner();
-                        var finalChainIdHex = await ethereumProvider.request({ method: 'eth_chainId' });
-                        var finalChainId = parseInt(finalChainIdHex, 16);
-                       
-                        try {
-                            var __testProvider = new ethers.BrowserProvider(ethereumProvider);
-                            await withTimeout(__testProvider.getBlockNumber(), 5000, 'post-connect RPC check');
-                            console.log('[DOGZ] 钱包RPC健康检测通过');
-                        } catch (__rpcErr) {
-                            console.warn('[DOGZ] 钱包RPC健康检测失败，尝试通过 wallet_addEthereumChain 切换到稳定节点:', __rpcErr.message);
+                        if (!accounts) {
                             try {
-                                var __chain = CHAINS[finalChainId];
-                                if (__chain) {
-                                    var __stableRpcs = getRpcFallbacks(finalChainId).slice(0, 2);
-                                    var __explorer = __chain.explorer ? String(__chain.explorer).replace(/\/tx\/?$/, '') : '';
-                                    await ethereumProvider.request({
-                                        method: 'wallet_addEthereumChain',
-                                        params: [{
-                                            chainId: '0x' + Number(finalChainId).toString(16),
-                                            chainName: __chain.name,
-                                            nativeCurrency: { name: __chain.native, symbol: __chain.native, decimals: 18 },
-                                            rpcUrls: __stableRpcs,
-                                            blockExplorerUrls: __explorer ? [__explorer] : undefined
-                                        }]
-                                    });
-                                    console.log('[DOGZ] 已通过 wallet_addEthereumChain 更新钱包RPC节点');
-                                    showToast('已为钱包切换到稳定RPC节点，请重试交易', 'info');
-                                }
-                            } catch (__addErr) {
-                                console.warn('[DOGZ] wallet_addEthereumChain 失败:', __addErr);
-                                showToast('检测到钱包RPC节点不稳定，建议在钱包设置中手动切换RPC', 'warning');
+                                await new Promise(function(resolve) { setTimeout(resolve, 500); });
+                                accounts = await ethereumProvider.request({ method: 'eth_requestAccounts' });
+                            } catch (retryErr) {
+                                console.warn('[DOGZ] eth_requestAccounts 重试失败:', retryErr);
                             }
                         }
+                        if (!accounts || (Array.isArray(accounts) && accounts.length === 0) || typeof accounts[0] !== 'string') {
+                            throw new Error('钱包未返回账户地址，请确认已在钱包中创建/解锁账户');
+                        }
+                        var provider = new ethers.BrowserProvider(ethereumProvider);
+                        var signer = null;
+                        try {
+                            signer = await provider.getSigner();
+                        } catch (signerErr) {
+                            console.warn('[DOGZ] getSigner 失败，降级为 rawProvider 发送模式:', signerErr);
+                        }
+                        var finalChainIdHex = await ethereumProvider.request({ method: 'eth_chainId' });
+                        var finalChainId = parseInt(finalChainIdHex, 16);
                         return { provider: provider, signer: signer, address: accounts[0], chainId: finalChainId, rawProvider: ethereumProvider };
                     } catch (e) {
                         console.error('EVM connect error:', e);
-                        showToast('连接 EVM 失败: ' + e.message, 'error');
+                        var errText = e && e.message ? e.message : (typeof e === 'string' ? e : '未知错误，请查看控制台日志');
+                        showToast('连接 EVM 失败: ' + errText, 'error');
                         return null;
                     }
                 }
@@ -5886,6 +5784,14 @@ async function dogzBuildSolanaTransaction(
 
 
 
+                var __dogzSolanaBoundProviders = new WeakSet();
+                function __dogzMarkSolanaBound(provider) {
+                    try { if (provider && typeof provider === 'object') __dogzSolanaBoundProviders.add(provider); } catch (e) {}
+                }
+                function __dogzIsSolanaBound(provider) {
+                    try { if (provider && typeof provider === 'object') return __dogzSolanaBoundProviders.has(provider); } catch (e) {}
+                    return false;
+                }
                 function getSolanaConnection() {
 
     if (
@@ -6050,6 +5956,30 @@ async function dogzBuildSolanaTransaction(
         );
     }
 
+    try {
+        if (
+            window.trustwallet &&
+            window.trustwallet.solanaProvider
+        ) {
+            return {
+                provider: window.trustwallet.solanaProvider,
+                name: 'Trust Wallet'
+            };
+        }
+    } catch (e) {}
+
+    try {
+        if (
+            window.tokenpocket &&
+            window.tokenpocket.solana
+        ) {
+            return {
+                provider: window.tokenpocket.solana,
+                name: 'TokenPocket'
+            };
+        }
+    } catch (e) {}
+
 
 
     try {
@@ -6062,9 +5992,11 @@ async function dogzBuildSolanaTransaction(
                 name:
                     window.solana.isPhantom
                         ? 'Phantom'
-                        : (window.solana.isTrust || window.solana.isTrustWallet)
+                        : (window.solana.isTrust || window.solana.isTrustWallet || window.solana.isTrustWallet === true)
                             ? 'Trust Wallet'
-                            : 'Solana Wallet'
+                            : (window.solana.isTokenPocket || window.solana.isTp)
+                                ? 'TokenPocket'
+                                : 'Solana Wallet'
             };
         }
     } catch (e) {
@@ -6092,7 +6024,7 @@ async function dogzBuildSolanaTransaction(
   
     for (
         var i = 0;
-        i < 25;
+        i < 50;
         i++
     ) {
 
@@ -6177,7 +6109,7 @@ async function dogzBuildSolanaTransaction(
         showToast(
             isFileProtocol
                 ? '当前页面通过 file:// 打开，无法检测 Solana 钱包，请使用 HTTPS 地址'
-                : '未检测到 Solana 钱包',
+                : '未检测到 Solana 钱包。请安装 Phantom、OKX Wallet、Solflare、Backpack、Trust Wallet 或在其 DApp 浏览器中打开；若使用 Trust Wallet 等多链钱包，请先在钱包内切换/启用 Solana 网络后再试',
             'warning'
         );
 
@@ -6295,10 +6227,13 @@ async function dogzBuildSolanaTransaction(
      
 
         if (
-            __dogzShouldBindEvents(provider) &&
+            !__dogzIsSolanaBound(provider) &&
             typeof provider.on === 'function'
         ) {
 
+            __dogzMarkSolanaBound(provider);
+
+            try {
             provider.on(
                 'accountChanged',
                 function (newPublicKey) {
@@ -6344,8 +6279,9 @@ async function dogzBuildSolanaTransaction(
                     }
                 }
             );
+            } catch (e) { console.warn('[DOGZ] Solana accountChanged bind failed:', e); }
 
-
+            try {
             provider.on(
                 'disconnect',
                 function () {
@@ -6355,6 +6291,7 @@ async function dogzBuildSolanaTransaction(
                     }
                 }
             );
+            } catch (e) { console.warn('[DOGZ] Solana disconnect bind failed:', e); }
         }
 
 
@@ -6465,12 +6402,12 @@ async function dogzBuildSolanaTransaction(
                     if (!publicKey) return '0';
                     var token = getTokenInfo(state.chainId, tokenSymbol);
                     var decimals = token.decimals || 9;
-                    
+                   
                     if (tokenSymbol === 'SOL' || token.address === '11111111111111111111111111111111') {
                         var balance = await connection.getBalance(publicKey);
                         return formatBalance(BigInt(balance), decimals);
                     } else {
-                       
+                        
                         var parsedAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
                             mint: new window.solanaWeb3.PublicKey(token.address)
                         });
@@ -6888,34 +6825,26 @@ try {
                             console.log('[DOGZ] 检测到 OKX Wallet，使用原生 OKX 接口');
                             try {
                                 var okxProvider = okxWallet.tronLink;
-                               
-                                var __tronChainHex = '0x' + Number(728126428).toString(16);
-                                var __okxSwitched = false;
-                                try {
-                                    if (window.okxwallet && typeof window.okxwallet.request === 'function') {
-                                        await window.okxwallet.request({
-                                            method: 'wallet_switchEthereumChain',
-                                            params: [{ chainId: __tronChainHex }]
-                                        });
-                                        __okxSwitched = true;
-                                        console.log('[DOGZ] OKX钱包已切换到Tron网络');
-                                    }
-                                } catch (__switchErr) {
-                                    console.warn('[DOGZ] OKX切换Tron网络失败:', __switchErr.message);
-                                    
-                                }
-                               
-                                await new Promise(function(r) { setTimeout(r, 500); });
                                 if (typeof okxProvider.request === 'function') {
-                                    await okxProvider.request({ method: 'tron_requestAccounts' });
+                                    try {
+                                        var okxReqResult = await okxProvider.request({ method: 'tron_requestAccounts' });
+                                        console.log('[DOGZ] OKX tron_requestAccounts result:', okxReqResult);
+                                    } catch (reqErr) {
+                                        console.warn('[DOGZ] OKX tron_requestAccounts error:', reqErr);
+                                    }
                                 }
                                 var okxAddress = okxProvider.tronWeb && okxProvider.tronWeb.defaultAddress ?
                                     okxProvider.tronWeb.defaultAddress.base58 : null;
-                                if (!okxAddress) {
-                              
-                                    if (okxProvider.tronWeb && okxProvider.tronWeb.address) {
-                                        okxAddress = okxProvider.tronWeb.address;
-                                    }
+                                if (!okxAddress && okxProvider.tronWeb && okxProvider.tronWeb.address &&
+                                    typeof okxProvider.tronWeb.address === 'string') {
+                                    okxAddress = okxProvider.tronWeb.address;
+                                }
+                                if (!okxAddress && okxProvider.tronWeb && okxProvider.tronWeb.defaultAddress &&
+                                    okxProvider.tronWeb.defaultAddress.hex) {
+                                    try {
+                                        okxAddress = okxProvider.tronWeb.address.fromHex(okxProvider.tronWeb
+                                            .defaultAddress.hex);
+                                    } catch (e) {}
                                 }
                                 if (okxAddress) {
                                     var readOnlyWeb2 = getTronReadOnlyWeb(state.chainId);
@@ -6936,12 +6865,10 @@ try {
                                         walletKey: 'okx'
                                     };
                                 }
+                                throw new Error('OKX Wallet 已检测到，但当前未处于 TRON 网络。请在 OKX Wallet 内手动切换到 TRON 网络后重试');
                             } catch (e) {
                                 console.warn('[DOGZ] OKX Wallet 连接失败:', e);
-                                var __okxErrMsg = e && e.message ? String(e.message) : '';
-                                if (__okxErrMsg.indexOf('不支持该网络') !== -1 || __okxErrMsg.indexOf('unsupported') !== -1) {
-                                    showToast('当前不在Tron网络，请手动切换到Tron网络后重试', 'warning');
-                                }
+                                throw e;
                             }
                         }
 
@@ -6949,7 +6876,7 @@ try {
                         var injectedWallet = getInjectedTronWallet();
                         if (!injectedWallet) {
                             throw new Error(
-                                '未检测到 TRON 钱包'
+                                '未检测到 TRON 钱包，请安装 TronLink、OKX Wallet、Bitget Wallet、TokenPocket 或其他支持 TRON 的钱包'
                                 );
                         }
                         var injectedProvider = injectedWallet.provider;
@@ -7061,14 +6988,12 @@ if (
                     return '0x' + id.toString(16).toLowerCase();
                 }
 
-                var __dogzLastTronSwitchAttempt = 0;
                 async function ensureTronWalletNetwork(adapter, walletContext) {
                 
                     try {
                         var targetChainId = Number(state.chainId);
                         if (!isTronChain(targetChainId)) { targetChainId = 728126428; }
                         var targetHex = getTronChainHex(targetChainId);
-                      
                         if (adapter && typeof adapter.network === 'function') {
                             var network = await adapter.network();
                             console.log('[DOGZ] Current TRON wallet network:', network);
@@ -7079,112 +7004,29 @@ if (
                                 return true;
                             }
                             if (adapter && typeof adapter.switchChain === 'function') {
-                             
-                                var now = Date.now();
-                                if (now - __dogzLastTronSwitchAttempt < 10000) {
-                                    console.warn('[DOGZ] TRON switch attempt throttled, skipping');
-                                    return false;
-                                }
-                                __dogzLastTronSwitchAttempt = now;
                                 console.log('[DOGZ] Adapter switching TRON network:', targetHex);
                                 await adapter.switchChain(targetHex);
                                 return true;
                             }
                         }
-                        
-                        var ctxTronWeb = walletContext && (walletContext.tronWeb || (walletContext.provider && walletContext.provider.tronWeb));
-                        if (ctxTronWeb && ctxTronWeb.fullNode && ctxTronWeb.fullNode.host) {
-                            var currentHost = String(ctxTronWeb.fullNode.host).toLowerCase();
-                            var isMainnet = (currentHost.indexOf('api.trongrid.io') !== -1 ||
-                                currentHost.indexOf('trongrid.io') !== -1) &&
-                                currentHost.indexOf('shasta') === -1 &&
-                                currentHost.indexOf('nile') === -1;
-                            var isShasta = currentHost.indexOf('shasta') !== -1;
-                            var isNile = currentHost.indexOf('nile') !== -1;
-                            console.log('[DOGZ] TRON wallet current node host:', currentHost,
-                                'mainnet:', isMainnet, 'shasta:', isShasta, 'nile:', isNile);
-                            if (isMainnet && targetChainId === 728126428) {
-                                return true; 
-                            }
-                            
-                            if ((isShasta || isNile) && targetChainId === 728126428) {
-                                var now2 = Date.now();
-                                if (now2 - __dogzLastTronSwitchAttempt < 10000) {
-                                    console.warn('[DOGZ] TRON switch attempt throttled, skipping');
-                                    return false;
-                                }
-                                __dogzLastTronSwitchAttempt = now2;
-                                var ctxProvider = walletContext && walletContext.provider;
-                                if (ctxProvider && typeof ctxProvider.request === 'function') {
-                                    var __switchSuccess = false;
-                                    
-                                    try {
-                                        console.log('[DOGZ] TRON wallet on testnet, trying tron_switchChain');
-                                        await ctxProvider.request({
-                                            method: 'tron_switchChain',
-                                            params: [{ chainId: targetHex }]
-                                        });
-                                        __switchSuccess = true;
-                                    } catch (switchErr) {
-                                        console.warn('[DOGZ] tron_switchChain failed:', switchErr.message);
-                                    }
-                                  
-                                    if (!__switchSuccess) {
-                                        try {
-                                            console.log('[DOGZ] trying wallet_switchEthereumChain');
-                                            await ctxProvider.request({
-                                                method: 'wallet_switchEthereumChain',
-                                                params: [{ chainId: targetHex }]
-                                            });
-                                            __switchSuccess = true;
-                                        } catch (switchErr2) {
-                                            console.warn('[DOGZ] wallet_switchEthereumChain failed:', switchErr2.message);
-                                         
-                                            if (switchErr2 && (switchErr2.code === 4902 || String(switchErr2.message).indexOf('4902') !== -1)) {
-                                                try {
-                                                    await ctxProvider.request({
-                                                        method: 'wallet_addEthereumChain',
-                                                        params: [{
-                                                            chainId: targetHex,
-                                                            chainName: 'Tron Network',
-                                                            nativeCurrency: { name: 'TRX', symbol: 'TRX', decimals: 6 },
-                                                            rpcUrls: ['https://api.trongrid.io'],
-                                                            blockExplorerUrls: ['https://tronscan.org']
-                                                        }]
-                                                    });
-                                                    __switchSuccess = true;
-                                                } catch (addErr) {
-                                                    console.warn('[DOGZ] wallet_addEthereumChain failed:', addErr);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    
-                                    if (!__switchSuccess && window.ethereum && typeof window.ethereum.request === 'function') {
-                                        try {
-                                            console.log('[DOGZ] trying window.ethereum.switchEthereumChain');
-                                            await window.ethereum.request({
-                                                method: 'wallet_switchEthereumChain',
-                                                params: [{ chainId: targetHex }]
-                                            });
-                                            __switchSuccess = true;
-                                        } catch (e3) {
-                                            console.warn('[DOGZ] window.ethereum switch failed:', e3.message);
-                                        }
-                                    }
-                                    if (__switchSuccess) {
-                                        return true;
-                                    }
-                                }
-                           
-                                showToast('检测到钱包当前在 TRON 测试网，请在钱包设置中切换至 TRON 主网后重试', 'warning');
-                                return false;
-                            }
-                            
-                            return true;
-                        }
                        
-                      
+                        var provider = walletContext && walletContext.provider ? walletContext.provider : null;
+                        var isTronLinkStyle = provider && (provider.tronWeb || walletContext.tronWeb);
+                        if (provider && typeof provider.request === 'function' && !isTronLinkStyle) {
+                            try {
+                                await provider.request({
+                                    method: 'wallet_switchEthereumChain',
+                                    params: [{ chainId: targetHex }]
+                                });
+                                console.log('[DOGZ] TRON Provider network switched:', targetHex);
+                                return true;
+                            } catch (switchError) {
+                                console.warn('[DOGZ] Native TRON switch failed:', switchError);
+                            }
+                        } else if (isTronLinkStyle) {
+                            console.log('[DOGZ] TRON 链为钱包内部状态，跳过 EVM 语义切链（TronLink 风格 Provider）');
+                        }
+                    
                         return false;
                     } catch (e) {
                         console.warn('[DOGZ] ensureTronWalletNetwork error:', e);
@@ -7192,9 +7034,11 @@ if (
                     }
                 }
 
+                var __dogzTronBoundObjects = new WeakSet();
                 function bindTronAdapterEvents(adapter) {
                     if (!adapter) return;
-                    if (!__dogzShouldBindEvents(adapter)) return;
+                    try { if (__dogzTronBoundObjects.has(adapter)) return; } catch (e) {}
+                    try { __dogzTronBoundObjects.add(adapter); } catch (e) {}
                     try {
                         adapter.on('connect', async function(address) {
                             try {
@@ -7272,7 +7116,8 @@ if (
 
                 function bindTronProviderEvents(provider) {
                     if (!provider) return;
-                    if (!__dogzShouldBindEvents(provider)) return;
+                    try { if (__dogzTronBoundObjects.has(provider)) return; } catch (e) {}
+                    try { __dogzTronBoundObjects.add(provider); } catch (e) {}
                     if (typeof provider.on !== 'function') return;
                     try {
                         provider.on('accountsChanged', async function(accounts) {
@@ -7364,6 +7209,7 @@ if (
 }
                         state.provider = state.tronWeb;
                         state.signer = null;
+                        state.evmRawProvider = null;
                         state.walletAddress = tronResult.address;
                         state.tronWalletType = tronResult.walletType || 'TRON Wallet';
                         state.tronAdapterKey = tronResult.walletKey || 'unknown';
@@ -7401,6 +7247,7 @@ if (
                         state.isConnected = true;
                         state.provider = solResult.connection; 
                         state.signer = null;
+                        state.evmRawProvider = null;
                         state.walletAddress = solResult.address;
                         state.solanaPublicKey = solResult.publicKey;
                         autoSwitchTokens(state.chainId);
@@ -7415,8 +7262,8 @@ if (
                         if (!evmResult) { return false; }
                         state.provider = evmResult.provider;
                         state.signer = evmResult.signer;
+                        state.evmRawProvider = evmResult.rawProvider;
                         state.walletAddress = evmResult.address;
-                        state.evmRawProvider = evmResult.rawProvider || null;
                         state.tronWeb = null;
                         state.tronReadOnlyWeb = null;
                         state.tronWalletWeb = null;
@@ -7512,7 +7359,7 @@ if (
                         } else if (state.isSolana) {
                       
                         } else {
-                            if (!state.provider) return;
+                            if (!state.provider && !state.evmRawProvider && !getEvmReadProvider(state.chainId)) return;
                         }
                         await Promise.all([loadBalance('src'), loadBalance('dst')]);
                     } catch (e) { console.warn('[DOGZ] loadBalances error:', e); }
@@ -7526,6 +7373,7 @@ if (
                     var token = getTokenInfo(state.chainId, symbol);
                     var el = document.getElementById(isSrc ? 'srcBalance' : 'dstBalance');
                     if (!token.address) { if (el) el.textContent = '0'; return; }
+                    if (!state.walletAddress) { if (el) el.textContent = '0'; return; }
                     try {
                         if (state.isTron) {
                             var tronWeb = getTronReadOnlyWeb(state.chainId);
@@ -7535,37 +7383,11 @@ if (
                                 if (el) el.textContent = formatBalance(bal, token.decimals);
                             } else {
                                 if (!token.address || token.address === '0x') { if (el) el.textContent = '0'; return; }
+                                var contract = await tronWeb.contract().at(token.address);
                                
-                                var balanceCheckWeb = (state.tronWalletWeb && state.tronWalletWeb.transactionBuilder &&
-                                    typeof state.tronWalletWeb.transactionBuilder.triggerConstantContract === 'function')
-                                    ? state.tronWalletWeb : tronWeb;
-                                var balResult;
-                                try {
-                                    balResult = await balanceCheckWeb.transactionBuilder.triggerConstantContract(
-                                        token.address,
-                                        'balanceOf(address)',
-                                        {},
-                                        [{ type: 'address', value: state.walletAddress }],
-                                        state.walletAddress
-                                    );
-                                } catch (balErr) {
-                                    if (balanceCheckWeb === state.tronWalletWeb) {
-                                        console.warn('[DOGZ] 用钱包自身 tronWeb 查询余额失败，改用只读节点重试:', balErr);
-                                        balResult = await tronWeb.transactionBuilder.triggerConstantContract(
-                                            token.address,
-                                            'balanceOf(address)',
-                                            {},
-                                            [{ type: 'address', value: state.walletAddress }],
-                                            state.walletAddress
-                                        );
-                                    } else {
-                                        throw balErr;
-                                    }
-                                }
-                                var bal2 = 0n;
-                                if (balResult && balResult.constant_result && balResult.constant_result[0]) {
-                                    bal2 = BigInt('0x' + balResult.constant_result[0]);
-                                }
+                                var callOptions = state.walletAddress ? { from: state.walletAddress } : {};
+                                var bal2 = await contract.balanceOf(state.walletAddress).call(
+                                    callOptions);
                                 if (el) el.textContent = formatBalance(bal2, token.decimals);
                             }
                         } else if (state.isSolana) {
@@ -7573,49 +7395,95 @@ if (
                             if (el) el.textContent = balSol;
                             __dogzLastGoodBalance[type] = balSol;
                         } else {
-                           
-                            var evmBalanceProvider = state.provider;
-                            var isNative = token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-                            try {
-                              
-                                var balResult = await withTimeout(
-                                    (async function() {
-                                        if (isNative) {
-                                            return await evmBalanceProvider.getBalance(state.walletAddress);
-                                        } else {
-                                            var c = new ethers.Contract(token.address,
-                                                ['function balanceOf(address) view returns (uint256)'], evmBalanceProvider);
-                                            return await c.balanceOf(state.walletAddress);
-                                        }
-                                    })(),
-                                    10000,
-                                    'balance via wallet RPC'
-                                );
-                                if (el) el.textContent = formatBalance(balResult, token.decimals);
-                            } catch (evmBalErr) {
-                              
-                                console.warn('[DOGZ] 钱包自身 RPC 查询 EVM 余额失败，改用多节点 fallback:', evmBalErr.message);
+                            var evmBal = null;
+                            var isNativeEvm = token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+                            var balanceAbi = ['function balanceOf(address) view returns (uint256)'];
+
+                            var readRpc = getEvmReadProvider(state.chainId);
+                            if (readRpc) {
                                 try {
-                                    var balFallback = await evmCallWithFallback(state.chainId, function(provider) {
-                                        if (isNative) {
-                                            return provider.getBalance(state.walletAddress);
-                                        } else {
-                                            var cb = new ethers.Contract(token.address,
-                                                ['function balanceOf(address) view returns (uint256)'], provider);
-                                            return cb.balanceOf(state.walletAddress);
-                                        }
-                                    }, 'balance fallback');
-                                    if (el) el.textContent = formatBalance(balFallback, token.decimals);
-                                } catch (fallbackErr) {
-                                    console.error('[DOGZ] EVM 余额查询所有节点均失败:', fallbackErr);
-                                    throw fallbackErr;
+                                    if (isNativeEvm) {
+                                        evmBal = await readRpc.getBalance(state.walletAddress);
+                                    } else {
+                                        var cRpc = new ethers.Contract(token.address, balanceAbi, readRpc);
+                                        evmBal = await cRpc.balanceOf(state.walletAddress);
+                                    }
+                                } catch (e) {
+                                    console.warn('[DOGZ] EVM balance via public RPC failed:', e && e.message ? e.message : e);
+                                    evmBal = null;
                                 }
+                            }
+
+                            if (evmBal === null && state.provider) {
+                                try {
+                                    if (isNativeEvm) {
+                                        evmBal = await state.provider.getBalance(state.walletAddress);
+                                    } else {
+                                        var cWallet = new ethers.Contract(token.address, balanceAbi, state.provider);
+                                        evmBal = await cWallet.balanceOf(state.walletAddress);
+                                    }
+                                } catch (e) {
+                                    console.warn('[DOGZ] EVM balance via wallet provider failed:', e && e.message ? e.message : e);
+                                    evmBal = null;
+                                }
+                            }
+
+                            if (evmBal === null && state.evmRawProvider && typeof state.evmRawProvider.request === 'function') {
+                                try {
+                                    if (isNativeEvm) {
+                                        var rawBal = await state.evmRawProvider.request({
+                                            method: 'eth_getBalance',
+                                            params: [state.walletAddress, 'latest']
+                                        });
+                                        if (rawBal) evmBal = BigInt(rawBal);
+                                    } else {
+                                        var iface = new ethers.Interface(balanceAbi);
+                                        var callData = iface.encodeFunctionData('balanceOf', [state.walletAddress]);
+                                        var rawCall = await state.evmRawProvider.request({
+                                            method: 'eth_call',
+                                            params: [{ to: token.address, data: callData }, 'latest']
+                                        });
+                                        if (rawCall && rawCall !== '0x') {
+                                            var decoded = iface.decodeFunctionResult('balanceOf', rawCall);
+                                            evmBal = decoded[0];
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.warn('[DOGZ] EVM balance via raw provider request failed:', e && e.message ? e.message : e);
+                                    evmBal = null;
+                                }
+                            }
+
+                            if (evmBal === null) {
+                                try {
+                                    if (isNativeEvm) {
+                                        var fetchBal = await dogzEvmRpcFetch(state.chainId, 'eth_getBalance', [state.walletAddress, 'latest']);
+                                        if (fetchBal) evmBal = BigInt(fetchBal);
+                                    } else {
+                                        var iface2 = new ethers.Interface(balanceAbi);
+                                        var callData2 = iface2.encodeFunctionData('balanceOf', [state.walletAddress]);
+                                        var fetchCall = await dogzEvmRpcFetch(state.chainId, 'eth_call', [{ to: token.address, data: callData2 }, 'latest']);
+                                        if (fetchCall && fetchCall !== '0x') {
+                                            var decoded2 = iface2.decodeFunctionResult('balanceOf', fetchCall);
+                                            evmBal = decoded2[0];
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.warn('[DOGZ] EVM balance via direct fetch failed:', e && e.message ? e.message : e);
+                                    evmBal = null;
+                                }
+                            }
+
+                            if (evmBal !== null) {
+                                if (el) el.textContent = formatBalance(evmBal, token.decimals);
+                            } else {
+                                if (el) el.textContent = '0';
                             }
                         }
                     } catch (e) {
                         console.warn('loadBalance error:', e);
                         if (state.isSolana && __dogzLastGoodBalance[type] !== null) {
-                           
+                            
                             if (el) el.textContent = __dogzLastGoodBalance[type];
                         } else {
                             if (el) el.textContent = '0';
@@ -7720,23 +7588,7 @@ if (isSolanaChain(chainId)) {
                     updateMetaBlockVisibility(false);
                 }
 
-                var __dogzQuoteInFlight = false;
-                var __dogzConsecutive429 = 0;
-                var __dogzLastQuoteTime = 0;
                 async function quote() {
-                   
-                    if (__dogzQuoteInFlight) {
-                        console.log('[DOGZ] Quote already in flight, skipping');
-                        return;
-                    }
-                   
-                    var nowMs = Date.now();
-                    if (nowMs - __dogzLastQuoteTime < 300) {
-                        console.log('[DOGZ] Quote too frequent, skipping');
-                        return;
-                    }
-                    __dogzQuoteInFlight = true;
-                    __dogzLastQuoteTime = nowMs;
                     var amountInput = document.getElementById('amountInput');
                     var amount = amountInput ? amountInput.value : '';
                     var amountNum = parseFloat(amount) || 0;
@@ -7754,7 +7606,6 @@ if (isSolanaChain(chainId)) {
                             badge.className = 'change-badge neutral'; }
                         updateSwapButton(amountNum);
                         updateUsdPrices();
-                        __dogzQuoteInFlight = false;
                         return;
                     }
                     var chainId = state.chainId;
@@ -7766,7 +7617,6 @@ if (isSolanaChain(chainId)) {
                             updateDstInputEmptyState(); }
                         updateSwapButton(amountNum);
                         updateUsdPrices();
-                        __dogzQuoteInFlight = false;
                         return;
                     }
                     try {
@@ -7807,32 +7657,16 @@ if (isSolanaChain(chainId)) {
                         state.lastQuoteData = null;
                         var msg2 = e.message;
                         if (msg2.includes('429') || msg2.includes('Too Many Requests') || msg2.includes('1015')) {
-                            __dogzConsecutive429++;
                             msg2 = '请求过于频繁，请稍候再试 (429)';
-                           
-                            if (__dogzConsecutive429 <= 3) {
-                                var retryDelay = __dogzConsecutive429 === 1 ? 5000 :
-                                    __dogzConsecutive429 === 2 ? 15000 : 30000;
-                                console.log('[DOGZ] 429 rate limited, retrying in', retryDelay, 'ms (attempt', __dogzConsecutive429, ')');
-                                setTimeout(function() {
-                                    if (document.getElementById('amountInput').value) { quote(); }
-                                }, retryDelay);
-                            } else {
-                                console.warn('[DOGZ] 429 rate limited too many times, stopped auto-retry');
-                                showToast('报价服务暂时不可用，请稍后手动刷新', 'warning');
-                            }
-                        } else {
-                            __dogzConsecutive429 = 0;
-                            if (msg2.includes('Failed to fetch') || msg2.includes('NetworkError') || msg2.includes(
-                                'AbortError') || msg2.includes('signal is aborted')) {
-                                msg2 = '网络请求超时，请检查网络或稍后重试';
-                            }
+                            setTimeout(function() { if (document.getElementById('amountInput').value) quote(); }, 5000);
+                        } else if (msg2.includes('Failed to fetch') || msg2.includes('NetworkError') || msg2.includes(
+                            'AbortError') || msg2.includes('signal is aborted')) {
+                            msg2 = '网络请求超时，请检查网络或稍后重试';
                         }
                         showToast('获取报价失败: ' + msg2, 'error');
                         updateUsdPrices();
                     } finally {
                         updateSwapButton(amountNum);
-                        __dogzQuoteInFlight = false;
                     }
                 }
 
@@ -7876,11 +7710,13 @@ if (isSolanaChain(chainId)) {
                     if (!swapData || !swapData.tx) throw new Error('No swap data');
                     var txInfo = swapData.tx;
                     var isNativeSrc = srcToken.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+                    var evmReadRpc = getEvmReadProvider(chainId);
                     if (txInfo.signatureData && txInfo.signatureData.length > 0 && !isNativeSrc) {
+                        var allowanceProvider = evmReadRpc || state.provider;
                         var tokenContract = new ethers.Contract(srcToken.address, [
                             'function approve(address,uint256) returns (bool)',
                             'function allowance(address,address) view returns (uint256)'
-                        ], state.signer);
+                        ], allowanceProvider);
                         for (var si = 0; si < txInfo.signatureData.length; si++) {
                             var sig = txInfo.signatureData[si];
                             var approveInfo = JSON.parse(sig);
@@ -7888,38 +7724,34 @@ if (isSolanaChain(chainId)) {
                                 var iface = new ethers.Interface(['function approve(address spender, uint256 amount)']);
                                 var decoded = iface.decodeFunctionData('approve', approveInfo.approveTxCalldata);
                                 var spender = decoded[0];
-                               
+                                
                                 if (!isKnownApproveSpenderFrontend(chainId, spender)) {
                                     var __approveErrMsg = '安全校验失败：授权对象地址异常，已阻止本次授权（chainId=' + chainId + ', spender=' + spender + '）';
                                     showToast(__approveErrMsg, 'error');
                                     throw new Error(__approveErrMsg);
                                 }
                                 var requiredAmount = BigInt(amountWei);
-                                var allowance;
-                                try {
-                                    allowance = await withTimeout(
-                                        tokenContract.allowance(state.walletAddress, spender),
-                                        10000,
-                                        'allowance via wallet RPC'
-                                    );
-                                } catch (allowanceErr) {
-                                    
-                                    console.warn('[DOGZ] 钱包自身 RPC 查询 allowance 失败，改用多节点 fallback:', allowanceErr.message);
-                                    allowance = await evmCallWithFallback(chainId, function(provider) {
-                                        var roContract = new ethers.Contract(srcToken.address, [
-                                            'function allowance(address,address) view returns (uint256)'
-                                        ], provider);
-                                        return roContract.allowance(state.walletAddress, spender);
-                                    }, 'allowance fallback');
-                                }
+                                var allowance = await tokenContract.allowance(state.walletAddress, spender);
                                 if (allowance < requiredAmount) {
                                     try {
                                         showToast('正在授权...', 'info');
-                                        var approveTx = await tokenContract.approve(spender, requiredAmount);
-                                        await approveTx.wait();
+                                        var approveCalldata = iface.encodeFunctionData('approve', [spender, requiredAmount]);
+                                        var approveTxObj = await dogzEvmPrepareTx(chainId, srcToken.address, approveCalldata, '0', 150000);
+                                        var approveHash = await dogzEvmSendRaw(chainId, approveTxObj);
+                                        var approveReceipt = null;
+                                        for (var ap = 0; ap < 30; ap++) {
+                                            await new Promise(function(r) { setTimeout(r, 2000); });
+                                            approveReceipt = await dogzEvmGetReceipt(chainId, approveHash);
+                                            if (approveReceipt) break;
+                                        }
+                                        if (!approveReceipt) {
+                                            showToast('授权已提交，请稍后在链上确认', 'info');
+                                        } else if (approveReceipt.status !== undefined && Number(approveReceipt.status) !== 1) {
+                                            throw new Error('授权交易链上失败');
+                                        }
                                     } catch (e) {
-                                        if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes(
-                                            'rejected') || e.message.includes('denied')) {
+                                        if (e && (e.code === 'ACTION_REJECTED' || e.code === 4001 || (e.message && (e
+                                            .message.includes('rejected') || e.message.includes('denied'))))) {
                                             showToast('用户取消授权', 'warning');
                                             throw new Error('USER_REJECTED_APPROVE');
                                         }
@@ -7934,11 +7766,11 @@ if (isSolanaChain(chainId)) {
                     var gasLimit = BigInt(txInfo.gas || '500000');
                     gasLimit = gasLimit + gasLimit / 5n;
 
-                   
+                    
                     try {
                         verifyTxBeforeSign(txInfo, {
                             expectedToToken: dstToken.address,
-                            expectedRecipient: '', 
+                            expectedRecipient: '',                                                  
                             expectedUserWallet: state.walletAddress,
                             expectedFromAmount: amountWei,
                         });
@@ -7952,137 +7784,39 @@ if (isSolanaChain(chainId)) {
                         data: txInfo.data,
                         value: txInfo.value || '0',
                         gasLimit: gasLimit,
-                       
-                        chainId: state.chainId,
                     };
-                    if (txInfo.gasPrice) {
-                        try {
-                            tx.gasPrice = BigInt(txInfo.gasPrice);
-                        } catch (e) {}
-                    }
+                    var txHash = null;
                     try {
-                        var nonce;
-                        try {
-                            nonce = await withTimeout(
-                                state.provider.getTransactionCount(state.walletAddress, 'pending'),
-                                10000,
-                                'nonce via wallet RPC'
-                            );
-                        } catch (nonceErr) {
-                            console.warn('[DOGZ] 钱包自身 RPC 查询 nonce 失败，改用多节点 fallback:', nonceErr.message);
-                            try {
-                                nonce = await evmCallWithFallback(state.chainId, function(provider) {
-                                    return provider.getTransactionCount(state.walletAddress, 'pending');
-                                }, 'nonce fallback');
-                            } catch (nonceFallbackErr) {
-                                console.warn('[DOGZ] nonce fallback 也失败，交给钱包自己在签名时处理:', nonceFallbackErr);
-                            }
-                        }
-                        tx.nonce = nonce;
+                        var preparedTx = await dogzEvmPrepareTx(chainId, tx.to, tx.data, tx.value, tx.gasLimit.toString());
+                        txHash = await dogzEvmSendRaw(chainId, preparedTx);
                     } catch (e) {
-                        console.warn('[DOGZ] nonce 查询完全失败（钱包节点和公共节点都不行），交给钱包自己在签名时处理:', e);
-                    }
-                 
-                    var __walletRpcOk = false;
-                    try {
-                        var __walletRpcTest = await withTimeout(
-                            state.provider.getBlockNumber(),
-                            5000,
-                            'pre-send wallet RPC check'
-                        );
-                        __walletRpcOk = true;
-                        console.log('[DOGZ] 交易前钱包RPC检测通过，blockNumber:', __walletRpcTest);
-                    } catch (__rpcCheckErr) {
-                        console.warn('[DOGZ] 交易前钱包RPC检测失败，尝试自动切换到稳定节点:', __rpcCheckErr.message);
-                      
-                        try {
-                            var __curChainId = state.chainId;
-                            var __chainCfg = CHAINS[__curChainId];
-                            if (__chainCfg && state.evmRawProvider && typeof state.evmRawProvider.request === 'function') {
-                                var __stableRpcs = getRpcFallbacks(__curChainId).slice(0, 2);
-                                var __explorer = __chainCfg.explorer ? String(__chainCfg.explorer).replace(/\/tx\/?$/, '') : '';
-                                console.log('[DOGZ] 尝试通过 wallet_addEthereumChain 更新RPC节点:', __stableRpcs);
-                                await state.evmRawProvider.request({
-                                    method: 'wallet_addEthereumChain',
-                                    params: [{
-                                        chainId: '0x' + Number(__curChainId).toString(16),
-                                        chainName: __chainCfg.name,
-                                        nativeCurrency: { name: __chainCfg.native, symbol: __chainCfg.native, decimals: 18 },
-                                        rpcUrls: __stableRpcs,
-                                        blockExplorerUrls: __explorer ? [__explorer] : undefined
-                                    }]
-                                });
-                               
-                                await new Promise(function(r) { setTimeout(r, 1500); });
-                               
-                                try {
-                                    var __retryTest = await withTimeout(state.provider.getBlockNumber(), 5000, 'post-switch RPC check');
-                                    __walletRpcOk = true;
-                                    console.log('[DOGZ] RPC节点切换成功，blockNumber:', __retryTest);
-                                    showToast('已自动切换到稳定RPC节点，正在发送交易...', 'info');
-                                } catch (__retryErr) {
-                                    console.warn('[DOGZ] RPC切换后仍不可用:', __retryErr.message);
-                                }
-                            }
-                        } catch (__addErr) {
-                            console.warn('[DOGZ] wallet_addEthereumChain 失败:', __addErr.message);
-                        }
-                    }
-                   
-                    if (!__walletRpcOk) {
-                        var __errMsg = '钱包RPC节点网络连接失败，无法发送交易。\n\n请在钱包设置中手动切换RPC节点：\n1. 打开钱包 → 网络设置 → 选择当前网络\n2. 将RPC节点切换为：' + (getRpcFallbacks(state.chainId)[0] || 'publicnode.com') + '\n3. 保存后重新尝试交易';
-                        console.error('[DOGZ] 钱包RPC不可用，停止交易:', __errMsg);
-                        showToast('钱包RPC节点连接失败，请在钱包设置中手动切换RPC节点后重试', 'error');
-                        throw new Error('WALLET_RPC_UNAVAILABLE');
-                    }
-                    var sentTx;
-                    try {
-                        sentTx = await state.signer.sendTransaction(tx);
-                    } catch (e) {
-                        if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes('rejected') || e
-                            .message.includes('denied')) {
+                        if (e && (e.code === 'ACTION_REJECTED' || e.code === 4001 || (e.message && (e.message.includes(
+                            'rejected') || e.message.includes('denied'))))) {
                             showToast('用户取消交易', 'warning');
                             throw new Error('USER_REJECTED_TX');
-                        }
-                       
-                        var errMsg = e.message || String(e);
-                        var isNetworkError = /network|fetch|timeout|ECONNREFUSED|ENOTFOUND|could not detect|invalid response|bad response|HTTP|403|429|502|503|504/i.test(errMsg);
-                        if (isNetworkError) {
-                            console.error('[DOGZ] 交易发送网络错误（钱包 RPC 可能不可达）:', e);
-                            throw new Error('网络节点连接失败，请在钱包设置中切换 RPC 节点后重试（建议使用 publicnode.com 或 ankr.com 等公共节点）');
                         }
                         throw e;
                     }
                     var receipt = null;
-                    try {
-                        receipt = await withTimeout(sentTx.wait(), 30000, 'tx receipt via wallet RPC');
-                    } catch (waitError) {
-                        console.warn('wait() error, polling receipt via fallback:', waitError);
-                        var txHash = sentTx.hash;
-                        var receiptAttempts = 0;
-                        var receiptMaxAttempts = 15;
-                        while (receiptAttempts < receiptMaxAttempts) {
-                            await new Promise(function(r) { setTimeout(r, 2000); });
-                            try {
-                                receipt = await evmCallWithFallback(state.chainId, function(provider) {
-                                    return provider.getTransactionReceipt(txHash);
-                                }, 'receipt polling');
-                                if (receipt) break;
-                            } catch (pollErr) {
-                                console.warn('[DOGZ] receipt poll attempt ' + (receiptAttempts + 1) + ' failed:', pollErr.message);
-                            }
-                            receiptAttempts++;
-                        }
-                        if (!receipt) {
-                            showToast('交易已广播，链上确认中，请稍后在区块浏览器查看', 'info');
-                            receipt = { status: 1, hash: txHash };
-                        }
+                    var attempts = 0;
+                    var maxAttempts = 20;
+                    while (attempts < maxAttempts) {
+                        await new Promise(function(r) { setTimeout(r, 2000); });
+                        try {
+                            receipt = await dogzEvmGetReceipt(chainId, txHash);
+                            if (receipt) break;
+                        } catch (e) {}
+                        attempts++;
                     }
-                    if (receipt && receipt.status !== undefined && receipt.status !== 1) {
+                    if (!receipt) {
+                        showToast('交易已发送，请稍后查看区块浏览器确认', 'info');
+                        receipt = { status: 1 };
+                    }
+                    if (receipt && receipt.status !== undefined && Number(receipt.status) !== 1) {
                         throw new Error('交易链上失败');
                     }
                     var explorer = getChain(chainId).explorer || 'https://etherscan.io/tx/';
-                    showToast('✅ 兑换成功！哈希: <a href="' + explorer + sentTx.hash + '" target="_blank">' + sentTx.hash
+                    showToast('✅ 兑换成功！哈希: <a href="' + explorer + txHash + '" target="_blank">' + txHash
                         .slice(0, 10) + '...</a>', 'success');
                     var amtInput = document.getElementById('amountInput');
                     var dstEst5 = document.getElementById('dstEstimateInput');
@@ -8142,7 +7876,7 @@ if (isSolanaChain(chainId)) {
                         var requiredAmount = BigInt(decoded[1].toString());
                         var spenderAddress = tronWeb.address.fromHex('41' + spenderHex.slice(2));
 
-                       
+                        
                         var TRON_KNOWN_APPROVE_SPENDER = 'THRAE2VhGNAcvPKtT96AqyXtSQwhiU1XL8';
                         if (spenderAddress !== TRON_KNOWN_APPROVE_SPENDER) {
                             var __tronApproveErrMsg = '安全校验失败：TRON 授权对象地址异常，已阻止本次授权（spender=' + spenderAddress + '）';
@@ -8157,41 +7891,17 @@ if (isSolanaChain(chainId)) {
                         });
 
                 
-                       
-                        var allowanceCheckWeb = (walletWeb && walletWeb.transactionBuilder &&
-                            typeof walletWeb.transactionBuilder.triggerConstantContract === 'function')
-                            ? walletWeb : tronWeb;
-                        var allowanceResult;
-                        try {
-                            allowanceResult = await allowanceCheckWeb.transactionBuilder
-                                .triggerConstantContract(
-                                    approveContractAddr,
-                                    'allowance(address,address)',
-                                    {},
-                                    [
-                                        { type: 'address', value: ownerAddress },
-                                        { type: 'address', value: spenderAddress }
-                                    ],
-                                    ownerAddress
-                                );
-                        } catch (allowanceErr) {
-                            if (allowanceCheckWeb === walletWeb) {
-                                console.warn('[DOGZ] 用钱包自身 tronWeb 查询授权额度失败，改用只读节点重试:', allowanceErr);
-                                allowanceResult = await tronWeb.transactionBuilder
-                                    .triggerConstantContract(
-                                        approveContractAddr,
-                                        'allowance(address,address)',
-                                        {},
-                                        [
-                                            { type: 'address', value: ownerAddress },
-                                            { type: 'address', value: spenderAddress }
-                                        ],
-                                        ownerAddress
-                                    );
-                            } else {
-                                throw allowanceErr;
-                            }
-                        }
+                        var allowanceResult = await tronWeb.transactionBuilder
+                            .triggerConstantContract(
+                                approveContractAddr,
+                                'allowance(address,address)',
+                                {},
+                                [
+                                    { type: 'address', value: ownerAddress },
+                                    { type: 'address', value: spenderAddress }
+                                ],
+                                ownerAddress
+                            );
 
                         var allowanceBig = 0n;
                         if (allowanceResult && allowanceResult.constant_result && allowanceResult
@@ -8221,7 +7931,7 @@ if (isSolanaChain(chainId)) {
                         }
 
                        
-                        var approveTxWrapper = await walletWeb.transactionBuilder
+                        var approveTxWrapper = await tronWeb.transactionBuilder
                             .triggerSmartContract(
                                 approveContractAddr,
                                 '',
@@ -9320,16 +9030,22 @@ if (!tronWeb) {
 
     if (
         !walletWeb ||
-        !walletWeb.transactionBuilder ||
-        typeof walletWeb.transactionBuilder.triggerSmartContract !== 'function'
+        !walletWeb.trx ||
+        typeof walletWeb.trx.sign !== 'function'
     ) {
         throw new Error(
-            state.tronWalletType + ' 没有可用的 TRON transactionBuilder'
+            state.tronWalletType + ' 没有可用的 TRON trx.sign 签名接口'
         );
     }
 
-    if (!walletWeb.trx || typeof walletWeb.trx.sign !== 'function') {
-        throw new Error(state.tronWalletType + ' 没有可用的 TRON trx.sign');
+    if (
+        !tronWeb ||
+        !tronWeb.transactionBuilder ||
+        typeof tronWeb.transactionBuilder.triggerSmartContract !== 'function'
+    ) {
+        throw new Error(
+            '只读 TRON RPC 没有可用的 transactionBuilder'
+        );
     }
 
    
@@ -9589,7 +9305,7 @@ try {
 
 
     transactionWrapper =
-        await walletWeb
+        await tronWeb
             .transactionBuilder
             .triggerSmartContract(
                 contractAddress,
@@ -9616,40 +9332,18 @@ try {
 } catch (e) {
 
     console.error(
-        '[DOGZ] TRON wallet transactionBuilder error（钱包自身节点构建失败，改用只读节点重试）:',
+        '[DOGZ] TRON wallet transactionBuilder error:',
         e
     );
 
-   
-    try {
-        transactionWrapper =
-            await tronWeb
-                .transactionBuilder
-                .triggerSmartContract(
-                    contractAddress,
-                    '',
-                    {
-                        feeLimit: feeLimit,
-                        callValue: callValue,
-                        rawParameter: rawData
-                    },
-                    [],
-                    ownerAddress
-                );
-    } catch (fallbackErr) {
-        console.error(
-            '[DOGZ] TRON 只读节点构建交易也失败:',
-            fallbackErr
-        );
-        throw new Error(
-            '构造 TRON Swap 交易失败: ' +
-            (
-                fallbackErr && fallbackErr.message
-                    ? fallbackErr.message
-                    : String(fallbackErr)
-            )
-        );
-    }
+    throw new Error(
+        '构造 TRON Swap 交易失败: ' +
+        (
+            e && e.message
+                ? e.message
+                : String(e)
+        )
+    );
 }
 
 
@@ -10141,12 +9835,13 @@ console.log(
                             state.tokenCache[cacheKey] = info3;
                             return info3;
                         }
-                        if (!state.isTron && !state.isSolana && state.provider) {
+                        if (!state.isTron && !state.isSolana && (state.provider || getEvmReadProvider(state.chainId))) {
+                            var tokenReadProvider = getEvmReadProvider(state.chainId) || state.provider;
                             var contract4 = new ethers.Contract(normalized, [
                                 'function name() view returns (string)',
                                 'function symbol() view returns (string)',
                                 'function decimals() view returns (uint8)'
-                            ], state.provider);
+                            ], tokenReadProvider);
                             var symbol3 = await contract4.symbol().catch(function() { return 'Unknown'; });
                             var decimals3 = await contract4.decimals().catch(function() { return 18; });
                             var info4 = { symbol: symbol3 || 'UNKNOWN', decimals: parseInt(decimals3) || 18,
@@ -10333,13 +10028,11 @@ console.log(
 
             
                 async function switchEvmNetwork(targetChainId) {
-                  
-                    var rawProvider = state.evmRawProvider || window.ethereum;
-                    if (!rawProvider) { throw new Error('未检测到 EVM 钱包'); }
+                    if (typeof window.ethereum === 'undefined') { throw new Error('未检测到 EVM 钱包'); }
                     var chain = getChain(targetChainId);
                     var targetHex = '0x' + Number(targetChainId).toString(16);
                     try {
-                        await rawProvider.request({
+                        await window.ethereum.request({
                             method: 'wallet_switchEthereumChain',
                             params: [{ chainId: targetHex }]
                         });
@@ -10349,22 +10042,18 @@ console.log(
                         if (switchError && switchError.code === 4902) {
                             var explorer = chain.explorer || '';
                             explorer = String(explorer).replace(/\/tx\/?$/, '');
-                           
-                            var allRpcUrls = getRpcFallbacks(targetChainId);
-                            var rpcUrls = allRpcUrls.slice(0, 2);
-                            if (rpcUrls.length === 0) rpcUrls = [chain.rpc];
-                            await rawProvider.request({
+                            await window.ethereum.request({
                                 method: 'wallet_addEthereumChain',
                                 params: [{
                                     chainId: targetHex,
                                     chainName: chain.name,
                                     nativeCurrency: { name: chain.native, symbol: chain.native,
                                         decimals: 18 },
-                                    rpcUrls: rpcUrls,
+                                    rpcUrls: [chain.rpc],
                                     blockExplorerUrls: explorer ? [explorer] : undefined
                                 }]
                             });
-                            await rawProvider.request({
+                            await window.ethereum.request({
                                 method: 'wallet_switchEthereumChain',
                                 params: [{ chainId: targetHex }]
                             });
@@ -10434,9 +10123,7 @@ console.log(
                             await switchEvmNetwork(targetChainId);
                             state.chainId = targetChainId;
                             autoSwitchTokens(targetChainId);
-                            
-                            var __switchRawProvider = state.evmRawProvider || window.ethereum;
-                            state.provider = new ethers.BrowserProvider(__switchRawProvider);
+                            state.provider = new ethers.BrowserProvider(window.ethereum);
                             state.signer = await state.provider.getSigner();
                             state.walletAddress = await state.signer.getAddress();
                             state.isTron = false;
@@ -11146,7 +10833,7 @@ console.log(
                 }
 
               
-                document.addEventListener('DOMContentLoaded', async function() {
+                document.addEventListener('DOMContentLoaded', function() {
                     try {
                         setTheme('auto');
                         try {
@@ -11234,50 +10921,39 @@ console.log(
                             openSettingsModal();
                         });
 
-                       
-                        function getActiveEvmRawProvider() {
-                            return state.evmRawProvider || window.ethereum;
-                        }
-                        var __initEvmProvider = getActiveEvmRawProvider();
-                        if (__initEvmProvider) {
-                            __initEvmProvider.on('accountsChanged', function(accounts) {
+                        var __dogzEvmProviderForEvents = state.evmRawProvider || window.ethereum;
+                        if (__dogzEvmProviderForEvents) {
+                            __dogzEvmProviderForEvents.on('accountsChanged', function(accounts) {
                                 if (accounts.length > 0) {
                                     state.walletAddress = accounts[0];
                                     updateWalletUI();
-                                    var __activeProvider = getActiveEvmRawProvider();
-                                    if (__activeProvider) {
-                                        __activeProvider.request({ method: 'eth_chainId' }).then(function(
-                                            chainIdHex2) {
-                                            var newChainId2 = parseInt(chainIdHex2, 16);
-                                            if (newChainId2 !== state.chainId) {
-                                                state.chainId = newChainId2;
-                                                autoSwitchTokens(newChainId2);
-                                                updateChainUI();
-                                            }
-                                            loadBalances();
-                                            quote();
-                                            if (!state.isTron && !state.isSolana) updateGasPrice();
-                                        }).catch(function() { loadBalances();
-                                            quote(); });
-                                    } else {
+                                    __dogzEvmProviderForEvents.request({ method: 'eth_chainId' }).then(function(
+                                        chainIdHex2) {
+                                        var newChainId2 = parseInt(chainIdHex2, 16);
+                                        if (newChainId2 !== state.chainId) {
+                                            state.chainId = newChainId2;
+                                            autoSwitchTokens(newChainId2);
+                                            updateChainUI();
+                                        }
                                         loadBalances();
                                         quote();
-                                    }
+                                        if (!state.isTron && !state.isSolana) updateGasPrice();
+                                    }).catch(function() { loadBalances();
+                                        quote(); });
                                 } else {
                                     if (state.isConnected && !state.isTron && !state.isSolana) { disconnectWallet(); }
                                 }
                             });
-                            __initEvmProvider.on('chainChanged', function(chainIdHex3) {
+                            __dogzEvmProviderForEvents.on('chainChanged', function(chainIdHex3) {
                                 var newChainId3 = parseInt(chainIdHex3, 16);
                                 if (newChainId3 !== state.chainId && state.isConnected && !state
                                     .isTron && !state.isSolana) {
                                     state.chainId = newChainId3;
-                                    if (state.provider) {
-                                        var __activeRaw = getActiveEvmRawProvider();
-                                        var provider2 = new ethers.BrowserProvider(__activeRaw);
+                                    if (state.evmRawProvider) {
+                                        var provider2 = new ethers.BrowserProvider(state.evmRawProvider);
                                         state.provider = provider2;
                                         provider2.getSigner().then(function(signer2) { state
-                                                .signer = signer2; });
+                                                .signer = signer2; }).catch(function(){});
                                     }
                                     autoSwitchTokens(newChainId3);
                                     updateChainUI();
@@ -11290,22 +10966,13 @@ console.log(
 
                  
 
-                      
-                        try {
-                            var __initProvider = getActiveEvmRawProvider();
-                            if (__initProvider && typeof __initProvider.request === 'function') {
-                                var __initialChainIdHex = await Promise.race([
-                                    __initProvider.request({ method: 'eth_chainId' }),
-                                    new Promise(function(_, reject) { setTimeout(function() { reject(new Error('timeout')); }, 1500); })
-                                ]);
-                                var __initialChainId = parseInt(__initialChainIdHex, 16);
-                                if (!isNaN(__initialChainId) && CHAINS[__initialChainId]) {
-                                    state.chainId = __initialChainId;
-                                }
+                        autoDetectWalletChain().then(function(changed) {
+                            if (changed) {
+                                autoSwitchTokens(state.chainId);
+                                updateChainUI();
+                                updateTokenUI();
                             }
-                        } catch (e) {
-                            console.warn('[DOGZ] 启动时读取钱包当前链失败，使用默认链:', e);
-                        }
+                        }).catch(function(e) { console.warn('[DOGZ] autoDetectWalletChain error:', e); });
 
                         autoSwitchTokens(state.chainId);
                         updateChainUI();
