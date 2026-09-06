@@ -5116,7 +5116,23 @@ function getTronWalletSigningWeb(walletKey) {
                 async function updateGasPrice() {
                     if (state.isTron || state.isSolana || !state.provider) return;
                     try {
-                        var feeData = await state.provider.getFeeData();
+                        var feeData = null;
+                        var readRpcForGas = getEvmReadProvider(state.chainId);
+                        if (readRpcForGas) {
+                            try {
+                                feeData = await readRpcForGas.getFeeData();
+                            } catch (publicFeeErr) {
+                                console.warn('[DOGZ] 公共 RPC 获取 gas 价格失败，改用钱包自身 RPC:', publicFeeErr && publicFeeErr
+                                    .message ? publicFeeErr.message : publicFeeErr);
+                                feeData = null;
+                            }
+                        }
+                        if (!feeData) {
+                            // 修复：钱包自身 RPC（如 TokenPocket 部分设备环境下的 Failed to fetch）
+                            // 不可用时，不再直接放弃，而是已经在上面优先走了公共 RPC；这里仅作为
+                            // 公共 RPC 也失败时的最后兜底。
+                            feeData = await state.provider.getFeeData();
+                        }
                         var gasPrice = feeData.gasPrice || feeData.maxFeePerGas;
                         if (!gasPrice) return;
                         var gwei = parseFloat(ethers.formatUnits(gasPrice, 9));
@@ -5179,6 +5195,11 @@ function getTronWalletSigningWeb(walletKey) {
                         return name.indexOf(keyword) !== -1 || rdns.indexOf(keyword) !== -1;
                     }
 
+                    console.log('[DOGZ] pickEvmProvider: EIP-6963 已宣告的钱包 =',
+                        dogzEip6963Providers.map(function(p) { return p.info && p.info.name; }),
+                        ' window.ethereum 是否存在 =', typeof window.ethereum !== 'undefined',
+                        ' window.trustwallet 是否存在 =', typeof window.trustwallet !== 'undefined');
+
                     if (dogzEip6963Providers.length > 0) {
                         var trustAnnounced = dogzEip6963Providers.find(function(p) {
                             return matchWalletByName(p.info, 'trust');
@@ -5211,6 +5232,7 @@ function getTronWalletSigningWeb(walletKey) {
                     if (dogzEip6963Providers.length > 0) {
                         return dogzEip6963Providers[0].provider;
                     }
+                    console.warn('[DOGZ] pickEvmProvider: 未检测到任何 EVM provider（既无 EIP-6963 宣告，也无 window.ethereum / window.trustwallet.ethereum）');
                     return null;
                 }
 
@@ -5255,13 +5277,41 @@ function getTronWalletSigningWeb(walletKey) {
                 }
 
                 
+                function dogzFormatError(e) {
+                    // 统一的错误信息提取：避免因为 e 没有 message 字段（例如某些钱包
+                    // reject 出来的是裸对象 {} 或非 Error 值）而在提示里显示成字面上的
+                    // "undefined"，同时保留原始对象方便控制台排查。
+                    if (!e) return '未知错误（钱包返回了空错误对象），请查看控制台日志';
+                    if (typeof e === 'string') return e;
+                    if (e.message) return e.message;
+                    try {
+                        var serialized = JSON.stringify(e);
+                        if (serialized && serialized !== '{}') return serialized;
+                    } catch (jsonErr) {}
+                    return '未知错误，请查看控制台日志';
+                }
+
                 async function connectEvmWallet() {
-                    var ethereumProvider = await waitForEvmProvider();
+                    var ethereumProvider;
+                    try {
+                        ethereumProvider = await waitForEvmProvider();
+                    } catch (detectErr) {
+                        // 修复：这一步之前完全没有被 try/catch 包住，一旦检测过程中
+                        // 抛出异常（比如某个钱包注入的 provider 对象格式不标准），整个
+                        // connectEvmWallet 就会以"未捕获的 Promise rejection"失败——
+                        // 界面上表现为点击连接按钮毫无反应。现在统一捕获并给出提示。
+                        console.error('[DOGZ] EVM provider 检测过程出错:', detectErr);
+                        showToast('检测钱包失败: ' + dogzFormatError(detectErr), 'error');
+                        return null;
+                    }
                     if (!ethereumProvider) {
                         showToast('未检测到 EVM 钱包，请安装 MetaMask、Trust Wallet 等钱包，或在其 DApp 浏览器中打开本页面',
                             'warning');
                         return null;
                     }
+                    console.log('[DOGZ] 使用的 EVM provider:', ethereumProvider && ethereumProvider.isTrust ?
+                        'Trust Wallet' : (ethereumProvider && ethereumProvider.isTokenPocket ? 'TokenPocket' :
+                            '未知/其他'));
                     try {
                         var chainIdHex;
                         try {
@@ -5292,7 +5342,7 @@ function getTronWalletSigningWeb(walletKey) {
                         return { provider: provider, signer: signer, address: accounts[0], chainId: finalChainId, rawProvider: ethereumProvider };
                     } catch (e) {
                         console.error('EVM connect error:', e);
-                        showToast('连接 EVM 失败: ' + e.message, 'error');
+                        showToast('连接 EVM 失败: ' + dogzFormatError(e), 'error');
                         return null;
                     }
                 }
@@ -6881,21 +6931,14 @@ if (
                             }
                         }
                        
-                        var provider = walletContext && walletContext.provider ? walletContext.provider : null;
-                        if (provider && typeof provider.request === 'function') {
-                            try {
-                                await provider.request({
-                                    method: 'wallet_switchEthereumChain',
-                                    params: [{ chainId: targetHex }]
-                                });
-                                console.log('[DOGZ] TRON Provider network switched:', targetHex);
-                                return true;
-                            } catch (switchError) {
-                                console.warn('[DOGZ] Native TRON switch failed:', switchError);
-                            }
-                        }
-                    
-                        return false;
+                        // 修复：Tron 原生/注入式 provider（例如 OKX 的 window.okxwallet.tronLink）
+                        // 不支持 EVM 专用的 wallet_switchEthereumChain 方法（EIP-3326），
+                        // 之前在这里调用它只会弹出一个必定失败的"切换网络"确认框（OKX 返回
+                        // 4902 暂不支持该网络），且每次连接都会重复弹出，造成"无限弹窗"。
+                        // Tron 主网本身也没有需要切换的多链概念，因此对非 Adapter 的 Tron
+                        // provider 直接跳过网络切换，不再发送该请求。
+                        console.log('[DOGZ] 非 Adapter 的 TRON Provider，跳过网络切换（Tron 无需/不支持 wallet_switchEthereumChain）');
+                        return true;
                     } catch (e) {
                         console.warn('[DOGZ] ensureTronWalletNetwork error:', e);
                         return false;
@@ -7539,6 +7582,56 @@ if (isSolanaChain(chainId)) {
                 }
 
              
+                async function getEvmTxOverrides(chainId, walletAddress) {
+                    var overrides = {};
+                    var readRpc = getEvmReadProvider(chainId);
+                    var nonce = null;
+                    var feeData = null;
+                    if (readRpc) {
+                        try {
+                            var results = await Promise.all([
+                                readRpc.getTransactionCount(walletAddress, 'pending'),
+                                readRpc.getFeeData()
+                            ]);
+                            nonce = results[0];
+                            feeData = results[1];
+                        } catch (e) {
+                            console.warn('[DOGZ] 公共 RPC 获取 nonce/gas 失败，改用钱包自身 RPC:', e && e.message ? e
+                                .message : e);
+                            nonce = null;
+                            feeData = null;
+                        }
+                    }
+                    if ((nonce === null || feeData === null) && state.provider) {
+                        try {
+                            if (nonce === null) {
+                                nonce = await state.provider.getTransactionCount(walletAddress, 'pending');
+                            }
+                            if (feeData === null) {
+                                feeData = await state.provider.getFeeData();
+                            }
+                        } catch (e) {
+                            // 修复：以前发交易时完全依赖钱包自身 RPC 去查 nonce/gas，一旦这个
+                            // 通道 Failed to fetch（TokenPocket 在部分设备/网络下会这样），
+                            // 就会在这一步直接卡死甚至阻断交易。现在公共 RPC 和钱包 RPC 都失败
+                            // 时，不再抛错阻断——把 overrides 留空，交给 ethers/钱包在
+                            // sendTransaction 时自行兜底填充（大多数钱包内部签名时会自己算）。
+                            console.warn('[DOGZ] 钱包自身 RPC 也无法获取 nonce/gas，交由钱包内部自行处理:', e &&
+                                e.message ? e.message : e);
+                        }
+                    }
+                    if (nonce !== null && nonce !== undefined) overrides.nonce = nonce;
+                    if (feeData) {
+                        if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+                            overrides.maxFeePerGas = feeData.maxFeePerGas;
+                            overrides.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+                        } else if (feeData.gasPrice) {
+                            overrides.gasPrice = feeData.gasPrice;
+                        }
+                    }
+                    return overrides;
+                }
+
                 async function executeEvmSwap() {
                     var chainId = state.chainId;
                     var srcToken = getTokenInfo(chainId, state.srcTokenSymbol);
@@ -7601,11 +7694,14 @@ if (isSolanaChain(chainId)) {
                                 if (allowance < requiredAmount) {
                                     try {
                                         showToast('正在授权...', 'info');
-                                        var approveTx = await tokenContract.approve(spender, requiredAmount);
+                                        var approveOverrides = await getEvmTxOverrides(chainId, state.walletAddress);
+                                        var approveTx = await tokenContract.approve(spender, requiredAmount,
+                                            approveOverrides);
                                         await approveTx.wait();
                                     } catch (e) {
-                                        if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes(
-                                            'rejected') || e.message.includes('denied')) {
+                                        var approveErrMsg = e && e.message ? e.message : '';
+                                        if (e.code === 'ACTION_REJECTED' || e.code === 4001 || approveErrMsg.includes(
+                                            'rejected') || approveErrMsg.includes('denied')) {
                                             showToast('用户取消授权', 'warning');
                                             throw new Error('USER_REJECTED_APPROVE');
                                         }
@@ -7633,18 +7729,20 @@ if (isSolanaChain(chainId)) {
                         throw verifyErr;
                     }
 
-                    var tx = {
+                    var txOverrides = await getEvmTxOverrides(chainId, state.walletAddress);
+                    var tx = Object.assign({
                         to: txInfo.to,
                         data: txInfo.data,
                         value: txInfo.value || '0',
                         gasLimit: gasLimit,
-                    };
+                    }, txOverrides);
                     var sentTx;
                     try {
                         sentTx = await state.signer.sendTransaction(tx);
                     } catch (e) {
-                        if (e.code === 'ACTION_REJECTED' || e.code === 4001 || e.message.includes('rejected') || e
-                            .message.includes('denied')) {
+                        var sendErrMsg = e && e.message ? e.message : '';
+                        if (e.code === 'ACTION_REJECTED' || e.code === 4001 || sendErrMsg.includes('rejected') ||
+                            sendErrMsg.includes('denied')) {
                             showToast('用户取消交易', 'warning');
                             throw new Error('USER_REJECTED_TX');
                         }
