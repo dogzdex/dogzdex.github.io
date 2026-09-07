@@ -73,7 +73,9 @@
 </script>
 
 
-<script src="./dogz-walletconnect.bundle.js"></script>
+<script src="./dogz-walletconnect.bundle.js"
+    onload="console.log('[DOGZ] dogz-walletconnect.bundle.js 加载成功，来源:', this.src)"
+    onerror="console.error('[DOGZ] dogz-walletconnect.bundle.js 加载失败！实际请求的地址是:', this.src, '——请直接在浏览器打开这个地址确认返回的是 JS 代码而不是 404，并确认文件名大小写和所在目录与 index.html 完全一致（GitHub Pages 区分大小写）')"></script>
 
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer>
@@ -4560,8 +4562,8 @@ function getTronWalletSigningWeb(walletKey) {
 
                 
                 var CHAIN_RPC_FALLBACKS = {
-                    1: ['https://rpc-eth.blockmachine.io', 'https://eth.drpc.org', 'https://ethereum-rpc.publicnode.com', 'https://cloudflare-eth.com'],
-                    56: ['https://rpc-bsc.blockmachine.io', 'https://bsc-dataseed.binance.org', 'https://bsc-dataseed1.defibit.io', 'https://bsc-rpc.publicnode.com'],
+                    1: ['https://eth.llamarpc.com', 'https://rpc.ankr.com/eth', 'https://ethereum-rpc.publicnode.com', 'https://cloudflare-eth.com'],
+                    56: ['https://binance.nodereal.io', 'https://bsc-dataseed.binance.org', 'https://bsc-dataseed1.defibit.io', 'https://bsc-rpc.publicnode.com'],
                     137: ['https://polygon-rpc.com', 'https://polygon-bor-rpc.publicnode.com', 'https://rpc.ankr.com/polygon'],
                     42161: ['https://arb1.arbitrum.io/rpc', 'https://arbitrum-one-rpc.publicnode.com', 'https://rpc.ankr.com/arbitrum'],
                     10: ['https://mainnet.optimism.io', 'https://optimism-rpc.publicnode.com', 'https://rpc.ankr.com/optimism'],
@@ -4624,8 +4626,50 @@ function getTronWalletSigningWeb(walletKey) {
                     }
                 }
 
+                async function dogzEvmRpcFetchViaProxy(chainId, method, params) {
+                    var resp = await fetch(PROXY_URL, {
+                        method: 'POST',
+                        headers: buildProxyHeaders(),
+                        body: JSON.stringify({
+                            type: 'evm-rpc',
+                            chainId: Number(chainId),
+                            payload: { jsonrpc: '2.0', id: 1, method: method, params: params || [] }
+                        })
+                    });
+                    var data;
+                    try {
+                        data = await resp.json();
+                    } catch (e) {
+                        throw new Error('EVM RPC 代理返回了非法响应 (HTTP ' + resp.status + ')');
+                    }
+                    if (data && data.error) {
+                        throw new Error(data.error.message || JSON.stringify(data.error));
+                    }
+                    if (!resp.ok || (data && typeof data.code !== 'undefined' && data.msg && data.result === undefined)) {
+                        throw new Error((data && data.msg) || ('EVM RPC 代理请求失败: HTTP ' + resp.status));
+                    }
+                    return data.result;
+                }
+
+                function dogzMakeProxyEip1193Provider(chainId) {
+                    return {
+                        request: function(args) {
+                            return dogzEvmRpcFetchViaProxy(chainId, args.method, args.params);
+                        }
+                    };
+                }
+
                 
                 async function dogzEvmMultiRpcCall(chainId, execFn, timeoutMs) {
+                   
+                    try {
+                        var proxyProvider = new ethers.BrowserProvider(dogzMakeProxyEip1193Provider(chainId), Number(
+                            chainId));
+                        return await dogzWithTimeout(execFn(proxyProvider), timeoutMs || 8000);
+                    } catch (proxyErr) {
+                        console.warn('[DOGZ] 后端 RPC 代理失败，改用客户端直连公共节点:', proxyErr && proxyErr.message ?
+                            proxyErr.message : proxyErr);
+                    }
                     var urls = getEvmRpcUrls(chainId);
                     var lastErr = new Error('没有可用的 RPC 节点');
                     for (var i = 0; i < urls.length; i++) {
@@ -5358,7 +5402,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                 
                 function dogzFormatError(e) {
-                    
+                   
                     if (!e) return '未知错误（钱包返回了空错误对象），请查看控制台日志';
                     if (typeof e === 'string') return e;
                     if (e.message) return e.message;
@@ -5450,7 +5494,7 @@ function getTronWalletSigningWeb(walletKey) {
                     try {
                         ethereumProvider = await waitForEvmProvider();
                     } catch (detectErr) {
-                        
+                       
                         console.error('[DOGZ] EVM provider 检测过程出错:', detectErr);
                         showToast('检测钱包失败: ' + dogzFormatError(detectErr), 'error');
                         return null;
@@ -6205,7 +6249,7 @@ async function dogzBuildSolanaTransaction(
         showToast(
             isFileProtocol
                 ? '当前页面通过 file:// 打开，无法检测 Solana 钱包，请使用 HTTPS 地址'
-                : '未检测到 Solana 钱包。',
+                : '未检测到 Solana 钱包',
             'warning'
         );
 
@@ -6952,14 +6996,14 @@ try {
                                         walletKey: 'okx'
                                     };
                                 }
-                                
+                               
                                 okxAlreadyFailed = true;
                             } catch (e) {
                                 console.warn('[DOGZ] OKX Wallet 连接失败:', e);
                                 okxAlreadyFailed = true;
                                 var okxErrMsg = e && e.message ? e.message : String(e);
                                 if (/不支持该网络|not support|unsupported/i.test(okxErrMsg)) {
-                                    
+                                   
                                     showToast('OKX 钱包未启用 TRON 网络，请在 OKX App 内「资产 → 管理网络」中开启 TRON 后重试',
                                         'error');
                                     throw new Error('OKX_TRON_NOT_ENABLED');
@@ -6970,12 +7014,12 @@ try {
                
                         var injectedWallet = getInjectedTronWallet();
                         if (okxAlreadyFailed && injectedWallet && injectedWallet.key === 'okx') {
-                            
+                           
                             injectedWallet = null;
                         }
                         if (!injectedWallet) {
                             throw new Error(
-                                '未检测到 TRON 钱包，'
+                                '未检测到 TRON 钱包，请安装 TronLink、OKX Wallet、Bitget Wallet、TokenPocket 或其他支持 TRON 的钱包'
                                 );
                         }
                         var injectedProvider = injectedWallet.provider;
@@ -7564,7 +7608,7 @@ if (
                             if (evmBal !== null) {
                                 if (el) el.textContent = formatBalance(evmBal, token.decimals);
                             } else {
-                                
+                               
                                 if (el) el.textContent = '读取失败';
                                 console.warn('[DOGZ] 余额读取彻底失败（公共RPC/钱包RPC/裸请求/直连fetch全部失败），请检查网络连接');
                             }
@@ -7788,7 +7832,7 @@ if (isSolanaChain(chainId)) {
                                 feeData = await state.provider.getFeeData();
                             }
                         } catch (e) {
-                            
+                           
                             console.warn('[DOGZ] 钱包自身 RPC 也无法获取 nonce/gas，交由钱包内部自行处理:', e &&
                                 e.message ? e.message : e);
                         }
