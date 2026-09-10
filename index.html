@@ -90,7 +90,7 @@
         };
         document.head.appendChild(s);
     }
-
+   
     loadScript(CDN_URL, function() {}, function() {
         loadScript(SELF_HOSTED_URL, function() {}, function() {
             console.error('[DOGZ] WalletConnect 组件两条加载路径全部失败（CDN 和自托管都不行），请检查网络，或确认', SELF_HOSTED_URL, '这个文件确实已经上传到仓库根目录');
@@ -4584,12 +4584,12 @@ function getTronWalletSigningWeb(walletKey) {
 
                
                 var CHAIN_RPC_FALLBACKS = {
-                    1: ['https://eth.llamarpc.com', 'https://rpc.ankr.com/eth', 'https://ethereum-rpc.publicnode.com', 'https://cloudflare-eth.com'],
+                    1: ['https://eth.llamarpc.com', 'https://ethereum-rpc.publicnode.com', 'https://cloudflare-eth.com', 'https://eth.drpc.org', 'https://1rpc.io/eth'],
                     56: ['https://binance.nodereal.io', 'https://bsc-dataseed.binance.org', 'https://bsc-dataseed1.defibit.io', 'https://bsc-rpc.publicnode.com'],
-                    137: ['https://polygon-rpc.com', 'https://polygon-bor-rpc.publicnode.com', 'https://rpc.ankr.com/polygon'],
-                    42161: ['https://arb1.arbitrum.io/rpc', 'https://arbitrum-one-rpc.publicnode.com', 'https://rpc.ankr.com/arbitrum'],
-                    10: ['https://mainnet.optimism.io', 'https://optimism-rpc.publicnode.com', 'https://rpc.ankr.com/optimism'],
-                    8453: ['https://mainnet.base.org', 'https://base-rpc.publicnode.com', 'https://rpc.ankr.com/base'],
+                    137: ['https://polygon-rpc.com', 'https://polygon-bor-rpc.publicnode.com', 'https://polygon.drpc.org'],
+                    42161: ['https://arb1.arbitrum.io/rpc', 'https://arbitrum-one-rpc.publicnode.com', 'https://arbitrum.drpc.org'],
+                    10: ['https://mainnet.optimism.io', 'https://optimism-rpc.publicnode.com', 'https://optimism.drpc.org'],
+                    8453: ['https://mainnet.base.org', 'https://base-rpc.publicnode.com', 'https://base.drpc.org'],
                     43114: ['https://api.avax.network/ext/bc/C/rpc', 'https://avalanche-c-chain-rpc.publicnode.com']
                 };
 
@@ -4692,9 +4692,9 @@ function getTronWalletSigningWeb(walletKey) {
                     return __dogzProxyBrowserProviderCache[key];
                 }
 
-                
+               
                 async function dogzEvmMultiRpcCall(chainId, execFn, timeoutMs) {
-                    
+                 
                     try {
                         var proxyProvider = getProxyEvmProvider(chainId);
                         return await dogzWithTimeout(execFn(proxyProvider), timeoutMs || 8000);
@@ -5290,7 +5290,7 @@ function getTronWalletSigningWeb(walletKey) {
                             feeData = null;
                         }
                         if (!feeData) {
-                           
+                          
                             feeData = await state.provider.getFeeData();
                         }
                         var gasPrice = feeData.gasPrice || feeData.maxFeePerGas;
@@ -5438,7 +5438,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                 
                 function dogzFormatError(e) {
-                   
+                  
                     if (!e) return '未知错误（钱包返回了空错误对象），请查看控制台日志';
                     if (typeof e === 'string') return e;
                     if (e.message) return e.message;
@@ -5526,7 +5526,7 @@ function getTronWalletSigningWeb(walletKey) {
                     modal.style.display = 'flex';
                     var deepLink = 'trust://wc?uri=' + encodeURIComponent(uri);
                     openBtn.onclick = function() {
-                       
+                     
                         window.location.href = deepLink;
                     };
                     copyBtn.onclick = function() {
@@ -5565,7 +5565,7 @@ function getTronWalletSigningWeb(walletKey) {
                                 return accts.map(function(a) { return a.split(':')[2]; });
                             }
                             if (method === 'wallet_switchEthereumChain') {
-                                
+                            
                                 var targetHex = params[0] && params[0].chainId;
                                 if (targetHex) {
                                     __dogzWcCurrentChainId = parseInt(targetHex, 16);
@@ -5673,13 +5673,13 @@ function getTronWalletSigningWeb(walletKey) {
                     try {
                         ethereumProvider = await waitForEvmProvider();
                     } catch (detectErr) {
-                        
+                       
                         console.error('[DOGZ] EVM provider 检测过程出错:', detectErr);
                         showToast('检测钱包失败: ' + dogzFormatError(detectErr), 'error');
                         return null;
                     }
                     if (!ethereumProvider) {
-                       
+                      
                         try {
                             showToast('未检测到已注入的钱包，正在打开 WalletConnect 连接（可用 Trust Wallet 等 App 扫码或直接跳转）...',
                                 'info');
@@ -7175,7 +7175,7 @@ try {
                                         walletKey: 'okx'
                                     };
                                 }
-                               
+                             
                                 okxAlreadyFailed = true;
                             } catch (e) {
                                 console.warn('[DOGZ] OKX Wallet 连接失败:', e);
@@ -7193,7 +7193,7 @@ try {
                
                         var injectedWallet = getInjectedTronWallet();
                         if (okxAlreadyFailed && injectedWallet && injectedWallet.key === 'okx') {
-                          
+                           
                             injectedWallet = null;
                         }
                         if (!injectedWallet) {
@@ -7791,7 +7791,7 @@ if (
                             if (evmBal !== null) {
                                 if (el) el.textContent = formatBalance(evmBal, token.decimals);
                             } else {
-                                
+                               
                                 if (el) el.textContent = '读取失败';
                                 console.warn('[DOGZ] 余额读取彻底失败（公共RPC/钱包RPC/裸请求/直连fetch全部失败），请检查网络连接');
                             }
@@ -8015,7 +8015,7 @@ if (isSolanaChain(chainId)) {
                                 feeData = await state.provider.getFeeData();
                             }
                         } catch (e) {
-                            
+                           
                             console.warn('[DOGZ] 钱包自身 RPC 也无法获取 nonce/gas，交由钱包内部自行处理:', e &&
                                 e.message ? e.message : e);
                         }
@@ -8074,7 +8074,7 @@ if (isSolanaChain(chainId)) {
                         } else if (txFields.gasPrice) {
                             rawTx.gasPrice = dogzToHexQuantity(txFields.gasPrice);
                         }
-                        
+                       
                         var txHash = await state.evmRawProvider.request({
                             method: 'eth_sendTransaction',
                             params: [rawTx]
