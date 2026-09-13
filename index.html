@@ -405,104 +405,7 @@
 
         })();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
-<script>new VConsole();</script>
-<script>
-(function() {
     
-    var __LOGS = [];
-    var MAX_LOGS = 3000; 
-
-   
-    var origLog = console.log;
-    var origWarn = console.warn;
-    var origError = console.error;
-    var origInfo = console.info;
-
-    function pushLog(type, args) {
-        try {
-            var msg = Array.from(args).map(function(a) {
-                if (typeof a === 'object') {
-                    try { return JSON.stringify(a, null, 2); } catch(e) { return String(a); }
-                }
-                return String(a);
-            }).join(' ');
-            __LOGS.push({ type: type, msg: msg, time: new Date().toLocaleTimeString() });
-            if (__LOGS.length > MAX_LOGS) __LOGS.shift();
-        } catch(e) {}
-    }
-
-  
-    console.log = function() { pushLog('LOG', arguments); return origLog.apply(console, arguments); };
-    console.warn = function() { pushLog('WARN', arguments); return origWarn.apply(console, arguments); };
-    console.error = function() { pushLog('ERROR', arguments); return origError.apply(console, arguments); };
-    console.info = function() { pushLog('INFO', arguments); return origInfo.apply(console, arguments); };
-
-    
-    window.getLogs = function() {
-        return __LOGS.map(function(l) { return '[' + l.time + '] [' + l.type + '] ' + l.msg; }).join('\n');
-    };
-
-  
-    setTimeout(function() {
-        var btn = document.createElement('div');
-        btn.innerHTML = '📋 复制日志';
-        btn.style.cssText = 'position:fixed;bottom:80px;right:10px;z-index:99999;background:#1a1a2e;color:#fff;padding:6px 12px;border-radius:20px;font-size:13px;font-family:sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.4);cursor:pointer;opacity:0.85;border:1px solid #6366f1;';
-        
-        btn.onclick = function() {
-            var text = window.getLogs();
-          
-            var overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:999999;display:flex;align-items:center;justify-content:center;';
-            
-            var box = document.createElement('div');
-            box.style.cssText = 'background:#fff;color:#000;width:90%;max-height:80%;border-radius:12px;padding:16px;display:flex;flex-direction:column;box-shadow:0 4px 20px rgba(0,0,0,0.5);';
-            
-            var title = document.createElement('div');
-            title.textContent = '📄 全部日志 (' + __LOGS.length + ' 条)';
-            title.style.cssText = 'font-weight:bold;font-size:16px;margin-bottom:8px;color:#333;';
-            box.appendChild(title);
-            
-            var ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.cssText = 'flex:1;width:100%;min-height:200px;border:1px solid #ccc;border-radius:8px;padding:8px;font-size:12px;font-family:monospace;background:#f9f9f9;color:#000;resize:vertical;';
-            box.appendChild(ta);
-            
-            var btnRow = document.createElement('div');
-            btnRow.style.cssText = 'display:flex;gap:10px;margin-top:12px;justify-content:flex-end;';
-            
-            var copyBtn = document.createElement('button');
-            copyBtn.textContent = '✅ 复制到剪贴板';
-            copyBtn.style.cssText = 'background:#4f46e5;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;';
-            copyBtn.onclick = function() {
-                ta.select();
-                try {
-                    document.execCommand('copy');
-                    alert('✅ 已复制 ' + __LOGS.length + ' 条日志到剪贴板！');
-                } catch(e) {
-                    alert('复制失败，请手动长按文本框全选复制');
-                }
-            };
-            btnRow.appendChild(copyBtn);
-            
-            var closeBtn = document.createElement('button');
-            closeBtn.textContent = '关闭';
-            closeBtn.style.cssText = 'background:#ef4444;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;';
-            closeBtn.onclick = function() { document.body.removeChild(overlay); };
-            btnRow.appendChild(closeBtn);
-            
-            box.appendChild(btnRow);
-            overlay.appendChild(box);
-            document.body.appendChild(overlay);
-            
-            
-            ta.select();
-        };
-        
-        document.body.appendChild(btn);
-    }, 1500);
-})();
-</script>
     
 </head>
 <style>
@@ -3186,51 +3089,51 @@
                     43114: { chainId: 43114, name: 'Avalanche', short: 'Avalanche', icon: '🔴', iconUrl: 'https://images.blockscan.com/chain-logos/avax.svg?v=1.1.9693.33322',
                         native: 'AVAX', rpc: 'https://api.avax.network/ext/bc/C/rpc', explorer: 'https://snowtrace.io/tx/',
                         id: '43114' },
-                    728126428: { chainId: 728126428, name: 'Tron', short: 'Tron', icon: '🔶', iconUrl: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x50327c6c5a14dcade707abad2e27eb517df87ab5-106/type=default_90_0?v=1785608444556&x-oss-process=image/format,webp/ignore-error,1',
+                    728126428: { chainId: 728126428, name: 'Tron', short: 'Tron', icon: '🔶', iconUrl: 'https://etherscan.io/token/images/trontrx_32.png',
                         native: 'TRX', rpc: 'https://api.trongrid.io', explorer: 'https://tronscan.org/#/transaction/',
                         id: 'tron', isTron: true },
-                    324: { chainId: 324, name: 'zkSync Era', short: 'zkSync', icon: '⚡', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/zk_17000.png?x-oss-process=image/format,webp/resize,w_48,h_48,type_6/ignore-error,1',
+                    324: { chainId: 324, name: 'zkSync Era', short: 'zkSync', icon: '⚡', iconUrl: 'https://etherscan.io/token/images/zksynceth_32.png',
                         native: 'ETH', rpc: 'https://mainnet.era.zksync.io', explorer: '', id: '324' },
-                    59144: { chainId: 59144, name: 'Linea', short: 'Linea', icon: '🔷', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/linea_eth_20700.png?x-oss-process=image/format,webp/ignore-error,1',
+                    59144: { chainId: 59144, name: 'Linea', short: 'Linea', icon: '🔷', iconUrl: 'https://images.blockscan.com/chain-logos/linea.svg?v=1.1.9749.36610',
                         native: 'ETH', rpc: 'https://rpc.linea.build', explorer: '', id: '59144' },
-                    5000: { chainId: 5000, name: 'Mantle', short: 'Mantle', icon: '🔶', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/mnt_20100.png?x-oss-process=image/format,webp/ignore-error,1',
+                    5000: { chainId: 5000, name: 'Mantle', short: 'Mantle', icon: '🔶', iconUrl: 'https://images.blockscan.com/chain-logos/mantle.svg?v=1.1.9749.36610',
                         native: 'MNT', rpc: 'https://mantle-rpc.publicnode.com', explorer: '', id: '5000' },
-                    169: { chainId: 169, name: 'Manta Pacific', short: 'Manta', icon: '🌀', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/manta_22000.png?x-oss-process=image/format,webp/ignore-error,1',
+                    169: { chainId: 169, name: 'Manta Pacific', short: 'Manta', icon: '🌀', iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/13631.png',
                         native: 'ETH', rpc: 'https://pacific-rpc.manta.network/http', explorer: '', id: '169' },
-                    4200: { chainId: 4200, name: 'Merlin', short: 'Merlin', icon: '🧙', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/merlin_btc_23400.png?x-oss-process=image/format,webp/ignore-error,1',
+                    4200: { chainId: 4200, name: 'Merlin', short: 'Merlin', icon: '🧙', iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/30712.png',
                         native: 'BTC', rpc: 'https://rpc.merlinchain.io', explorer: '', id: '4200' },
-                    1088: { chainId: 1088, name: 'Metis', short: 'Metis', icon: '🔺', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/metis.png?x-oss-process=image/format,webp/ignore-error,1',
+                    1088: { chainId: 1088, name: 'Metis', short: 'Metis', icon: '🔺', iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/9640.png',
                         native: 'METIS', rpc: 'https://metis-rpc.publicnode.com', explorer: '', id: '1088' },
-                    9745: { chainId: 9745, name: 'Plasma', short: 'Plasma', icon: '🔴', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/xpl_35400.png?x-oss-process=image/format,webp/ignore-error,1',
+                    9745: { chainId: 9745, name: 'Plasma', short: 'Plasma', icon: '🔴', iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/36645.png',
                         native: 'XPL', rpc: 'https://plasma.drpc.org', explorer: '', id: '9745' },
-                    1672: { chainId: 1672, name: 'Pharos', short: 'Pharos', icon: '🔮', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/pharos_36600.png?x-oss-process=image/format,webp/ignore-error,1',
+                    1672: { chainId: 1672, name: 'Pharos', short: 'Pharos', icon: '🔮', iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/39682.png',
                         native: 'PROS', rpc: 'https://rpc.pharos.xyz', explorer: '', id: '1672' },
-                    4663: { chainId: 4663, name: 'Robinhood', short: 'Robinhood', icon: '🐦', iconUrl: 'https://web3.okx.com/cdn/web3/wallet/logo/robinhood.png?x-oss-process=image/format,webp/ignore-error,1',
+                    4663: { chainId: 4663, name: 'Robinhood', short: 'Robinhood', icon: '🐦', iconUrl: 'https://assets.coingecko.com/coins/images/102174169/small/0xea72ecca2d0f6bfa1394dbbcff85b52cd4233931.png?1782444721',
                         native: 'ETH', rpc: 'https://robinhood.rpc.blxrbdn.com', explorer: '', id: '4663' },
-                    146: { chainId: 146, name: 'Sonic', short: 'Sonic', icon: '🔊', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/s_31600.png?x-oss-process=image/format,webp/ignore-error,1',
+                    146: { chainId: 146, name: 'Sonic', short: 'Sonic', icon: '🔊', iconUrl: 'https://images.blockscan.com/chain-logos/sonic.svg?v=1.1.9749.36610',
                         native: 'S', rpc: 'https://sonic.api.pocket.network', explorer: '', id: '146' },
-                    534352: { chainId: 534352, name: 'Scroll', short: 'Scroll', icon: '📜', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/scroll_eth_21400.png?x-oss-process=image/format,webp/ignore-error,1',
+                    534352: { chainId: 534352, name: 'Scroll', short: 'Scroll', icon: '📜', iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/26998.png',
                         native: 'ETH', rpc: 'https://scroll-rpc.publicnode.com', explorer: '', id: '534352' },
-                    130: { chainId: 130, name: 'Unichain', short: 'Unichain', icon: '🦄', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/unichain_33200.png?x-oss-process=image/format,webp/ignore-error,1',
+                    130: { chainId: 130, name: 'Unichain', short: 'Unichain', icon: '🦄', iconUrl: 'https://images.blockscan.com/chain-logos/uni.svg?v=1.1.9749.36610',
                         native: 'ETH', rpc: 'https://unichain-rpc.publicnode.com', explorer: '', id: '130' },
-                    196: { chainId: 196, name: 'X Layer', short: 'X Layer', icon: '❌', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/okb_22400.png?x-oss-process=image/format,webp/ignore-error,1',
+                    196: { chainId: 196, name: 'X Layer', short: 'X Layer', icon: '❌', iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3897.png',
                         native: 'OKB', rpc: 'https://xlayer.drpc.org', explorer: '', id: '196' },
-                    81457: { chainId: 81457, name: 'Blast', short: 'Blast', icon: '💥', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/blast_eth_23800.png?x-oss-process=image/format,webp/ignore-error,1',
+                    81457: { chainId: 81457, name: 'Blast', short: 'Blast', icon: '💥', iconUrl: 'https://images.blockscan.com/chain-logos/blast.svg?v=1.1.9749.36610',
                         native: 'ETH', rpc: 'https://blast-rpc.publicnode.com', explorer: '', id: '81457' },
-                    25: { chainId: 25, name: 'Cronos', short: 'Cronos', icon: '🔴', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/cro.png?x-oss-process=image/format,webp/ignore-error,1',
+                    25: { chainId: 25, name: 'Cronos', short: 'Cronos', icon: '🔴', iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3635.png',
                         native: 'CRO', rpc: 'https://1rpc.io/cro', explorer: '', id: '25' },
-                    1030: { chainId: 1030, name: 'Conflux eSpace', short: 'Conflux', icon: '🔶', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/cfx_19200.png?x-oss-process=image/format,webp/ignore-error,1',
+                    1030: { chainId: 1030, name: 'Conflux eSpace', short: 'Conflux', icon: '🔶', iconUrl: 'https://etherscan.io/token/images/confluxnetwork_32.png',
                         native: 'CFX', rpc: 'https://conflux-espace-public.unifra.io', explorer: '', id: '1030' },
-                    250: { chainId: 250, name: 'Fantom', short: 'Fantom', icon: '🔷', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/FTM-20220328.png?x-oss-process=image/format,webp/ignore-error,1',
+                    250: { chainId: 250, name: 'Fantom', short: 'Fantom', icon: '🔷', iconUrl: 'https://etherscan.io/token/images/fantomtoken_32.png',
                         native: 'FTM', rpc: 'https://1rpc.io/ftm', explorer: '', id: '250' },
-                    999: { chainId: 999, name: 'HyperEVM', short: 'HyperEVM', icon: '🔺', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/hype_35600.png?x-oss-process=image/format,webp/ignore-error,1',
+                    999: { chainId: 999, name: 'HyperEVM', short: 'HyperEVM', icon: '🔺', iconUrl: 'https://images.blockscan.com/chain-logos/hype.svg?v=1.1.9749.36610',
                         native: 'HYPE', rpc: 'https://rpc.hypurrscan.io', explorer: '', id: '999' },
-                    57073: { chainId: 57073, name: 'Ink', short: 'Ink', icon: '🖊️', iconUrl: 'https://web3.okx.com/cdn/assets/imgs/338/INK.png?x-oss-process=image/format,webp/ignore-error,1',
+                    57073: { chainId: 57073, name: 'Ink', short: 'Ink', icon: '🖊️', iconUrl: 'https://s2.coinmarketcap.com/static/img/coins/64x64/36851.png',
                         native: 'INK', rpc: 'https://ink.drpc.org', explorer: '', id: '57073' },
-                    143: { chainId: 143, name: 'Monad', short: 'Monad', icon: '🔮', iconUrl: 'https://web3.okx.com/cdn/wallet/logo/mon_36000_new.png?x-oss-process=image/format,webp/ignore-error,1',
+                    143: { chainId: 143, name: 'Monad', short: 'Monad', icon: '🔮', iconUrl: 'https://images.blockscan.com/chain-logos/monad.svg?v=1.1.9749.36610',
                         native: 'MON', rpc: 'https://infra.originstake.com/monad/evm', explorer: '', id: '143' },
                    
-                    501: { chainId: 501, name: 'Solana', short: 'Solana', icon: '◎', iconUrl: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1', native: 'SOL',
+                    501: { chainId: 501, name: 'Solana', short: 'Solana', icon: '◎', iconUrl: 'https://bscscan.com/token/images/solana_32.png', native: 'SOL',
                         rpc: 'https://api.mainnet-beta.solana.com', explorer: 'https://solscan.io/tx/', id: 'solana', isSolana: true }
                 };
                 var CHAIN_LIST = Object.keys(CHAINS).map(function(k) { return CHAINS[k]; });
@@ -3241,39 +3144,39 @@
                         'DOGZ': { address: '0x82A77710495A35549D2aDD797412b4a4497D33eF', symbol: 'DOGZ', decimals: 18,
                             icon: 'https://etherscan.io/token/images/dogz_32.png' },
                         'USDT': { address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'USDC': { address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'USDG': { address: '0xe343167631d89B6Ffc58B88d6b7fB0228795491D', symbol: 'USDG', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xe343167631d89b6ffc58b88d6b7fb0228795491d-110/type=default_90_0?v=1770372351565&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/globaldollarpaxos_32.png' },
                         'XAUt': { address: '0x68749665FF8D2d112Fa859AA293F07A622782F38', symbol: 'XAUt', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x68749665ff8d2d112fa859aa293f07a622782f38-999/type=default_90_0?v=1777537415145&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/tethergold_xaut.svg?v=1.1.9749.36610' },
                         'USDe': { address: '0x4c9EDD5852cd905f086C759E8383e09bff1E68B3', symbol: 'USDe', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1780906403391&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/syusde.png?v=1.1.9749.36610' },
                         'USD1': { address: '0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d', symbol: 'USD1', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d-107/type=default_90_0?v=1756473338168&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wlfi-usd1_32.png?v=1.1.9749.36610' },
                         'UNI': { address: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', symbol: 'UNI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x1f9840a85d5af5bf1d1762f925bdaddc4201f984-106/type=default_90_0?v=1785866534324&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/uniswap_32.png' },
                         'PEPE': { address: '0x6982508145454Ce325dDbE47a25d4ec3d2311933', symbol: 'PEPE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x6982508145454ce325ddbe47a25d4ec3d2311933-106/type=default_90_0?v=1785866496694&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/pepe_32.png?v=2' },
                         'SHIB': { address: '0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE', symbol: 'SHIB', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/8453-0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce-110/type=default_90_0?v=1766385055704&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/shibainu_ofc_32.svg?v=1.1.9749.36610' },
                         'TRX': { address: '0x50327c6c5a14DCaDE707ABad2E27eB517df87AB5', symbol: 'TRX', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/TRX.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/tronnetwork_32.png' },
                         'WBTC': { address: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'AAVE': { address: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9', symbol: 'AAVE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/10-0x76fb31fb4af56892a25e32cfc43de717950c9278-999/type=default_90_0?v=1773648528847&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/avax.svg?v=1.1.9749.36610' },
                         'LINK': { address: '0x514910771AF9Ca656af840dff83E8264EcF986CA', symbol: 'LINK', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/LINK-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://assets.coingecko.com/coins/images/877/small/Chainlink_Logo_500.png?1760023405' },
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-110/type=default_90_0?v=1765368555397&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'BNB': { address: '0xB8c77482e45F1F44dE1745F52C74426C631bDD52', symbol: 'BNB', decimals: 18,
                             icon: 'https://images.blockscan.com/chain-logos/bsc.svg' },
                         'DAI': { address: '0x6B175474E89094C44Da98b954EedeAC495271d0F', symbol: 'DAI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/196-0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4-1?v=1744949565136&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/dai_128.png' },
                         'WETH': { address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' }
                     },
                     56: {
                         'BNB': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'BNB', decimals: 18,
@@ -3281,439 +3184,438 @@
                         'WBNB': { address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c', symbol: 'WBNB', decimals: 18,
                             icon: 'https://images.blockscan.com/chain-logos/bsc.svg' },
                         'WBTC': { address: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'SHIB': { address: '0x2859e4544C4bB03966803b044A93563Bd2D0DD4D', symbol: 'SHIB', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/8453-0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce-110/type=default_90_0?v=1766385055704&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/shibainu_ofc_32.svg?v=1.1.9749.36610' },
                         'DAI': { address: '0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3', symbol: 'DAI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/196-0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4-1?v=1744949565136&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/dai_128.png' },
                         'UNI': { address: '0xBf5140A22578168FD562DCcF235E5D43A02ce9B1', symbol: 'UNI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x1f9840a85d5af5bf1d1762f925bdaddc4201f984-106/type=default_90_0?v=1785866534324&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/uniswap_32.png' },
                         'TRX': { address: '0xCE7de646e7208a4Ef112cb6ed5038FA6cC6b12e3', symbol: 'TRX', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/TRX.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/tronnetwork_32.png' },
                         'SOL': { address: '0x570A5D26f7765Ecb712C0924E4De545B89fD43dF', symbol: 'SOL', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/solana_32.png' },
                         'USDe': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDe', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1780906403391&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/syusde.png?v=1.1.9749.36610' },
                         'USD1': { address: '0x8d0D000Ee44948FC98c9B98A4FA4921476f08B0d', symbol: 'USD1', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d-107/type=default_90_0?v=1756473338168&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wlfi-usd1_32.png?v=1.1.9749.36610' },
                         'XRP': { address: '0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE', symbol: 'XRP', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x1d2f0da169ceb9fc7b3144628db156f3f6c60dbe-106/type=default_90_0?v=1785866570011&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/xrpibc_32.png' },
                         'BTCB': { address: '0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c', symbol: 'BTCB', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/459-btcb-110/type=default_90_0?v=1768992876857&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/btcb_32.png?v=1.1.9749.36610' },
                         'USDT': { address: '0x55d398326f99059fF775485246999027B3197955', symbol: 'USDT', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'ADA': { address: '0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47', symbol: 'ADA', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/2001-0xae83571000af4499798d1e3b0fa0070eb3a3e3f9-105?v=1749148417326&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/cardano_32.png' },
                         'ETH': { address: '0x2170Ed0880ac9A755fd29B2688956BD959F933F8', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-110/type=default_90_0?v=1765368555397&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'USDC': { address: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d', symbol: 'USDC', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'DOGE': { address: '0xbA2aE424d960c26247Dd6c32edC70B295c744C43', symbol: 'DOGE', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/Ethereum-7947-003955854.png?x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/dogecoin_128.png' }
                     },
                     250: {
                         'FTM': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'FTM', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/FTM-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/fantomtoken_32.png' },
                         'WFTM': { address: '0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83', symbol: 'WFTM', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/FTM-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/fantomtoken_32.png' },
                         'USDC': { address: '0x04068da6c83afcfa0e13ba15a6696662335d5b75', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' }
                     },
                     25: {
                         'CRO': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'CRO', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/25-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-107?v=1750214338804&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3635.png' },
                         'WBTC': { address: '0x062E66477Faf219F25D27dCED647BF57C3107d52', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'SHIB': { address: '0xbED48612BC69fA1CaB67052b42a95FB30C1bcFee', symbol: 'SHIB', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/8453-0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce-110/type=default_90_0?v=1766385055704&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/shibainu_ofc_32.svg?v=1.1.9749.36610' },
                         'XRP': { address: '0xb9Ce0dd29C91E02d4620F57a66700Fc5e41d6D15', symbol: 'XRP', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x1d2f0da169ceb9fc7b3144628db156f3f6c60dbe-106/type=default_90_0?v=1785866570011&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/xrpibc_32.png' },
                         'ADA': { address: '0x0e517979C2c1c1522ddB0c73905e0D39b3F990c0', symbol: 'ADA', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/2001-0xae83571000af4499798d1e3b0fa0070eb3a3e3f9-105?v=1749148417326&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/cardano_32.png' },
                         'LINK': { address: '0xBc6f24649CCd67eC42342AccdCECCB2eFA27c9d9', symbol: 'LINK', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/LINK-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://assets.coingecko.com/coins/images/877/small/Chainlink_Logo_500.png?1760023405' },
                         'SOL': { address: '0xc9DE0F3e08162312528FF72559db82590b481800', symbol: 'SOL', decimals: 9,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/solana_32.png' },
                         'USDT': { address: '0x66e428c3f67a68878562e79A0234c1F83c208770', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'DAI': { address: '0xF2001B145b43032AAF5Ee2884e456CCd805F677D', symbol: 'DAI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/196-0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4-1?v=1744949565136&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/dai_128.png' },
                         'USDC.e': { address: '0xc21223249CA28397B4B6541dfFaEcC539BfF0c59', symbol: 'USDC.e', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'DOGE': { address: '0x1a8E39ae59e5556B56b76fCBA98d22c9ae557396', symbol: 'DOGE', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/Ethereum-7947-003955854.png?x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/dogecoin_128.png' }
                     },
                     130: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-110/type=default_90_0?v=1765368555397&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'WBTC': { address: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'USDT': { address: '0x9151434b16b9763660705744891fA906F660EcC5', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/5000-0x779ded0c9e1022225f8e0630b35a9b54be713736-999/type=default_90_0?v=1785814151772&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png?v=1.1.9749.36610' },
                         'HYPE': { address: '0x15D0e0c55a3E7eE67152aD7E89acf164253Ff68d', symbol: 'HYPE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/70000080-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-107/type=default_90_0?v=1758782101416&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/hype.svg?v=1.1.9749.36610' },
                         'WETH': { address: '0x4200000000000000000000000000000000000006', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDC': { address: '0x078D782b760474a361dDA0AF3839290b0EF57AD6', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'UNI': { address: '0x8f187aA05619a017077f5308904739877ce9eA21', symbol: 'UNI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/130-0x8f187aa05619a017077f5308904739877ce9ea21-105?v=1749148653707&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/uniswap_32.png' }
                     },
                     324: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-110/type=default_90_0?v=1765368555397&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'WBTC': { address: '0xbbeb516fb02a01611cbbe0453fe3c580d7281011', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'USDT': { address: '0x493257fd37edb34451f62edf8d2a0c418852ba4c', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'WETH': { address: '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDC.e': { address: '0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4', symbol: 'USDC.e', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'USDC': { address: '0x1d17CBcF0D6D143135aE902365D2E5e2A16538D4', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'ZK': { address: '0x5a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e', symbol: 'ZK', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/324-0x5a7d6b2f92c77fad6ccabd7ee0624e64907eaf3e-106/type=default_90_0?v=1785607264519&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/zksynceth_32.png?v=1.1.9749.36610' }
                     },
                     999: {
                         'HYPE': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'HYPE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/70000080-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-107/type=default_90_0?v=1758782101416&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/hype.svg?v=1.1.9749.36610' },
                         'UBTC': { address: '0x9FDBdA0A5e284c32744D2f17Ee5c74B284993463', symbol: 'UBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/70000080-0x9fdbda0a5e284c32744d2f17ee5c74b284993463-105/type=default_90_0?v=1785611483505&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://polygonscan.com/token/images/ubtc_32.png?v=1.1.9749.36610' },
                         'USDT': { address: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'UETH': { address: '0xBe6727B535545C67d5cAa73dEa54865B92CF7907', symbol: 'UETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/70000080-0xbe6727b535545c67d5caa73dea54865b92cf7907-105/type=default_90_0?v=1785611483428&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://hyperevmscan.io/token/images/eth.svg?v=1.1.9749.36610' },
                         'USDC': { address: '0xb88339CB7199b77E23DB6E890353E22632Ba630f', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'WHYPE': { address: '0x5555555555555555555555555555555555555555', symbol: 'WHYPE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/70000080-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-107/type=default_90_0?v=1758782101416&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://images.blockscan.com/chain-logos/hype.svg?v=1.1.9749.36610' }
                     },
                     1030: {
                         'CFX': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'CFX', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/cfx_19200.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/confluxnetwork_32.png' },
                         'WBTC': { address: '0x1f545487c62e5acfea45dcadd9c627361d1616d8', symbol: 'WBTC', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'USDT': { address: '0xaf37e8b6c9ed7f6318979f56fc287d76c30847ff', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'ETH': { address: '0xa47f43de2f9623acb395ca4905746496d2014d57', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-110/type=default_90_0?v=1765368555397&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'USDC': { address: '0x6963efed0ab40f6c3d7bda44a05dcf1437c44372', symbol: 'USDC', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'WCFX': { address: '0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b', symbol: 'WCFX', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/cfx_19200.png?x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/confluxnetwork_32.png' }
                     },
                     1088: {
                         'METIS': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'METIS', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/Metis-c067e66f69b8483c857510c70bbebedb-20220719.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/metisdao_32.png?v=1.1.9749.36610' },
                         'WMETIS': { address: '0x75cb093E4D61d2A2e65D8e0BBb01DE8d89b53481', symbol: 'WMETIS', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/Metis-c067e66f69b8483c857510c70bbebedb-20220719.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/metisdao_32.png?v=1.1.9749.36610' },
                         'USDT': { address: '0xbB06DCA3AE6887fAbF931640f67cab3e3a16F4dC', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'WETH': { address: '0x420000000000000000000000000000000000000A', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDC': { address: '0xEA32A96608495e54156Ae48931A7c20f0dcc1a21', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' }
                     },
                     1672: {
                         'PROS': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'PROS', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1672-null-999/type=default_90_0?v=1777448267901&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/pharos_pros_64.png?v=1.1.9749.36610' },
                         'FBTC': { address: '0xd990cf81e9aea2417326fdfac12b19aa66f8b6c2', symbol: 'FBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xc96de26018a54d51c097160568752c4e3bd6c364-999/type=default_90_0?v=1773133399032&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/fbtc_64.png?v=1.1.9749.36610' },
                         'LINK': { address: '0x51e2a24742db77604b881d6781ee16b5b8fcbe29', symbol: 'LINK', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd-106/type=default_90_0?v=1785607285527&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/chainlink_32.png' },
                         'WPROS': { address: '0x52c48d4213107b20bc583832b0d951fb9ca8f0b0', symbol: 'WPROS', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1672-null-999/type=default_90_0?v=1777448267901&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/pharos_pros_64.png?v=1.1.9749.36610' },
                         'USDC': { address: '0xc879c018db60520f4355c26ed1a6d572cdac1815', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' }
                     },
                     4200: {
                         'BTC': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'BTC', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4200-0xf6d226f9dc15d9bb51182815b320d3fbe324e1ba-110/type=default_90_0?v=1768993246543&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://arbiscan.io/token/images/ubtc_32.png' },
                         'WBTC': { address: '0xF6D226f9Dc15d9bB51182815b320D3fBE324e1bA', symbol: 'WBTC', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4200-0xf6d226f9dc15d9bb51182815b320d3fbe324e1ba-110/type=default_90_0?v=1768993246543&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://arbiscan.io/token/images/wrappedbtc_wbtc_64.pngg' },
                         'SolvBTC': { address: '0x41D9036454BE47d3745A823C4aaCD0e29cFB0f71', symbol: 'SolvBTC', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x4aae823a6a0b376de6a78e74ecc5b079d38cbcf7-106/type=default_90_0?v=1785434428088&x-oss-process=image/format,webp/ignore-error,1' },
-                        'M-STONE': { address: '0xB5d8b1e73c79483d7750C5b8DF8db45A0d24e2cf', symbol: 'M-STONE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x7122985656e38bdc0302db86685bb972b145bd3c-106/type=default_90_0?v=1785522145872&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/sycornsolvbtc.bbn.png?v=1.1.9749.36610' },
+                       
                         'MERL': { address: '0x5c46bFF4B38dc1EAE09C5BAc65872a1D8bc87378', symbol: 'MERL', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/4200-0x5c46bff4b38dc1eae09c5bac65872a1d8bc87378.png/type=png_350_0?x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/merlinchain_32.png?v=1.1.9749.36610' }
                     },
                     4663: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-110/type=default_90_0?v=1765368555397&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'NVDA': { address: '0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC', symbol: 'NVDA', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC-900/type=default_90_0?v=1785667513850&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://basescan.org/token/images/swarmnvidia_32.svg?v=1.1.9749.36610' },
                         'APE': { address: '0x8f86a15EC17cb3369d8b3E666dAdBC11daA82b79', symbol: 'APE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-C1MHyoTJpRTeS9AQCyspNVu2EWAYCZwmJ1jNkEArFP1f-107/type=default_90_0?v=1776945088516&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://apescan.io/token/images/wrappedapecoin_32.png?v=2' },
                         'SPCX': { address: '0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa', symbol: 'SPCX', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa-900/type=default_90_0?v=1785938768090&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/xstocks_spcxx_64.png' },
                         'AMD': { address: '0x86923f96303D656E4aa86D9d42D1e57ad2023fdC', symbol: 'AMD', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa-900/type=default_90_0?v=1785938768090&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/amdon_40x40.svg' },
                         'TSLA': { address: '0x322F0929c4625eD5bAd873c95208D54E1c003b2d', symbol: 'TSLA', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9-900/type=default_90_0?v=1785939250831&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://arbiscan.io/token/images/ftsla_32.png?v=1.1.9749.36610' },
                         'TENDIES': { address: '0x45242320DBB855EeA8Fd36804C6487E10E97FCF9', symbol: 'TENDIES', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x45242320dbb855eea8fd36804c6487e10e97fcf9-999/type=default_90_0?v=1783689155673&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://assets.coingecko.com/coins/images/102174418/small/x1o0qj8dm7mlay3licerc1y75hr4.?1783667012' },
                         'AAPL': { address: '0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9', symbol: 'AAPL', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9-900/type=default_90_0?v=1785939250831&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://basescan.org/token/images/swarmaapl_32.svg?v=1.1.9749.36610' },
                         'GOOGL': { address: '0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3', symbol: 'GOOGL', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9-900/type=default_90_0?v=1785939250831&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://cdn.robinhood.com/ncw_assets/logos/0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3.png' },
                         'STONKBROKER': { address: '0xe934e36A439C94017B64a3FecE66AF12099aBF50', symbol: 'STONKBROKER', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0xe934e36a439c94017b64a3fece66af12099abf50-105/type=default_90_0?v=1785871267213&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://assets.coingecko.com/coins/images/102174654/small/9gwu14e3hpizobkefg65k66l70wu.?1784445702' },
                         'VIRTUAL': { address: '0xc6911796042b15d7Fa4F6CDe69e245DdCd3d9c31', symbol: 'VIRTUAL', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-3iQL8BFS2vE7mww4ehAqQHAsbmRNCrPxizWAT2Zfyr9y-110/type=default_90_0?v=1768993328532&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://assets.coingecko.com/coins/images/34057/small/LOGOMARK.png?1708356054' },
                         'CASHCAT': { address: '0x020bfC650A365f8BB26819deAAbF3E21291018b4', symbol: 'CASHCAT', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-CashcatZMRn4Jv8sPQZUSsbTLi2PcPe1ssqbHcnaJqSS-106/type=default_90_0?v=1784598501004&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://assets.coingecko.com/coins/images/102174280/small/cashcat-logo.jpg?1782922765' },
                         'PIPEDOG': { address: '0x5Cb6F181081301b44905F3ae15419112ecaBd8A6', symbol: 'PIPEDOG', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x5cb6f181081301b44905f3ae15419112ecabd8a6-109/type=default_90_0?v=1785273280464&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://assets.coingecko.com/coins/images/102174876/small/pipedog.png?1785289835' },
                         'USDG': { address: '0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168', symbol: 'USDG', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xe343167631d89b6ffc58b88d6b7fb0228795491d-110/type=default_90_0?v=1770372351565&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/globaldollarpaxos_32.png' },
                         'WETH': { address: '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDE': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/4663-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1783664108626&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://assets.coingecko.com/coins/images/33613/small/usde.png?1733810059' }
                     },
                     143: {
                         'MON': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'MON', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/143-null-110/type=default_90_0?v=1763995219024&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/monad.svg?v=1.1.9749.36610' },
                         'WBTC': { address: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'USDT': { address: '0xe7cd86e13AC4309349F30B3435a9d337750fC82D', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'AUSD': { address: '0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a', symbol: 'AUSD', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/143-0x00000000efe302beaa2b3e6e1b18d08d69a9012a-105/type=default_90_0?v=1785870933237&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/agrousd_64.png?v=1.1.9749.36610' },
                         'WETH': { address: '0xEE8c0E9f1BFFb4Eb878d8f15f368A02a35481242', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDC': { address: '0x754704Bc059F8C67012fEd69BC8A327a5aafb603', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'WMON': { address: '0x3bd359C1119dA7Da1D913D1C4D2B7c461115433A', symbol: 'WMON', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/143-null-110/type=default_90_0?v=1763995219024&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://images.blockscan.com/chain-logos/monad.svg?v=1.1.9749.36610' }
                     },
                     146: {
                         'S': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'S', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/146-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-1?v=1742540268312&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/sonic.svg?v=1.1.9749.36610' },
                         'WBTC': { address: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'WETH': { address: '0x50c42dEAcD8Fc9773493ED674b675bE577f2634b', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDC': { address: '0x29219dd400f2Bf60E5a23d13Be72B486D4038894', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'WS': { address: '0x039e2fB66102314Ce7b64Ce5Ce3E5183bc94aD38', symbol: 'WS', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/146-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-1?v=1742540268312&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://images.blockscan.com/chain-logos/sonic.svg?v=1.1.9749.36610' }
                     },
                     169: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-110/type=default_90_0?v=1765368555397&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'USDT': { address: '0xf417F5A458eC102B90352F697D6e2Ac3A3d2851f', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'WETH': { address: '0x0Dc808adcE2099A9F62AA87D9670745AbA741746', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDC': { address: '0xb73603C5d87fA094B7314C74ACE2e64D165016fb', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' }
                     },
                     196: {
                         'OKB': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'OKB', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-null-999/type=default_90_0?v=1777549250903&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/okex_32.png?v=2' },
                         'USDT': { address: '0x779ded0c9e1022225f8e0630b35a9b54be713736', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'SOL': { address: '0x505000008de8748dbd4422ff4687a4fc9beba15b', symbol: 'SOL', decimals: 9,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/solana_32.png' },
                         'WETH': { address: '0xe7b000003a45145decf8a28fc755ad5ec5ea025a', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'WOKB': { address: '0xe538905cf8410324e03a5a23c1c177a474d59b2b', symbol: 'WOKB', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0xe538905cf8410324e03a5a23c1c177a474d59b2b-999/type=default_90_0?v=1777550304676&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/okex_32.png?v=2' },
                         'USDC': { address: '0x74b7f16337b8972027f6196a17a631ac6de26d22', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' }
                     },
                     137: {
                         'POL': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'POL', decimals: 18,
                             icon: 'https://amoy.polygonscan.com/assets/poly/images/svg/logos/token-dark.svg?v=26.7.2.1' },
                         'USDT': { address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'WETH': { address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDC': { address: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'UNI': { address: '0xb33EaAd8d922B1083446DC23f610c2567fB5180f', symbol: 'UNI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x1f9840a85d5af5bf1d1762f925bdaddc4201f984-106/type=default_90_0?v=1785866534324&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/uniswap_32.png' },
                         'pUSD': { address: '0xC011a7E12a19f7B1f670d46F03B03f3342E82DFB', symbol: 'pUSD', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/137-0xc011a7e12a19f7b1f670d46f03b03f3342e82dfb-106/type=default_90_0?v=1785886916017&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://polygonscan.com/token/images/polymarket_poly.svg?v=1.1.9749.36610' },
                         'SHIB': { address: '0x6f8a06447Ff6FcF75d803135a7de15CE88C1d4ec', symbol: 'SHIB', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/8453-0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce-110/type=default_90_0?v=1766385055704&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/shibainu_ofc_32.svg?v=1.1.9749.36610' },
                         'CRV': { address: '0x172370d5Cd63279eFa6d502DAB29171933a610AF', symbol: 'CRV', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/10-0x0994206dfe8de6ec6920ff4d779b0d950605fb53-106/type=default_90_0?v=1785866429951&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/Curvefi_32.png?v=2' },
                         'LINK': { address: '0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39', symbol: 'LINK', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd-106/type=default_90_0?v=1785607285527&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/chainlink_32.png' },
                         'AAVE': { address: '0xD6DF932A45C0f255f85145f286eA0b292B21C90B', symbol: 'AAVE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/10-0x76fb31fb4af56892a25e32cfc43de717950c9278-999/type=default_90_0?v=1773648528847&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/avax.svg?v=1.1.9749.36610' },
                         'WBTC': { address: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'SOL': { address: '0xd93f7E271cB87c23AaA73edC008A79646d1F9912', symbol: 'SOL', decimals: 9,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/solana_32.png' },
                         'USDC.e': { address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', symbol: 'USDC.e', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'BNB': { address: '0x3BA4c387f786bFEE076A58914F5Bd38d668B42c3', symbol: 'BNB', decimals: 18,
                             icon: 'https://images.blockscan.com/chain-logos/bsc.svg' },
                         'DAI': { address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', symbol: 'DAI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/196-0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4-1?v=1744949565136&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/dai_128.png' }
                     },
                     42161: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-110/type=default_90_0?v=1765368555397&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'USDT': { address: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'USDC': { address: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'USDC.e': { address: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8', symbol: 'USDC.e', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'LINK': { address: '0xf97f4df75117a78c1A5a0DBb814Af92458539FB4', symbol: 'LINK', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd-106/type=default_90_0?v=1785607285527&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/chainlink_32.png' },
                         'UNI': { address: '0xFa7F8980b0f1E64A2062791cc3b0871572f1F7f0', symbol: 'UNI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/130-0x8f187aa05619a017077f5308904739877ce9ea21-105?v=1749148653707&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/uniswap_32.png' },
                         'DAI': { address: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', symbol: 'DAI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/196-0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4-1?v=1744949565136&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/dai_128.png' },
                         'ZRO': { address: '0x6985884C4392D348587B19cb9eAAf157F13271cd', symbol: 'ZRO', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/43114-0x6985884c4392d348587b19cb9eaaf157f13271cd-106/type=default_90_0?v=1770825662511&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/zro_32.png' },
                         'RAIN': { address: '0x25118290e6A5f4139381D072181157035864099d', symbol: 'RAIN', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/42161-0x25118290e6a5f4139381d072181157035864099d-110/type=default_90_0?v=1766992332852&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://arbiscan.io/token/images/rain_32.svg?v=1.1.9749.36610' },
                         'ARB': { address: '0x912CE59144191C1204E64559FE8253a0e49E6548', symbol: 'ARB', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/810180-0xcb70533c9635060275f1a97539dda2e3f8bfac42-105?v=1749148892266&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://arbiscan.io/token/images/arbitrumone2_32_new.png' },
                         'WBTC': { address: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'WETH': { address: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' }
                     },
                     10: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'USDT': { address: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'USDC': { address: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'UNI': { address: '0x6fd9d7AD17242c41f7131d257212c54A0e816691', symbol: 'UNI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x1f9840a85d5af5bf1d1762f925bdaddc4201f984-106/type=default_90_0?v=1785866534324&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/uniswap_32.png' },
                         'ZRO': { address: '0x6985884C4392D348587B19cb9eAAf157F13271cd', symbol: 'ZRO', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/43114-0x6985884c4392d348587b19cb9eaaf157f13271cd-106/type=default_90_0?v=1770825662511&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/zro_32.png' },
                         'USDC.e': { address: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', symbol: 'USDC.e', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'WBTC': { address: '0x68f180fcCe6836688e9084f035309E29Bf0A2095', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'LINK': { address: '0x350a791Bfc2C21F9Ed5d10980Dad2e2638ffa7f6', symbol: 'LINK', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd-106/type=default_90_0?v=1785607285527&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/chainlink_32.png' },
                         'DAI': { address: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', symbol: 'DAI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/196-0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4-1?v=1744949565136&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/dai_128.png' },
                         'WLD': { address: '0xdC6fF44d5d932Cbd77B52E5612Ba0529DC6226F1', symbol: 'WLD', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x163f8c2467924be0ae7b5347228cabf260318753-106/type=default_90_0?v=1785866522547&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/world.svg?v=1.1.9749.36610' },
                         'OP': { address: '0x4200000000000000000000000000000000000042', symbol: 'OP', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/op_10000.png?x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/optimism_32.png' }
                     },
                     8453: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'USDC': { address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'EURC': { address: '0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42', symbol: 'EURC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/8453-0x60a3e35cc302bfa44cb288bc5a4f316fdb1adb42-107/type=default_90_0?v=1755762811021&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/circleeurcoin_32.png?v=1.1.9749.36610' },
                         'WETH': { address: '0x4200000000000000000000000000000000000006', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDS': { address: '0x820C137fa70C8691f0e44Dc420a5e53c168921Dc', symbol: 'USDS', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xdc035d45d973e3ec169d2276ddab16f1e407384f-106/type=default_90_0?v=1785867252314&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/skyusds_32.svg?v=2' },
                         'AAVE': { address: '0x63706e401c06ac8513145b7687A14804d17f814b', symbol: 'AAVE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/10-0x76fb31fb4af56892a25e32cfc43de717950c9278-999/type=default_90_0?v=1773648528847&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/avax.svg?v=1.1.9749.36610' },
                         'LINK': { address: '0x88Fb150BDc53A65fe94Dea0c9BA0a6dAf8C6e196', symbol: 'LINK', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd-106/type=default_90_0?v=1785607285527&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/chainlink_32.png' },
                         'DAI': { address: '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb', symbol: 'DAI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/196-0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4-1?v=1744949565136&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/dai_128.png' },
                         'wstETH': { address: '0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452', symbol: 'wstETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0-107/type=default_90_0?v=1753850278448&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wsteth3_32.png?v=1.1.9749.36610' },
                         'WBTC': { address: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'cbBTC': { address: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf', symbol: 'cbBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/8453-0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf-107/type=default_90_0?v=1755269913473&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/cbbtc_32.png?v=2' },
                         'cbETH': { address: '0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22', symbol: 'cbETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xbe9895146f7af43049ca1c1ae358b0541ea49704-106/type=default_90_0?v=1785867019045&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_cbeth.png?v=1.1.9749.36610' },
                         'SOL': { address: '0x311935Cd80B76769bF2ecC9D8Ab7635b2139cf82', symbol: 'SOL', decimals: 9,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/501-11111111111111111111111111111111-1.png/type=default_350_0?v=1734571825920&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/solana_32.png' }
                     },
                     5000: {
                         'MNT': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'MNT', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/mnt_20100.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/mantle.svg?v=1.1.9749.36610' },
                         'USDC': { address: '0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'USDT': { address: '0x779Ded0c9e1022225f8E0630b35a9b54bE713736', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'WETH': { address: '0xdEAddEaDdeadDEADDEADDEAddEADDEAddead1111', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'WMNT': { address: '0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8', symbol: 'WMNT', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/mnt_20100.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/mantle.svg?v=1.1.9749.36610' },
                         'USDE': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1780906403391&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/syusde.png?v=1.1.9749.36610' }
                     },
                     9745: {
                         'XPL': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'XPL', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/9745-null-107/type=default_90_0?v=1759032087969&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/plasma_64.png' },
                         'USDE': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDE', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1780906403391&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/syusde.png?v=1.1.9749.36610' },
                         'USDT': { address: '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'WETH': { address: '0x9895D81bB462A195b4922ED7De0e3ACD007c32CB', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'WXPL': { address: '0x6100E367285b01F48D07953803A2d8dCA5D19873', symbol: 'WXPL', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/9745-null-107/type=default_90_0?v=1759032087969&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://bscscan.com/token/images/plasma_64.png' }
                     },
                     57073: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'USDC': { address: '0x2D270e6886d130D724215A266106e6832161EAEd', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'WETH': { address: '0x4200000000000000000000000000000000000006', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDG': { address: '0xe343167631d89B6Ffc58B88d6b7fB0228795491D', symbol: 'USDG', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0xe343167631d89b6ffc58b88d6b7fb0228795491d-110/type=default_90_0?v=1770372351565&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/globaldollarpaxos_32.png' },
                         'USDT': { address: '0x0200C29006150606B650577BBE7B6248F58470c1', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' }
                     },
                     59144: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'USDC': { address: '0x176211869cA2b568f2A7D4EE941E073a821EE1ff', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'DAI': { address: '0x4AF15ec2A0BD43Db75dd04E62FAA3B8EF36b00d5', symbol: 'DAI', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/196-0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4-1?v=1744949565136&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/dai_128.png' },
                         'LINEA': { address: '0x1789e0043623282D5DCc7F213d703C6D8BAfBB04', symbol: 'LINEA', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/59144-0x1789e0043623282d5dcc7f213d703c6d8bafbb04-107/type=default_90_0?v=1757336017675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/linea.svg?v=1.1.9749.36610' },
                         'wstETH': { address: '0xB5beDd42000b71FddE22D3eE8a79Bd49A568fC8F', symbol: 'wstETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0-107/type=default_90_0?v=1753850278448&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wsteth3_32.png?v=1.1.9749.36610' },
                         'WETH': { address: '0xe5D7C2a44fFDDf6b295A15c148167daaAf5Cf34f', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'WBTC': { address: '0x3aAB2285ddcDdaD8edf438C1bAB47e1a9D05a9b4', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-5XZw2LKTyrfvfiskJ78AMpackRjPcyCif1WhUsPDuVqQ-107/type=default_90_0?v=1785932441672&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'USDT': { address: '0xA219439258ca9da29E9Cc4cE5596924745e12B93', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' }
                     },
                     81457: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'USDB': { address: '0x4300000000000000000000000000000000000003', symbol: 'USDB', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/81457-0x4300000000000000000000000000000000000003.png/type=png_350_0?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://blastscan.io/token/images/usdb_32.png?v=1.1.9749.36610' },
                         'WETH': { address: '0x4300000000000000000000000000000000000004', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'BLAST': { address: '0xb1a5700fA2358173Fe465e6eA4Ff52E36e88E2ad', symbol: 'BLAST', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/81457-0xb1a5700fa2358173fe465e6ea4ff52e36e88e2ad-106/type=default_90_0?v=1785607400522&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/blast.svg?v=1.1.9749.36610' },
                         'USDe': { address: '0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34', symbol: 'USDe', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/196-0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34-999/type=default_90_0?v=1780906403391&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/syusde.png?v=1.1.9749.36610' }
                     },
                     534352: {
                         'ETH': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/ETH-20220328.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://images.blockscan.com/chain-logos/eth.svg?v=1.1.9749.36610' },
                         'USDC': { address: '0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'WETH': { address: '0x5300000000000000000000000000000000000004', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'SCR': { address: '0xd29687c813D741E2F938F4aC377128810E217b1b', symbol: 'SCR', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/534352-0xd29687c813d741e2f938f4ac377128810e217b1b-106/type=default_90_0?v=1785607296586&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://s2.coinmarketcap.com/static/img/coins/64x64/26998.png' },
                         'USDT': { address: '0xf55BEC9cafDbE8730f096Aa55dad6D22d44099Df', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' }
                     },
                     43114: {
                         'AVAX': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'AVAX', decimals: 18,
@@ -3721,54 +3623,54 @@
                         'WAVAX': { address: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7', symbol: 'WAVAX', decimals: 18,
                             icon: 'https://images.blockscan.com/chain-logos/avax.svg?v=1.1.9693.33322' },
                         'USDC': { address: '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'USDC.e': { address: '0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664', symbol: 'USDC.e', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/810180-0x7581469cb53e786f39ff26e8af6fd750213daced-999/type=default_90_0?v=1782468541500&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'WBTC': { address: '0x0555E30da8f98308EdB960aa94C0Db47230d2B9c', symbol: 'WBTC', decimals: 8,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x0555e30da8f98308edb960aa94c0db47230d2b9c-106/type=default_90_0?v=1785608492675&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wrappedbtc_wbtc_64.png?v=1.1.9749.36610' },
                         'WETH': { address: '0xe50fA9b3c56FfB159cB0FCA61F5c9D750e8128c8', symbol: 'WETH', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xaf8cd5edc19c4512f4259f0bee101a40d41ebed738ade5874359610ef8eeced5::coin::COIN-999/type=default_90_0?v=1776753673405&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
                         'USDT': { address: '0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' }
                     },
                     728126428: {
                         'TRX': { address: 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb', symbol: 'TRX', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/TRX.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/tronnetwork_32.png' },
                         'WTRX': { address: 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR', symbol: 'WTRX', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/wallet/logo/TRX.png?x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/tronnetwork_32.png' },
                         'NFT': { address: 'TFczxzPhnThNSqr5by8tvxsdCFRRz6cPNq', symbol: 'NFT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/56-0x20ee7b720f4e4c4ffcb00c4065cdae55271aecca-105/type=default_90_0?v=1767465161810&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/apenft_32.png' },
                         'USDD': { address: 'TXDk8mbtRbXeYuMNS83CfKPaYYT8XWv9Hz', symbol: 'USDD', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/195-TXDk8mbtRbXeYuMNS83CfKPaYYT8XWv9Hz-106/type=default_90_0?v=1785608477288&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/usdd-tron_32.png?v=1.1.9749.36610' },
                         'TUSD': { address: 'TUpMhErZL2fhh4sVNULAbNKLokS4GjC1F4', symbol: 'TUSD', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/195-TUpMhErZL2fhh4sVNULAbNKLokS4GjC1F4-106/type=default_90_0?v=1785868316608&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/trueusd_32.png?v=2' },
                         'JST': { address: 'TCFLL5dx5ZJdKnWuesXxi1VPwjLVmWZZy9', symbol: 'JST', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/195-TCFLL5dx5ZJdKnWuesXxi1VPwjLVmWZZy9-106/type=default_90_0?v=1785607290503&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/just_32.png' },
                         'SUN': { address: 'TSSMHYeV2uE9qYH95DqyoCuNCzEL1NvU3S', symbol: 'SUN', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/195-TSSMHYeV2uE9qYH95DqyoCuNCzEL1NvU3S-106/type=default_90_0?v=1785607894847&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/tronsun_32.png' },
                         'BTT': { address: 'TAFjULxiVgT4qWk6UZwjqwZXTSaGaqnVp4', symbol: 'BTT', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/195-TAFjULxiVgT4qWk6UZwjqwZXTSaGaqnVp4-106/type=default_90_0?v=1785607318249&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/btt.svg' },
                         'USD1': { address: 'TPFqcBAaaUMCSVRCqPaQ9QnzKhmuoLR6Rc', symbol: 'USD1', decimals: 18,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/1-0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d-107/type=default_90_0?v=1756473338168&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/wlfi-usd1_32.png?v=1.1.9749.36610' },
                         'USDT': { address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' }
                     },
                    
                     501: {
                         'SOL': { address: '11111111111111111111111111111111', symbol: 'SOL', decimals: 9,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/solana_32.png' },
                         'USDC': { address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', symbol: 'USDC', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v-110/type=default_90_0?v=1785867002008&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
                         'USDT': { address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB', symbol: 'USDT', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/321-0x0039f574ee5cc39bdd162e9a88e3eb1f111baf48-999/type=default_90_0?v=1780290238263&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/aave_usdt.png' },
                         'WSOL': { address: 'So11111111111111111111111111111111111111112', symbol: 'WSOL', decimals: 9,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/784-0xb7844e289a8410e50fb3ca48d69eb9cf29e27d223ef90353fe1bd8e27ff8f3f8::coin::COIN-110/type=default_90_0?v=1768992857426&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://bscscan.com/token/images/solana_32.png' },
                         'JUP': { address: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', symbol: 'JUP', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/501-JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN-96?v=1744225771822&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/jupiter_32.svg' },
                         'RAY': { address: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R', symbol: 'RAY', decimals: 6,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/small/501-4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R-96?v=1744224535655&x-oss-process=image/format,webp/ignore-error,1' },
+                            icon: 'https://etherscan.io/token/images/raydium_ofc_32.png' },
                         'BONK': { address: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', symbol: 'BONK', decimals: 5,
-                            icon: 'https://web3.okx.com/cdn/web3/currency/token/large/501-DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263-107/type=default_90_0?v=1786685817074&x-oss-process=image/format,webp/ignore-error,1' }
+                            icon: 'https://etherscan.io/token/images/bonkcoin_32.jpg' }
                     }
                 };
 
