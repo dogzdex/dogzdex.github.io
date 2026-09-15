@@ -72,7 +72,6 @@
     crossorigin="anonymous">
 </script>
 
-
 <script>
 (function() {
     var SELF_HOSTED_URL = './dogz-wc-signclient.bundle.js';
@@ -90,7 +89,7 @@
         };
         document.head.appendChild(s);
     }
-   
+ 
     loadScript(CDN_URL, function() {}, function() {
         loadScript(SELF_HOSTED_URL, function() {}, function() {
             console.error('[DOGZ] WalletConnect 组件两条加载路径全部失败（CDN 和自托管都不行），请检查网络，或确认', SELF_HOSTED_URL, '这个文件确实已经上传到仓库根目录');
@@ -3072,7 +3071,7 @@
                 }
 
              
-                var CHAINS = {
+                 var CHAINS = {
                     1: { chainId: 1, name: 'Ethereum', short: 'Ethereum', icon: '⟠', iconUrl: 'https://images.blockscan.com/chain-logos/eth.svg', native: 'ETH',
                         rpc: 'https://eth.llamarpc.com', explorer: 'https://etherscan.io/tx/', id: '1' },
                     56: { chainId: 56, name: 'BNB Chain', short: 'BNB Chain', icon: '🟡', iconUrl: 'https://images.blockscan.com/chain-logos/bsc.svg',
@@ -4528,7 +4527,7 @@ function getTronWalletSigningWeb(walletKey) {
                     var cacheKey = Number(chainId) + '|' + rpcUrl;
                     if (__dogzEvmReadProviderCache[cacheKey]) return __dogzEvmReadProviderCache[cacheKey];
                     try {
-                        
+                       
                         var p = new ethers.JsonRpcProvider(rpcUrl, Number(chainId), { staticNetwork: true });
                         __dogzEvmReadProviderCache[cacheKey] = p;
                         return p;
@@ -4596,7 +4595,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                
                 async function dogzEvmMultiRpcCall(chainId, execFn, timeoutMs) {
-                 
+                   
                     try {
                         var proxyProvider = getProxyEvmProvider(chainId);
                         return await dogzWithTimeout(execFn(proxyProvider), timeoutMs || 8000);
@@ -4853,45 +4852,75 @@ function getTronWalletSigningWeb(walletKey) {
                 }
 
                
-                var DOGZ_TOKEN_ADDRESS = '0x82a77710495a35549d2add797412b4a4497d33ef';
-                
-                var FEE_WHITELIST_DISPLAY = [
-                    '0x6f46c3267dbee08bc31e68efaca6626892255105',
-                    'twpfwxgyjwdq4zk8dj9ezt9kmcpt5nf1yp',
-                    'cdg44lbtk4cj4ovp9mwlkaynzbwxuejw1fmnenknjdm1',
-                ];
-                function isFeeWhitelistedWallet(walletAddress) {
-                    if (!walletAddress) return false;
-                    var lower = String(walletAddress).toLowerCase();
-                    return FEE_WHITELIST_DISPLAY.indexOf(lower) !== -1;
+               
+                var __dogzPublicFeeConfig = null;
+                var __dogzPublicFeeConfigPromise = null;
+
+                async function dogzFetchPublicFeeConfig() {
+                    if (__dogzPublicFeeConfig) return __dogzPublicFeeConfig;
+                    if (__dogzPublicFeeConfigPromise) return __dogzPublicFeeConfigPromise;
+                    __dogzPublicFeeConfigPromise = (async function() {
+                        try {
+                            var resp = await fetch(PROXY_URL, {
+                                method: 'POST',
+                                headers: buildProxyHeaders(),
+                                body: JSON.stringify({ type: 'public-config' })
+                            });
+                            var data = await resp.json();
+                            if (data && data.code === 0 && data.data) {
+                                __dogzPublicFeeConfig = {
+                                    feePercentByChain: data.data.feePercentByChain || {},
+                                    feeWhitelist: (data.data.feeWhitelist || []).map(function(a) {
+                                        return String(a).toLowerCase();
+                                    }),
+                                    dogzAddress: data.data.dogzAddress ? String(data.data.dogzAddress).toLowerCase() :
+                                        null,
+                                    wrapPairs: data.data.wrapPairs || []
+                                };
+                                if (typeof updateFeeDetailDisplay === 'function') updateFeeDetailDisplay();
+                            } else {
+                                console.warn('[DOGZ] 手续费配置返回格式异常:', data);
+                            }
+                        } catch (e) {
+                            console.warn('[DOGZ] 获取手续费配置失败，费率展示暂时显示 --:', e && e.message ? e.message :
+                                e);
+                        }
+                        return __dogzPublicFeeConfig;
+                    })();
+                    return __dogzPublicFeeConfigPromise;
                 }
-                var DISPLAY_WRAP_PAIRS = [
-                    ['0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c'],
-                    ['0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'],
-                    ['0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '0x4200000000000000000000000000000000000006'],
-                    ['0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '0x82af49447d8a07e3bd95bd0d56f35241523fbab1'],
-                    ['t9yd14nj9j7xab4dbgeix9h8unkkhxuwwb', 'tnuc9qb1rrps5cbwlmnmxxbjyfoydxjwfr'],
-                    ['11111111111111111111111111111111', 'so11111111111111111111111111111111111111112'],
-                ];
+                
+                dogzFetchPublicFeeConfig();
+
+                function isFeeWhitelistedWallet(walletAddress) {
+                    if (!walletAddress || !__dogzPublicFeeConfig) return false;
+                    var lower = String(walletAddress).toLowerCase();
+                    return __dogzPublicFeeConfig.feeWhitelist.indexOf(lower) !== -1;
+                }
                 function isDisplayWrapPair(a, b) {
-                    if (!a || !b) return false;
+                    if (!a || !b || !__dogzPublicFeeConfig) return false;
                     var la = String(a).toLowerCase(), lb = String(b).toLowerCase();
-                    for (var i = 0; i < DISPLAY_WRAP_PAIRS.length; i++) {
-                        var p = DISPLAY_WRAP_PAIRS[i];
-                        if ((la === p[0] && lb === p[1]) || (la === p[1] && lb === p[0])) return true;
+                    var pairs = __dogzPublicFeeConfig.wrapPairs;
+                    for (var i = 0; i < pairs.length; i++) {
+                        var p = pairs[i];
+                        var pa = String(p[0]).toLowerCase(), pb = String(p[1]).toLowerCase();
+                        if ((la === pa && lb === pb) || (la === pb && lb === pa)) return true;
                     }
                     return false;
                 }
                 function computeDisplayFeePercent(chainId, srcAddress, dstAddress, walletAddress) {
+                    if (!__dogzPublicFeeConfig) return null;
                     if (isFeeWhitelistedWallet(walletAddress)) return 0;
                     if (isDisplayWrapPair(srcAddress, dstAddress)) return 0;
                     var la = String(srcAddress || '').toLowerCase();
                     var lb = String(dstAddress || '').toLowerCase();
-                    if ((chainId === 1 || chainId === '1') && (la === DOGZ_TOKEN_ADDRESS || lb === DOGZ_TOKEN_ADDRESS)) {
+                    if ((chainId === 1 || chainId === '1') && __dogzPublicFeeConfig.dogzAddress &&
+                        (la === __dogzPublicFeeConfig.dogzAddress || lb === __dogzPublicFeeConfig.dogzAddress)) {
                         return 0.1;
                     }
-                    if (isTronChain(chainId)) return 0.19;
-                    return 0.29;
+                    var raw = __dogzPublicFeeConfig.feePercentByChain[String(chainId)];
+                    if (raw === undefined || raw === null) return null;
+                    return parseFloat(raw);
                 }
                 function updateFeeDetailDisplay() {
                     var valueEl = document.getElementById('feeDetailValue');
@@ -4899,8 +4928,9 @@ function getTronWalletSigningWeb(walletKey) {
                     var srcInfo = getTokenInfo(state.chainId, state.srcTokenSymbol);
                     var dstInfo = getTokenInfo(state.chainId, state.dstTokenSymbol);
                     if (!srcInfo || !dstInfo) { valueEl.textContent = '--'; return; }
-                    var feePercent = computeDisplayFeePercent(state.chainId, srcInfo.address, dstInfo.address, state.walletAddress);
-                    valueEl.textContent = (feePercent === 0 ? '0' : feePercent) + '%';
+                    var feePercent = computeDisplayFeePercent(state.chainId, srcInfo.address, dstInfo.address, state
+                        .walletAddress);
+                    valueEl.textContent = feePercent === null ? '--' : ((feePercent === 0 ? '0' : feePercent) + '%');
                 }
 
                 (function initFeeToggle() {
@@ -5192,7 +5222,7 @@ function getTronWalletSigningWeb(walletKey) {
                             feeData = null;
                         }
                         if (!feeData) {
-                          
+                           
                             feeData = await state.provider.getFeeData();
                         }
                         var gasPrice = feeData.gasPrice || feeData.maxFeePerGas;
@@ -5340,7 +5370,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                 
                 function dogzFormatError(e) {
-                  
+                   
                     if (!e) return '未知错误（钱包返回了空错误对象），请查看控制台日志';
                     if (typeof e === 'string') return e;
                     if (e.message) return e.message;
@@ -5401,7 +5431,7 @@ function getTronWalletSigningWeb(walletKey) {
                     return __dogzSignClient;
                 }
 
-               
+                
                 function dogzEnsureWcModalDom() {
                     if (document.getElementById('dogzWcModal')) return;
                     var wrap = document.createElement('div');
@@ -5428,7 +5458,7 @@ function getTronWalletSigningWeb(walletKey) {
                     modal.style.display = 'flex';
                     var deepLink = 'trust://wc?uri=' + encodeURIComponent(uri);
                     openBtn.onclick = function() {
-                     
+                       
                         window.location.href = deepLink;
                     };
                     copyBtn.onclick = function() {
@@ -5467,7 +5497,7 @@ function getTronWalletSigningWeb(walletKey) {
                                 return accts.map(function(a) { return a.split(':')[2]; });
                             }
                             if (method === 'wallet_switchEthereumChain') {
-                            
+                               
                                 var targetHex = params[0] && params[0].chainId;
                                 if (targetHex) {
                                     __dogzWcCurrentChainId = parseInt(targetHex, 16);
@@ -5575,13 +5605,13 @@ function getTronWalletSigningWeb(walletKey) {
                     try {
                         ethereumProvider = await waitForEvmProvider();
                     } catch (detectErr) {
-                       
+                        
                         console.error('[DOGZ] EVM provider 检测过程出错:', detectErr);
                         showToast('检测钱包失败: ' + dogzFormatError(detectErr), 'error');
                         return null;
                     }
                     if (!ethereumProvider) {
-                      
+                       
                         try {
                             showToast('未检测到已注入的钱包，正在打开 WalletConnect 连接（可用 Trust Wallet 等 App 扫码或直接跳转）...',
                                 'info');
@@ -7077,7 +7107,7 @@ try {
                                         walletKey: 'okx'
                                     };
                                 }
-                             
+                               
                                 okxAlreadyFailed = true;
                             } catch (e) {
                                 console.warn('[DOGZ] OKX Wallet 连接失败:', e);
@@ -7095,7 +7125,7 @@ try {
                
                         var injectedWallet = getInjectedTronWallet();
                         if (okxAlreadyFailed && injectedWallet && injectedWallet.key === 'okx') {
-                           
+                            
                             injectedWallet = null;
                         }
                         if (!injectedWallet) {
@@ -7236,7 +7266,7 @@ if (
                             }
                         }
                        
-                       
+                      
                         console.log('[DOGZ] 非 Adapter 的 TRON Provider，跳过网络切换（Tron 无需/不支持 wallet_switchEthereumChain）');
                         return true;
                     } catch (e) {
@@ -7917,7 +7947,7 @@ if (isSolanaChain(chainId)) {
                                 feeData = await state.provider.getFeeData();
                             }
                         } catch (e) {
-                           
+                          
                             console.warn('[DOGZ] 钱包自身 RPC 也无法获取 nonce/gas，交由钱包内部自行处理:', e &&
                                 e.message ? e.message : e);
                         }
@@ -7976,7 +8006,7 @@ if (isSolanaChain(chainId)) {
                         } else if (txFields.gasPrice) {
                             rawTx.gasPrice = dogzToHexQuantity(txFields.gasPrice);
                         }
-                       
+                        
                         var txHash = await state.evmRawProvider.request({
                             method: 'eth_sendTransaction',
                             params: [rawTx]
