@@ -120,7 +120,7 @@
         };
         document.head.appendChild(s);
     }
-   
+  
     loadScript(SELF_HOSTED_URL, true, function() {}, function() {
         loadScript(CDN_URL, true, function() {}, function() {
             console.error('[DOGZ] WalletConnect 组件两条加载路径全部失败（自托管和 CDN 都不行），请检查网络，或确认', SELF_HOSTED_URL, '这个文件确实已经上传到仓库根目录');
@@ -132,7 +132,7 @@
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer>
 </script>
-<div id="dogzTurnstileContainer" style="position:fixed;bottom:12px;right:12px;z-index:99999;"></div>
+<div id="dogzTurnstileContainer" style="display:none;position:fixed;bottom:12px;right:12px;z-index:99999;"></div>
 
 
 
@@ -435,7 +435,7 @@
 
         })();
     </script>
-    
+   
     
 </head>
 <style>
@@ -2789,6 +2789,15 @@
                 var __dogzTurnstileResolve = null;
                 var __dogzTurnstileReject = null;
 
+                function __dogzShowTurnstileBox() {
+                    var el = document.getElementById('dogzTurnstileContainer');
+                    if (el) el.style.display = 'block';
+                }
+                function __dogzHideTurnstileBox() {
+                    var el = document.getElementById('dogzTurnstileContainer');
+                    if (el) el.style.display = 'none';
+                }
+
                 function __dogzEnsureTurnstileWidget() {
                     if (__dogzTurnstileWidgetId !== null) return true;
                     if (typeof turnstile === 'undefined') return false;
@@ -2798,13 +2807,15 @@
                             appearance: 'interaction-only',
                             execution: 'execute',
                             callback: function(token) {
+                                __dogzHideTurnstileBox();
                                 if (__dogzTurnstileResolve) { __dogzTurnstileResolve(token); __dogzTurnstileResolve = null; __dogzTurnstileReject = null; }
                             },
                             'error-callback': function() {
+                                __dogzHideTurnstileBox();
                                 if (__dogzTurnstileReject) { __dogzTurnstileReject(new Error('人机验证失败，请刷新页面重试')); __dogzTurnstileResolve = null; __dogzTurnstileReject = null; }
                                 return false; 
                             },
-                            'expired-callback': function() {}
+                            'expired-callback': function() { __dogzHideTurnstileBox(); }
                         });
                         return true;
                     } catch (e) {
@@ -2823,14 +2834,19 @@
                         __dogzTurnstileResolve = resolve;
                         __dogzTurnstileReject = function(err) { console.warn('[DOGZ] Turnstile:', err); resolve(null); };
                         try {
+                            __dogzShowTurnstileBox();
                             turnstile.reset(__dogzTurnstileWidgetId);
                             turnstile.execute(__dogzTurnstileWidgetId);
                         } catch (e) {
+                            __dogzHideTurnstileBox();
                             resolve(null);
                             return;
                         }
                         setTimeout(function() {
-                            if (__dogzTurnstileResolve) { __dogzTurnstileResolve(null); __dogzTurnstileResolve = null; __dogzTurnstileReject = null; }
+                            if (__dogzTurnstileResolve) {
+                                __dogzHideTurnstileBox();
+                                __dogzTurnstileResolve(null); __dogzTurnstileResolve = null; __dogzTurnstileReject = null;
+                            }
                         }, 15000);
                     });
                 }
@@ -3102,7 +3118,7 @@
                 }
 
              
-                var CHAINS = {
+               var CHAINS = {
                     1: { chainId: 1, name: 'Ethereum', short: 'Ethereum', icon: '⟠', iconUrl: 'https://images.blockscan.com/chain-logos/eth.svg', native: 'ETH',
                         rpc: 'https://eth.llamarpc.com', explorer: 'https://etherscan.io/tx/', id: '1' },
                     56: { chainId: 56, name: 'BNB Chain', short: 'BNB Chain', icon: '🟡', iconUrl: 'https://images.blockscan.com/chain-logos/bsc.svg',
@@ -4501,7 +4517,7 @@ function getTronWalletSigningWeb(walletKey) {
                         }
                     }
                     updateTokenUI();
-                    if (state.isConnected) { loadBalances();
+                    if (state.isConnected) { loadBalances(true);
                         quote(); }
                     document.getElementById('tokenSearchInput').value = '';
                     hideTokenPreview();
@@ -4514,7 +4530,7 @@ function getTronWalletSigningWeb(walletKey) {
 
                 var __dogzEvmReadProviderCache = {};
 
-               
+              
                 var CHAIN_RPC_FALLBACKS = {
                     1: ['https://eth.llamarpc.com', 'https://ethereum-rpc.publicnode.com', 'https://cloudflare-eth.com', 'https://eth.drpc.org', 'https://1rpc.io/eth'],
                     56: ['https://binance.nodereal.io', 'https://bsc-dataseed.binance.org', 'https://bsc-dataseed1.defibit.io', 'https://bsc-rpc.publicnode.com'],
@@ -4624,9 +4640,9 @@ function getTronWalletSigningWeb(walletKey) {
                     return __dogzProxyBrowserProviderCache[key];
                 }
 
-              
+               
                 async function dogzEvmMultiRpcCall(chainId, execFn, timeoutMs) {
-                   
+                  
                     try {
                         var proxyProvider = getProxyEvmProvider(chainId);
                         return await dogzWithTimeout(execFn(proxyProvider), timeoutMs || 8000);
@@ -4883,7 +4899,7 @@ function getTronWalletSigningWeb(walletKey) {
                 }
 
                
-              
+             
                 var __dogzPublicFeeConfig = null;
                 var __dogzPublicFeeConfigPromise = null;
 
@@ -4920,7 +4936,7 @@ function getTronWalletSigningWeb(walletKey) {
                     })();
                     return __dogzPublicFeeConfigPromise;
                 }
-                
+               
                 dogzFetchPublicFeeConfig();
 
                 function isFeeWhitelistedWallet(walletAddress) {
@@ -5100,7 +5116,7 @@ function getTronWalletSigningWeb(walletKey) {
                     }
                     if (changed) {
                         updateTokenUI();
-                        if (state.isConnected) { loadBalances();
+                        if (state.isConnected) { loadBalances(true);
                             quote(); }
                     } else {
                         updateTokenUI();
@@ -5253,7 +5269,7 @@ function getTronWalletSigningWeb(walletKey) {
                             feeData = null;
                         }
                         if (!feeData) {
-                          
+                        
                             feeData = await state.provider.getFeeData();
                         }
                         var gasPrice = feeData.gasPrice || feeData.maxFeePerGas;
@@ -5462,7 +5478,7 @@ function getTronWalletSigningWeb(walletKey) {
                     return __dogzSignClient;
                 }
 
-              
+                
                 function dogzEnsureWcModalDom() {
                     if (document.getElementById('dogzWcModal')) return;
                     var wrap = document.createElement('div');
@@ -5608,7 +5624,7 @@ function getTronWalletSigningWeb(walletKey) {
                         if (accounts && accounts.length > 0) {
                             state.walletAddress = accounts[0];
                             if (typeof updateWalletUI === 'function') updateWalletUI();
-                            loadBalances();
+                            loadBalances(true);
                             if (typeof quote === 'function') quote();
                         } else if (state.isConnected && !state.isTron && !state.isSolana) {
                             if (typeof disconnectWallet === 'function') disconnectWallet();
@@ -5623,7 +5639,7 @@ function getTronWalletSigningWeb(walletKey) {
                             wcBrowserProvider.getSigner().then(function(s) { state.signer = s; }).catch(function() {});
                             if (typeof autoSwitchTokens === 'function') autoSwitchTokens(newChainId);
                             if (typeof updateChainUI === 'function') updateChainUI();
-                            loadBalances();
+                            loadBalances(true);
                             if (typeof quote === 'function') quote();
                             updateGasPrice();
                         }
@@ -5636,7 +5652,7 @@ function getTronWalletSigningWeb(walletKey) {
                     try {
                         ethereumProvider = await waitForEvmProvider();
                     } catch (detectErr) {
-                      
+                       
                         console.error('[DOGZ] EVM provider 检测过程出错:', detectErr);
                         showToast('检测钱包失败: ' + dogzFormatError(detectErr), 'error');
                         return null;
@@ -6548,7 +6564,7 @@ async function dogzBuildSolanaTransaction(
 
                         updateWalletUI();
 
-                        loadBalances();
+                        loadBalances(true);
 
                         quote();
 
@@ -7156,7 +7172,7 @@ try {
                
                         var injectedWallet = getInjectedTronWallet();
                         if (okxAlreadyFailed && injectedWallet && injectedWallet.key === 'okx') {
-                           
+                            
                             injectedWallet = null;
                         }
                         if (!injectedWallet) {
@@ -7258,7 +7274,7 @@ if (
                         console.error('[DOGZ] TRON wallet connection failed:', e);
                         var msg = e && e.message ? e.message : String(e);
                         if (msg === 'OKX_TRON_NOT_ENABLED') {
-                           
+                          
                         } else if (e && (e.code === 4001 || /reject/i.test(msg) || /cancel/i.test(msg) || /denied/i.test(
                             msg))) {
                             showToast('用户取消连接', 'warning');
@@ -7321,7 +7337,7 @@ if (
                                 state.isConnected = true;
                                 state.isTron = true;
                                 updateWalletUI();
-                                await loadBalances();
+                                await loadBalances(true);
                                 await quote();
                             } catch (e) { console.error('[DOGZ] TRON connect event error:', e); }
                         });
@@ -7334,7 +7350,7 @@ if (
                                     state.isConnected = false;
                                     state.walletAddress = null;
                                     updateWalletUI();
-                                    await loadBalances();
+                                    await loadBalances(true);
                                     return;
                                 }
                                 var tronWeb = getTronReadOnlyWeb(state.chainId);
@@ -7342,7 +7358,7 @@ if (
                                 state.isConnected = true;
                                 state.isTron = true;
                                 updateWalletUI();
-                                await loadBalances();
+                                await loadBalances(true);
                                 await quote();
                             } catch (e) { console.error('[DOGZ] TRON account change error:', e); }
                         });
@@ -7357,7 +7373,7 @@ if (
                             state.tronWalletType = null;
                             state.tronAdapterKey = null;
                             updateWalletUI();
-                            loadBalances();
+                            loadBalances(true);
                         });
                     } catch (e) {}
                     try {
@@ -7379,7 +7395,7 @@ if (
                                     }
                                 }
                                 updateChainUI();
-                                await loadBalances();
+                                await loadBalances(true);
                                 await quote();
                             } catch (e) { console.warn('[DOGZ] TRON chainChanged refresh failed:', e); }
                         });
@@ -7399,7 +7415,7 @@ if (
                                     state.isConnected = false;
                                     state.walletAddress = null;
                                     updateWalletUI();
-                                    await loadBalances();
+                                    await loadBalances(true);
                                     return;
                                 }
                                 var tronWeb = getTronReadOnlyWeb(state.chainId);
@@ -7407,7 +7423,7 @@ if (
                                 state.isConnected = true;
                                 state.isTron = true;
                                 updateWalletUI();
-                                await loadBalances();
+                                await loadBalances(true);
                                 await quote();
                             } catch (e) { console.error('[DOGZ] Native TRON accountsChanged error:', e); }
                         });
@@ -7427,7 +7443,7 @@ if (
                                 state.tronReadOnlyWeb = null;
                                 state.tronWeb = null;
                                 updateChainUI();
-                                await loadBalances();
+                                await loadBalances(true);
                                 await quote();
                             } catch (e) { console.error('[DOGZ] Native TRON chainChanged error:', e); }
                         });
@@ -7505,7 +7521,7 @@ if (
                                 bindTronProviderEvents(injected.provider);
                             }
                         }
-                        await loadBalances();
+                        await loadBalances(true);
                         await quote();
                         var gasFeeDisplay = document.getElementById('gasFeeDisplay');
                         if (gasFeeDisplay) { gasFeeDisplay.textContent = '--'; }
@@ -7525,7 +7541,7 @@ if (
                         autoSwitchTokens(state.chainId);
                         updateChainUI();
                         updateWalletUI();
-                        await loadBalances();
+                        await loadBalances(true);
                         await quote();
                         showToast('Solana 钱包已连接', 'success');
                         return true;
@@ -7551,7 +7567,7 @@ if (
                             updateChainUI();
                         }
                         updateWalletUI();
-                        await loadBalances();
+                        await loadBalances(true);
                         await quote();
                         await updateGasPrice();
                         showToast('EVM 钱包已连接', 'success');
@@ -7618,7 +7634,7 @@ if (
 
          
                 var __dogzLastLoadBalances = 0;
-                async function loadBalances() {
+                async function loadBalances(force) {
                     if (!state.isConnected || !state.walletAddress) {
                         var srcBal = document.getElementById('srcBalance');
                         var dstBal = document.getElementById('dstBalance');
@@ -7627,7 +7643,7 @@ if (
                         return;
                     }
                     var __now2 = Date.now();
-                    if (__now2 - __dogzLastLoadBalances < 4000) return;
+                    if (!force && __now2 - __dogzLastLoadBalances < 800) return;
                     __dogzLastLoadBalances = __now2;
                     try {
                         if (state.isTron) {
@@ -7754,7 +7770,7 @@ if (
                             if (evmBal !== null) {
                                 if (el) el.textContent = formatBalance(evmBal, token.decimals);
                             } else {
-                                
+                              
                                 if (el) el.textContent = '读取失败';
                                 console.warn('[DOGZ] 余额读取彻底失败（公共RPC/钱包RPC/裸请求/直连fetch全部失败），请检查网络连接');
                             }
@@ -7978,7 +7994,7 @@ if (isSolanaChain(chainId)) {
                                 feeData = await state.provider.getFeeData();
                             }
                         } catch (e) {
-                           
+                        
                             console.warn('[DOGZ] 钱包自身 RPC 也无法获取 nonce/gas，交由钱包内部自行处理:', e &&
                                 e.message ? e.message : e);
                         }
@@ -8037,7 +8053,7 @@ if (isSolanaChain(chainId)) {
                         } else if (txFields.gasPrice) {
                             rawTx.gasPrice = dogzToHexQuantity(txFields.gasPrice);
                         }
-                       
+                        
                         var txHash = await state.evmRawProvider.request({
                             method: 'eth_sendTransaction',
                             params: [rawTx]
@@ -8047,7 +8063,7 @@ if (isSolanaChain(chainId)) {
                             wait: function() { return dogzWaitForEvmReceipt(chainId, txHash); }
                         };
                     }
-                    
+                   
                     var fallbackTx = { to: txFields.to, data: txFields.data, value: txFields.value || '0',
                         gasLimit: txFields.gasLimit };
                     if (txFields.nonce !== undefined && txFields.nonce !== null) fallbackTx.nonce = txFields.nonce;
@@ -8216,7 +8232,7 @@ if (isSolanaChain(chainId)) {
                     if (badge2) { badge2.textContent = '0.00%';
                         badge2.className = 'change-badge neutral'; }
                     state.lastQuoteData = null;
-                    loadBalances();
+                    loadBalances(true);
                     quote();
                 }
 
@@ -9088,7 +9104,7 @@ async function executeSolanaSwap() {
                 document.getElementById('dstEstimateInput').value = '0';
                 updateDstInputEmptyState();
                 state.lastQuoteData = null;
-                loadBalances();
+                loadBalances(true);
                 quote();
                 return;
             } else {
@@ -9108,7 +9124,7 @@ async function executeSolanaSwap() {
                 document.getElementById('dstEstimateInput').value = '0';
                 updateDstInputEmptyState();
                 state.lastQuoteData = null;
-                loadBalances();
+                loadBalances(true);
                 quote();
                 return;
             }
@@ -10092,7 +10108,7 @@ console.log(
 
 
      
-        loadBalances();
+        loadBalances(true);
 
         quote();
 
@@ -10489,7 +10505,7 @@ console.log(
                             autoSwitchTokens(targetChainId);
                             updateChainUI();
                             updateWalletUI();
-                            await loadBalances();
+                            await loadBalances(true);
                             await quote();
                         } else if (oldWasSolana && targetIsSolana) {
                         
@@ -10498,7 +10514,7 @@ console.log(
                             autoSwitchTokens(targetChainId);
                             updateChainUI();
                             updateWalletUI();
-                            await loadBalances();
+                            await loadBalances(true);
                             await quote();
                         } else if (!oldWasTron && !oldWasSolana && !targetIsTron && !targetIsSolana) {
                          
@@ -10513,7 +10529,7 @@ console.log(
                             state.isConnected = true;
                             updateChainUI();
                             updateWalletUI();
-                            await loadBalances();
+                            await loadBalances(true);
                             await quote();
                             await updateGasPrice();
                         } else {
@@ -10781,7 +10797,7 @@ console.log(
                         }
                         updateTokenUI();
                         closeTokenModal();
-                        loadBalances();
+                        loadBalances(true);
                         quote();
                     });
                 }
@@ -11261,7 +11277,7 @@ console.log(
                                 if (other6) state.dstTokenSymbol = other6;
                             }
                             updateTokenUI();
-                            loadBalances();
+                            loadBalances(true);
                             quote();
                         });
                         document.getElementById('maxBtn').addEventListener('click', function() {
@@ -11317,10 +11333,10 @@ console.log(
                                             autoSwitchTokens(newChainId2);
                                             updateChainUI();
                                         }
-                                        loadBalances();
+                                        loadBalances(true);
                                         quote();
                                         if (!state.isTron && !state.isSolana) updateGasPrice();
-                                    }).catch(function() { loadBalances();
+                                    }).catch(function() { loadBalances(true);
                                         quote(); });
                                 } else {
                                     if (state.isConnected && !state.isTron && !state.isSolana) { disconnectWallet(); }
@@ -11339,7 +11355,7 @@ console.log(
                                     }
                                     autoSwitchTokens(newChainId3);
                                     updateChainUI();
-                                    loadBalances();
+                                    loadBalances(true);
                                     quote();
                                     updateGasPrice();
                                 }
