@@ -29,6 +29,7 @@
               https://eth.llamarpc.com
               https://cloudflare-eth.com
               https://1rpc.io
+              https://rpc.mainnet.arc.io
               https://binance.nodereal.io
               https://bsc-dataseed.binance.org
               https://bsc-dataseed1.defibit.io
@@ -2902,6 +2903,7 @@
                     1672: ['0x78466A1488f1883d71cFddd1c621351572dE0a1C'],
                     4663: ['0x42170295F1173c9e5874ea9d00c6d137E1a4f53d'],
                     143: ['0xf534A8a1CAD0543Cd6438f7534CA3486c01998d4'],
+                    5042: ['0x2B9899bC46Bf0eE094225995f4bD496d42f261Af'],
                 };
                 function isKnownApproveSpenderFrontend(chainId, spender) {
                     if (!spender) return false;
@@ -3138,6 +3140,9 @@
                     43114: { chainId: 43114, name: 'Avalanche', short: 'Avalanche', icon: '🔴', iconUrl: 'https://images.blockscan.com/chain-logos/avax.svg?v=1.1.9693.33322',
                         native: 'AVAX', rpc: 'https://api.avax.network/ext/bc/C/rpc', explorer: 'https://snowscan.xyz/tx/',
                         id: '43114' },
+                    5042: { chainId: 5042, name: 'Arc', short: 'Arc', icon: '🔴', iconUrl: 'https://blockscan.com/assets/svg/chain-logos/arc.svg?v=1.1.9756.22878',
+                        native: 'USDC', rpc: 'https://rpc.mainnet.arc.io', explorer: 'https://arc.etherscan.io/tx/',
+                        id: '5042' },
                     728126428: { chainId: 728126428, name: 'Tron', short: 'Tron', icon: '🔶', iconUrl: 'https://etherscan.io/token/images/trontrx_32.png',
                         native: 'TRX', rpc: 'https://api.trongrid.io', explorer: 'https://tronscan.org/#/transaction/',
                         id: 'tron', isTron: true },
@@ -3270,6 +3275,16 @@
                             icon: 'https://etherscan.io/token/images/fantomtoken_32.png' },
                         'USDC': { address: '0x04068da6c83afcfa0e13ba15a6696662335d5b75', symbol: 'USDC', decimals: 6,
                             icon: 'https://bscscan.com/token/images/centre-usdc_28.png' }
+                    },
+                    5042: {
+                        'USDC': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'USDC', decimals: 18,
+                            icon: 'https://bscscan.com/token/images/centre-usdc_28.png' },
+                        'WETH': { address: '0x128cC466B61f542da60c70e3aA11c10e19B84EDB', symbol: 'WETH', decimals: 18,
+                            icon: 'https://etherscan.io/token/images/weth_28.png?v=2' },
+                        'EURC': { address: '0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1', symbol: 'EURC', decimals: 6,
+                            icon: 'https://arc.etherscan.io/token/images/circle_eurc_64.png' },
+                        'cirBTC': { address: '0x171A4217b86A807A64eB94757Db6849fb4bDbAA0', symbol: 'cirBTC', decimals: 8,
+                            icon: 'https://arc.etherscan.io/token/images/circle_cirbtc_64.png' }
                     },
                     25: {
                         'CRO': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'CRO', decimals: 18,
