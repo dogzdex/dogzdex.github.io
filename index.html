@@ -49,6 +49,8 @@
               https://rpc.hypurrscan.io
               https://infra.originstake.com
               https://api.mainnet-beta.solana.com
+              https://arc-rpc.publicnode.com
+              https://zeta-chain.drpc.org
               https://*.walletconnect.com
               https://*.walletconnect.org
               wss://*.walletconnect.com
@@ -2903,6 +2905,7 @@
                     4663: ['0x42170295F1173c9e5874ea9d00c6d137E1a4f53d'],
                     143: ['0xf534A8a1CAD0543Cd6438f7534CA3486c01998d4'],
                     5042: ['0x2B9899bC46Bf0eE094225995f4bD496d42f261Af'],
+                    7000: ['0x03B5ACdA01207824cc7Bc21783Ee5aa2B8d1D2fE'],
                 };
                 function isKnownApproveSpenderFrontend(chainId, spender) {
                     if (!spender) return false;
@@ -3185,6 +3188,8 @@
                         native: 'INK', rpc: 'https://ink.drpc.org', explorer: 'https://explorer.inkonchain.com/tx', id: '57073' },
                     143: { chainId: 143, name: 'Monad', short: 'Monad', icon: '🔮', iconUrl: 'https://app.debridge.com/assets/images/chain/monad.svg',
                         native: 'MON', rpc: 'https://infra.originstake.com/monad/evm', explorer: 'https://monadscan.com/tx/', id: '143' },
+                    7000: { chainId: 7000, name: 'Zeta', short: 'Zeta', icon: '🔮', iconUrl: 'https://assets.coingecko.com/coins/images/35398/large/wzeta.png?1708490516',
+                        native: 'Zeta', rpc: 'https://zeta-chain.drpc.org', explorer: 'https://zetascan.com/tx/', id: '7000' },
                    
                     501: { chainId: 501, name: 'Solana', short: 'Solana', icon: '◎', iconUrl: 'https://tokens.debridge.finance/Logo/56/0x570a5d26f7765ecb712c0924e4de545b89fd43df/big/token-logo.png', native: 'SOL',
                         rpc: 'https://api.mainnet-beta.solana.com', explorer: 'https://solscan.io/tx/', id: 'solana', isSolana: true }
@@ -3717,6 +3722,28 @@
                             icon: 'https://tokens.debridge.finance/Logo/1/0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d/big/token-logo.png' },
                         'USDT': { address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', symbol: 'USDT', decimals: 6,
                             icon: 'https://tokens.debridge.finance/Logo/56/0x55d398326f99059ff775485246999027b3197955/big/token-logo.png' }
+                    },
+                    7000: {
+                        
+                        'USDT.ETH': { address: '0x7c8dDa80bbBE1254a7aACf3219EBe1481c6E01d7', symbol: 'USDT.ETH', decimals: 6,
+                            icon: 'https://tokens.debridge.finance/Logo/56/0x55d398326f99059ff775485246999027b3197955/big/token-logo.png' },
+                        'USDT.BSC': { address: '0x91d4F0D54090Df2D81e834c3c8CE71C6c865e79F', symbol: 'USDT.BSC', decimals: 18,
+                            icon: 'https://tokens.debridge.finance/Logo/56/0x55d398326f99059ff775485246999027b3197955/big/token-logo.png' },
+                        'USDC.BSC': { address: '0x05BA149A7bd6dC1F937fA9046A9e05C05f3b18b0', symbol: 'USDC.BSC', decimals: 18,
+                            icon: 'https://tokens.debridge.finance/Logo/42161/0xaf88d065e77c8cc2239327c5edb3a432268e5831/big/token-logo.png' },
+                        'USDC.ETH': { address: '0x0cbe0dF132a6c6B4a2974Fa1b7Fb953CF0Cc798a', symbol: 'USDC.ETH', decimals: 6,
+                            icon: 'https://tokens.debridge.finance/Logo/42161/0xaf88d065e77c8cc2239327c5edb3a432268e5831/big/token-logo.png' },
+                        
+                        'BTC.BTC': { address: '0x13A0c5930C028511Dc02665E7285134B6d11A5f4', symbol: 'BTC.BTC', decimals: 8,
+                            icon: 'https://assets.coingecko.com/coins/images/35419/large/BTC.png?1708525043' },
+                        'BNB.BSC': { address: '0x48f80608B672DC30DC7e3dbBd0343c5F02C738Eb', symbol: 'BNB.BSC', decimals: 18,
+                            icon: 'https://images.blockscan.com/chain-logos/bsc.svg' },
+                       
+                        'ZETA': { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', symbol: 'ZETA', decimals: 18,
+                            icon: 'https://assets.coingecko.com/coins/images/35398/large/wzeta.png?1708490516' },
+                        
+                        'WZETA': { address: '0x5F0b1a82749cb4E2278EC87F8BF6B618dC71a8bf', symbol: 'WZETA', decimals: 18,
+                            icon: 'https://assets.coingecko.com/coins/images/35398/large/wzeta.png?1708490516' }
                     },
                    
                     501: {
